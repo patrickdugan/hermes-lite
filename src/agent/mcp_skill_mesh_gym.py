@@ -853,6 +853,8 @@ def run_live_registered(
     min_free_mb: int,
     max_temp_c: int,
     external_pressure_monitor: bool = False,
+    resource_run_id: str = "",
+    inter_cell_delay_s: float = 0.0,
 ) -> dict[str, Any]:
     receipt = verify_registration(registration_dir, confirm_registration_id)
     config = read_json(registration_dir / "protocol.json")
@@ -961,6 +963,7 @@ def run_live_registered(
                     "raw_content": content[:2000],
                     "pressure_before": pressure_before,
                     "pressure_after": pressure_after,
+                    "resource_run_id": resource_run_id,
                 }
                 rows.append(row)
                 write_json_atomic(_live_cell_receipt_path(cell_receipt_dir, row), row)
@@ -971,6 +974,8 @@ def run_live_registered(
                 if not pressure_after.get("passed", False):
                     abort_reason = "resource_pressure_gate"
                     break
+                if inter_cell_delay_s > 0:
+                    time.sleep(inter_cell_delay_s)
             if abort_reason:
                 break
         if abort_reason:
@@ -1042,9 +1047,80 @@ def run_live_registered(
         "smoke_receipt": str(output_dir / f"live_{stage}_smoke.json"),
         "claim_boundary": config["claim_scope"],
         "pressure_monitor": "external_wrapper" if external_pressure_monitor else "in_process",
+        "resource_run_id": resource_run_id,
+        "inter_cell_delay_s": inter_cell_delay_s,
     }
     write_json(output_dir / f"live_{stage}_summary.json", summary)
     return summary
+
+
+def attest_live_resources(output_dir: Path, *, stage: str, registration_id: str) -> dict[str, Any]:
+    if stage not in {"screening", "confirmation"}:
+        raise ValueError("stage must be screening or confirmation")
+    cells_path = output_dir / f"live_{stage}_cells.jsonl"
+    summary_path = output_dir / f"live_{stage}_summary.json"
+    if not cells_path.exists() or not summary_path.exists():
+        raise ValueError("resource attestation requires completed cells and summary")
+    rows = read_jsonl(cells_path)
+    summary = read_json(summary_path)
+    if summary.get("registration_id") != registration_id or summary.get("status") != "completed":
+        raise ValueError("resource attestation requires the completed registered stage")
+    completed = [row for row in rows if row.get("status") == "completed"]
+    expected = int(summary.get("expected_cells", 0))
+    if len(completed) != expected or len(rows) != expected:
+        raise ValueError("resource attestation requires exactly the expected completed cells")
+
+    grouped: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for row in completed:
+        run_id = str(row.get("resource_run_id") or "")
+        if not run_id:
+            raise ValueError("completed cell is missing resource_run_id")
+        grouped[run_id].append(row)
+
+    accepted_aborts = {"gpu_pressure_gate", "wall_clock_cap"}
+    chunks: list[dict[str, Any]] = []
+    for run_id, run_rows in sorted(grouped.items()):
+        receipt_path = output_dir / "wrappers" / run_id / "resource_receipt.json"
+        if not receipt_path.exists():
+            raise ValueError(f"missing resource receipt for {run_id}")
+        receipt = read_json(receipt_path)
+        if receipt.get("registration_id") != registration_id or receipt.get("stage") != stage:
+            raise ValueError(f"resource receipt identity mismatch for {run_id}")
+        status = str(receipt.get("status") or "")
+        abort_reason = str(receipt.get("abort_reason") or "")
+        accepted_status = status == "completed" or (status == "aborted" and abort_reason in accepted_aborts)
+        cap_passed = bool((receipt.get("cap_enforcement") or {}).get("passed"))
+        cleanup_passed = bool((receipt.get("cleanup") or {}).get("passed"))
+        if not accepted_status or not cap_passed or not cleanup_passed:
+            raise ValueError(f"resource receipt is not admissible for {run_id}")
+        chunks.append(
+            {
+                "run_id": run_id,
+                "completed_cells": len(run_rows),
+                "status": status,
+                "abort_reason": abort_reason,
+                "peak_job_memory_mb": receipt.get("peak_ram_mb", 0),
+                "peak_io_mb_s": receipt.get("peak_io_mb_s", 0),
+                "resource_receipt_sha256": sha256_file(receipt_path),
+                "cap_enforcement_passed": cap_passed,
+                "cleanup_passed": cleanup_passed,
+            }
+        )
+
+    attestation = {
+        "schema": "hermes.mcp_skill_mesh_resource_attestation.v0",
+        "created_at": utc_now(),
+        "registration_id": registration_id,
+        "stage": stage,
+        "completed_cells": len(completed),
+        "expected_cells": expected,
+        "resource_run_count": len(chunks),
+        "all_completed_cells_cap_valid": sum(chunk["completed_cells"] for chunk in chunks) == expected,
+        "cells_sha256": sha256_file(cells_path),
+        "chunks": chunks,
+    }
+    write_json_atomic(output_dir / f"live_{stage}_resource_attestation.json", attestation)
+    return attestation
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -1075,6 +1151,13 @@ def build_parser() -> argparse.ArgumentParser:
     live.add_argument("--min-free-mb", type=int, default=512)
     live.add_argument("--max-temp-c", type=int, default=86)
     live.add_argument("--external-pressure-monitor", action="store_true")
+    live.add_argument("--resource-run-id", default="")
+    live.add_argument("--inter-cell-delay-s", type=float, default=0.0)
+
+    attest = sub.add_parser("attest-resources", help="Bind completed cells to cap-valid wrapper receipts")
+    attest.add_argument("--output-dir", required=True)
+    attest.add_argument("--stage", choices=["screening", "confirmation"], default="screening")
+    attest.add_argument("--registration-id", required=True)
     return parser
 
 
@@ -1086,7 +1169,7 @@ def main(argv: Optional[list[str]] = None) -> int:
         result = verify_registration(Path(args.registration_dir), args.registration_id)
     elif args.command == "calibrate":
         result = calibrate_registered(Path(args.registration_dir), Path(args.output_dir))
-    else:
+    elif args.command == "live":
         result = run_live_registered(
             Path(args.registration_dir),
             Path(args.output_dir),
@@ -1099,6 +1182,14 @@ def main(argv: Optional[list[str]] = None) -> int:
             min_free_mb=args.min_free_mb,
             max_temp_c=args.max_temp_c,
             external_pressure_monitor=args.external_pressure_monitor,
+            resource_run_id=args.resource_run_id,
+            inter_cell_delay_s=args.inter_cell_delay_s,
+        )
+    else:
+        result = attest_live_resources(
+            Path(args.output_dir),
+            stage=args.stage,
+            registration_id=args.registration_id,
         )
     print(json.dumps(result, indent=2, sort_keys=True))
     return 0 if result.get("status") not in {"aborted", "construction_failure"} else 1

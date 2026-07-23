@@ -28,6 +28,7 @@ param(
   [int]$MaxTempC = 86,
   [int]$StartupSeconds = 120,
   [int]$RequestTimeoutSeconds = 180,
+  [int]$InterCellDelaySeconds = 5,
   [switch]$ValidateOnly,
   [switch]$JobObjectProbe
 )
@@ -260,6 +261,7 @@ $manifest = [ordered]@{
     fit = "on"
     fit_target_mb = $FitTargetMb
     request_timeout_seconds = $RequestTimeoutSeconds
+    inter_cell_delay_seconds = $InterCellDelaySeconds
   }
   checkpoint_cadence = "after every live cell"
   chunk_strategy = "one case-arm response per request"
@@ -438,7 +440,9 @@ $evalArgs = @(
   "--max-tokens", "128",
   "--min-free-mb", "$MinFreeVramMb",
   "--max-temp-c", "$MaxTempC",
-  "--external-pressure-monitor"
+  "--external-pressure-monitor",
+  "--resource-run-id", $RunId,
+  "--inter-cell-delay-s", "$InterCellDelaySeconds"
 )
 
 $server = $null

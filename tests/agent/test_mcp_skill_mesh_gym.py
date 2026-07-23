@@ -12,6 +12,7 @@ from agent.mcp_skill_mesh_gym import (
     _confirmation_arms,
     _score_live_response,
     _read_live_checkpoints,
+    attest_live_resources,
     append_jsonl,
     build_mesh_packet,
     calibrate_registered,
@@ -249,3 +250,59 @@ def test_live_checkpoint_preserves_non_completed_status_for_lane_rejection(tmp_p
     write_json_atomic(receipt_dir / "receipt.json", row)
 
     assert _read_live_checkpoints(cells_path, receipt_dir) == [row]
+
+
+def test_resource_attestation_binds_each_cell_to_cap_valid_wrapper(tmp_path):
+    registration_id = "registered-id"
+    rows = [
+        {
+            "task_id": f"logic.l0{index}",
+            "arm": "typed_packet",
+            "seed": 17,
+            "status": "completed",
+            "resource_run_id": run_id,
+        }
+        for index, run_id in enumerate(("chunk-a", "chunk-b"), start=1)
+    ]
+    append_jsonl(tmp_path / "live_screening_cells.jsonl", rows)
+    (tmp_path / "live_screening_summary.json").write_text(
+        json.dumps(
+            {
+                "registration_id": registration_id,
+                "status": "completed",
+                "expected_cells": 2,
+            }
+        ),
+        encoding="utf-8",
+    )
+    for run_id, status, abort_reason in (
+        ("chunk-a", "aborted", "gpu_pressure_gate"),
+        ("chunk-b", "completed", ""),
+    ):
+        wrapper_dir = tmp_path / "wrappers" / run_id
+        wrapper_dir.mkdir(parents=True)
+        (wrapper_dir / "resource_receipt.json").write_text(
+            json.dumps(
+                {
+                    "registration_id": registration_id,
+                    "stage": "screening",
+                    "status": status,
+                    "abort_reason": abort_reason,
+                    "peak_ram_mb": 1500,
+                    "peak_io_mb_s": 1,
+                    "cap_enforcement": {"passed": True},
+                    "cleanup": {"passed": True},
+                }
+            ),
+            encoding="utf-8",
+        )
+
+    result = attest_live_resources(
+        tmp_path,
+        stage="screening",
+        registration_id=registration_id,
+    )
+
+    assert result["all_completed_cells_cap_valid"] is True
+    assert result["completed_cells"] == 2
+    assert result["resource_run_count"] == 2

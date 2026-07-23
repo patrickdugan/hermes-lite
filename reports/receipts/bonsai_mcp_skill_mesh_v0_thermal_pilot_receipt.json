@@ -1,0 +1,21 @@
+{
+  "schema": "hermes.mcp_skill_mesh_thermal_pilot.v0",
+  "study_id": "bonsai_mcp_skill_mesh_complexity_v0",
+  "registration_id": "fdaa6dce3853b05e8dba52cf0b1c935b32123e25e746bdce317708616767679f",
+  "run_id": "bonsai-mcp-mesh-screening-20260723-145112",
+  "status": "aborted",
+  "abort_reason": "gpu_pressure_gate",
+  "completed_cells": 12,
+  "admissible_primary_cells": 0,
+  "pilot_cells": 12,
+  "cells_sha256": "ff0df2ae553b8e558b0d93e9cafd2d7332ce50fa549e868aecdff99620ff48eb",
+  "cell_receipt_count": 12,
+  "resource_receipt_sha256": "bf48bf98692ba92dba0bf2a8aee559f6a2b59b3154311ee9dead27fe607055f4",
+  "peak_job_memory_mb": 1566.066,
+  "cap_enforcement_passed": true,
+  "cleanup_passed": true,
+  "max_temp_c": 86,
+  "raw_artifact_root": "experiments/mcp_skill_mesh_v0/thermal_pilot_ctx6144_20260723-145112",
+  "exclusion_reason": "Rows predate per-cell resource_run_id and are retained only as a thermal feasibility pilot.",
+  "claim": "The ctx6144 CUDA runtime is inference-feasible under the host-memory cap but requires duty-cycle control to remain under the frozen thermal gate."
+}
