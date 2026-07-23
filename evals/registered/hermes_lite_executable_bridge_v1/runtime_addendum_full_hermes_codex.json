@@ -1,0 +1,59 @@
+{
+  "schema": "hermes.full_hermes_runtime_addendum.v1",
+  "addendum_id": "b1c62a073a36cac7c98e78152f0bf94f3db6804444815b425cc6eb793c0d5526",
+  "addendum_id_definition": "SHA-256 of canonical JSON with addendum_id and addendum_id_definition omitted",
+  "study_id": "hermes_lite_executable_bridge_v1",
+  "registration_id": "9255e3b4e1395ab18d73f6bc33bdae05a93c165ade71ce06944f0fddfe043d00",
+  "authored_after_failed_attempts": true,
+  "benchmark_responses_consumed": 0,
+  "preceding_failures": [
+    {
+      "route": "direct OpenAI gpt-4.1",
+      "valid_model_responses": 0,
+      "classification": "invalid credential"
+    },
+    {
+      "route": "OpenRouter openai/gpt-4.1",
+      "valid_model_responses": 0,
+      "classification": "invalid credential"
+    },
+    {
+      "route": "Hermes openai-codex gpt-5.2-codex and gpt-5.3-codex smoke",
+      "valid_model_responses": 0,
+      "classification": "models unavailable to the configured ChatGPT account"
+    }
+  ],
+  "prospective_change": {
+    "provider": "openai-codex",
+    "base_url": "https://chatgpt.com/backend-api/codex",
+    "model": "gpt-5.6-sol",
+    "credential_source": "~/.codex/auth.json loaded in memory",
+    "fresh_output_lane": "full_hermes_codex_56",
+    "context_budget_tokens": 160000,
+    "runtime_compatibility": [
+      "Bind the current Codex account id header.",
+      "Omit tools when Hermes preflight produces null rather than an empty list.",
+      "Omit max_output_tokens because the ChatGPT Codex route rejects that field.",
+      "Reconstruct the final Hermes message verbatim from response.output_text.delta events when the completed envelope has an empty output list."
+    ],
+    "output_limit": "The frozen concise JSON contract remains prompt-enforced; responses longer than 4000 characters are rejected before scoring."
+  },
+  "provider_smoke": {
+    "completed_before_benchmark_outcomes": true,
+    "exact_contract_match": true,
+    "response_characters": 15,
+    "model": "gpt-5.6-sol",
+    "tool_surface": "none"
+  },
+  "unchanged": {
+    "prompts_sha256": "93017a1cd71885dd654d323b51d8833832f30b604f8d3904a69bc83572b3ad5e",
+    "prompt_count": 8,
+    "max_packet_tokens_est": 7048,
+    "context_budget_tokens": 160000,
+    "tool_surface": "none",
+    "scorer": "frozen executable bridge v1 scorer",
+    "task_split": "frozen executable bridge v1 held split"
+  },
+  "interpretation": "This is a post-registration substitute denominator and must be reported separately from the unavailable preregistered GPT-4.1 denominator. It is a stricter, newer model comparison, not a completed GPT-4.1 baseline.",
+  "claim_boundary": "The run tests eight roughly 7k-token synthetic MCP action-sequencing packets under a 160k configured context budget. It does not test 160k-length retrieval, general agent capability, or broad alignment."
+}

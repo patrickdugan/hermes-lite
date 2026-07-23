@@ -25,6 +25,8 @@ from scripts.run_full_hermes_baseline_v1 import (
     AgentResultError,
     _extract_agent_response,
     _load_api_key,
+    _load_codex_cli_credentials,
+    _synthesize_codex_response,
 )
 
 
@@ -200,6 +202,36 @@ def test_full_hermes_runner_loads_named_dotenv_key(tmp_path):
     )
 
     assert _load_api_key(credential, "OPENROUTER_API_KEY") == "not-a-real-key"
+
+
+def test_full_hermes_runner_loads_codex_cli_credentials(tmp_path):
+    credential = tmp_path / "auth.json"
+    credential.write_text(
+        '{"tokens":{"access_token":"test-token","account_id":"test-account"}}\n',
+        encoding="utf-8",
+    )
+
+    assert _load_codex_cli_credentials(credential) == ("test-token", "test-account")
+
+
+def test_full_hermes_runner_reconstructs_empty_codex_final_response():
+    from types import SimpleNamespace
+
+    original = SimpleNamespace(
+        output=[],
+        status="completed",
+        model="test-codex",
+        usage=SimpleNamespace(input_tokens=12, output_tokens=4),
+        incomplete_details=None,
+        error=None,
+    )
+
+    repaired = _synthesize_codex_response(original, '{"actions":[]}')
+
+    assert repaired.status == "completed"
+    assert repaired.model == "test-codex"
+    assert repaired.output[0].content[0].text == '{"actions":[]}'
+    assert repaired.usage.input_tokens == 12
 
 
 def test_cap_wrappers_have_explicit_executable_bridge_modes():

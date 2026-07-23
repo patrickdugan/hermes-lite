@@ -1,0 +1,25 @@
+{
+  "schema": "hermes.full_hermes_provider_smoke.v1",
+  "study_id": "hermes_lite_executable_bridge_v1",
+  "registration_id": "9255e3b4e1395ab18d73f6bc33bdae05a93c165ade71ce06944f0fddfe043d00",
+  "status": "completed",
+  "benchmark_prompts_consumed": 0,
+  "provider": "openai-codex",
+  "model": "gpt-5.6-sol",
+  "context_budget_tokens": 160000,
+  "tool_surface": "none",
+  "smoke_contract": {
+    "requested_exact_response": true,
+    "contract_match": true,
+    "response_characters": 15,
+    "usage_reported": true
+  },
+  "runtime_compatibility": {
+    "credential_source": "~/.codex/auth.json loaded in memory",
+    "account_header_bound": true,
+    "null_tools_omitted": true,
+    "unsupported_max_output_tokens_omitted": true,
+    "streamed_text_reconstructed_verbatim": true
+  },
+  "claim_boundary": "This receipt establishes provider viability only. It contains no executable-bridge task outcome and does not validate a 160k-length prompt."
+}

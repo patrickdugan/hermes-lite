@@ -8,6 +8,7 @@ import json
 import sys
 import time
 from pathlib import Path
+from types import SimpleNamespace
 from typing import Any
 
 
@@ -54,6 +55,18 @@ def _load_api_key(path: Path, variable: str = "") -> str:
     return value
 
 
+def _load_codex_cli_credentials(path: Path) -> tuple[str, str]:
+    payload = json.loads(path.read_text(encoding="utf-8-sig"))
+    tokens = payload.get("tokens", {}) if isinstance(payload, dict) else {}
+    if not isinstance(tokens, dict):
+        raise ValueError("Codex CLI credential token object is absent")
+    access_token = str(tokens.get("access_token") or "").strip()
+    account_id = str(tokens.get("account_id") or "").strip()
+    if not access_token or not account_id:
+        raise ValueError("Codex CLI access token or account id is absent")
+    return access_token, account_id
+
+
 class AgentResultError(RuntimeError):
     """A controlled failure returned as an AIAgent result dictionary."""
 
@@ -88,6 +101,82 @@ def _extract_agent_response(result: Any) -> tuple[str, dict[str, Any]]:
     return content, usage
 
 
+def _synthesize_codex_response(response: Any, text: str) -> Any:
+    if getattr(response, "output", None) or not text:
+        return response
+    message = SimpleNamespace(
+        type="message",
+        status="completed",
+        phase="final_answer",
+        content=[SimpleNamespace(type="output_text", text=text)],
+    )
+    return SimpleNamespace(
+        output=[message],
+        status=getattr(response, "status", "completed"),
+        model=getattr(response, "model", None),
+        usage=getattr(response, "usage", None),
+        incomplete_details=getattr(response, "incomplete_details", None),
+        error=getattr(response, "error", None),
+    )
+
+
+def _install_codex_cli_compatibility(agent: Any, account_id: str) -> None:
+    client_kwargs = dict(agent._client_kwargs)
+    headers = dict(client_kwargs.get("default_headers") or {})
+    headers["ChatGPT-Account-Id"] = account_id
+    client_kwargs["default_headers"] = headers
+    agent._client_kwargs = client_kwargs
+    if not agent._replace_primary_openai_client(reason="codex_cli_account_binding"):
+        raise AgentResultError("codex_cli_client_rebuild_failed")
+
+    original_preflight = agent._preflight_codex_api_kwargs
+
+    def compatible_preflight(
+        api_kwargs: Any,
+        *,
+        allow_stream: bool = False,
+    ) -> dict[str, Any]:
+        normalized = original_preflight(api_kwargs, allow_stream=allow_stream)
+        if normalized.get("tools") is None:
+            normalized.pop("tools")
+        normalized.pop("max_output_tokens", None)
+        return normalized
+
+    def compatible_stream(
+        api_kwargs: dict[str, Any],
+        client: Any = None,
+        on_first_delta: Any = None,
+    ) -> Any:
+        active_client = client or agent._ensure_primary_openai_client(
+            reason="codex_cli_compatible_stream"
+        )
+        text_parts: list[str] = []
+        first_delta_fired = False
+        with active_client.responses.stream(**api_kwargs) as stream:
+            for event in stream:
+                if agent._interrupt_requested:
+                    break
+                event_type = str(getattr(event, "type", ""))
+                if "output_text.delta" in event_type:
+                    delta = getattr(event, "delta", "")
+                    if isinstance(delta, str) and delta:
+                        text_parts.append(delta)
+                        if not first_delta_fired:
+                            first_delta_fired = True
+                            if on_first_delta:
+                                on_first_delta()
+                        agent._fire_stream_delta(delta)
+                elif "reasoning" in event_type and "delta" in event_type:
+                    reasoning = getattr(event, "delta", "")
+                    if isinstance(reasoning, str) and reasoning:
+                        agent._fire_reasoning_delta(reasoning)
+            response = stream.get_final_response()
+        return _synthesize_codex_response(response, "".join(text_parts))
+
+    agent._preflight_codex_api_kwargs = compatible_preflight
+    agent._run_codex_stream = compatible_stream
+
+
 def run(
     prompts_path: Path,
     output_path: Path,
@@ -95,6 +184,7 @@ def run(
     hermes_root: Path,
     api_key_path: Path,
     api_key_variable: str,
+    credential_mode: str,
     provider: str,
     base_url: str,
     model: str,
@@ -113,7 +203,13 @@ def run(
     if any(row.get("status") != "completed" for row in existing):
         raise ValueError("non-completed full Hermes checkpoint requires a fresh output lane")
     completed = {str(row["task_id"]) for row in existing}
-    key = _load_api_key(api_key_path, api_key_variable)
+    codex_account_id = ""
+    if credential_mode == "codex_cli":
+        key, codex_account_id = _load_codex_cli_credentials(api_key_path)
+        if provider != "openai-codex":
+            raise ValueError("codex_cli credential mode requires openai-codex provider")
+    else:
+        key = _load_api_key(api_key_path, api_key_variable)
     started = time.perf_counter()
     for prompt in prompts:
         task_id = str(prompt["task_id"])
@@ -138,6 +234,8 @@ def run(
                 context_length_override=context_tokens,
                 minimum_context_length=context_tokens,
             )
+            if credential_mode == "codex_cli":
+                _install_codex_cli_compatibility(agent, codex_account_id)
             result = agent.run_conversation(
                 str(prompt["prompt"]),
                 system_message=(
@@ -148,6 +246,8 @@ def run(
                 sync_honcho=False,
             )
             content, usage = _extract_agent_response(result)
+            if len(content) > 4000:
+                raise AgentResultError("response_exceeds_4000_character_receipt_cap")
         except Exception as exc:
             error = (
                 f"{type(exc).__name__}: {exc}"
@@ -166,6 +266,11 @@ def run(
             "provider": provider,
             "model": model,
             "context_tokens": context_tokens,
+            "output_limit_mode": (
+                "prompt_contract_and_4000_character_receipt_cap"
+                if credential_mode == "codex_cli"
+                else "api_max_tokens"
+            ),
         }
         _append_jsonl(output_path, row)
         if error:
@@ -183,6 +288,12 @@ def run(
         "base_url": base_url,
         "model": model,
         "context_tokens": context_tokens,
+        "credential_mode": credential_mode,
+        "output_limit_mode": (
+            "prompt_contract_and_4000_character_receipt_cap"
+            if credential_mode == "codex_cli"
+            else "api_max_tokens"
+        ),
         "prompts_sha256": prompts_sha256,
         "results_sha256": _sha256_file(output_path) if output_path.exists() else "",
     }
@@ -195,6 +306,11 @@ def main() -> None:
     parser.add_argument("--hermes-root", required=True)
     parser.add_argument("--api-key-path", required=True)
     parser.add_argument("--api-key-variable", default="")
+    parser.add_argument(
+        "--credential-mode",
+        choices=("dotenv_or_bare", "codex_cli"),
+        default="dotenv_or_bare",
+    )
     parser.add_argument("--provider", default="openai")
     parser.add_argument("--base-url", default="https://api.openai.com/v1")
     parser.add_argument("--model", default="gpt-4.1")
@@ -209,6 +325,7 @@ def main() -> None:
         hermes_root=Path(args.hermes_root),
         api_key_path=Path(args.api_key_path),
         api_key_variable=args.api_key_variable,
+        credential_mode=args.credential_mode,
         provider=args.provider,
         base_url=args.base_url,
         model=args.model,
