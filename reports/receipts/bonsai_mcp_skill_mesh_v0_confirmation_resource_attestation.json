@@ -1,0 +1,18 @@
+{
+  "schema": "hermes.mcp_skill_mesh_resource_attestation_receipt.v0",
+  "study_id": "bonsai_mcp_skill_mesh_complexity_v0",
+  "registration_id": "fdaa6dce3853b05e8dba52cf0b1c935b32123e25e746bdce317708616767679f",
+  "stage": "confirmation",
+  "status": "passed",
+  "all_completed_cells_cap_valid": true,
+  "completed_cells": 72,
+  "expected_cells": 72,
+  "resource_run_count": 1,
+  "resource_run_cell_counts": {
+    "bonsai-mcp-mesh-confirmation-20260723-165618": 72
+  },
+  "cells_sha256": "1b719aff95fcf930ed3711d981da5e226241ba8a8980e0951b934efa3a927bd6",
+  "live_attestation_sha256": "7429e3c4b8ff84398fb539166daf716c13e6d9e0ba582f7edcd2f88a774f3f9c",
+  "created_at": "2026-07-23T21:19:11.951842+00:00",
+  "claim": "Every completed confirmation cell is bound to the registered wrapper receipt whose OS-level cap enforcement and owned-process cleanup passed. Confirmation outcomes may now be interpreted."
+}
