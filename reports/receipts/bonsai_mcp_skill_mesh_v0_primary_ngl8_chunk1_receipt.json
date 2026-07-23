@@ -1,0 +1,27 @@
+{
+  "schema": "hermes.mcp_skill_mesh_primary_chunk.v0",
+  "study_id": "bonsai_mcp_skill_mesh_complexity_v0",
+  "registration_id": "fdaa6dce3853b05e8dba52cf0b1c935b32123e25e746bdce317708616767679f",
+  "run_id": "bonsai-mcp-mesh-screening-20260723-150657",
+  "status": "aborted",
+  "abort_reason": "gpu_pressure_gate",
+  "completed_cells": 48,
+  "matched_case_blocks": 8,
+  "cell_statuses": [
+    "completed"
+  ],
+  "cells_sha256_after_chunk": "2602b59c93ca29e91a8ea74f3d33736d4dd365e4bcb125989a44c6e727642082",
+  "cell_receipts_manifest_sha256_after_chunk": "f521072ee2903ac45c606a39f4b539c7396702242f0a3489a28eaaf763eba153",
+  "resource_receipt_sha256": "5ea64ccf92e1c319aaebb13a4be857aa826d4875d869d0350985b4efc6f43811",
+  "peak_job_memory_mb": 1369.094,
+  "configured_job_memory_limit_mb": 2048,
+  "cap_enforcement_passed": true,
+  "cleanup_passed": true,
+  "max_observed_temperature_c": 87,
+  "frozen_max_temperature_c": 86,
+  "gpu_layers": 8,
+  "inter_cell_delay_seconds": 10,
+  "sample_cadence_seconds": 5,
+  "runtime_addendum_sha256": "df8a214bef3ae4bf5d4a70505dc8e0b9f0661dfda8fae7c5f6c1eb61f0ce3994",
+  "claim": "Forty-eight primary cells form eight complete matched six-arm blocks and are resource-admissible; the chunk stopped at the frozen thermal gate."
+}
