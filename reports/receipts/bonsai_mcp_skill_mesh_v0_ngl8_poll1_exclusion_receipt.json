@@ -1,0 +1,19 @@
+{
+  "schema": "hermes.mcp_skill_mesh_primary_exclusion.v0",
+  "study_id": "bonsai_mcp_skill_mesh_complexity_v0",
+  "registration_id": "fdaa6dce3853b05e8dba52cf0b1c935b32123e25e746bdce317708616767679f",
+  "run_id": "bonsai-mcp-mesh-screening-20260723-150319",
+  "status": "excluded_thermal_pilot",
+  "completed_cells": 2,
+  "admissible_primary_cells": 0,
+  "cells_sha256": "87429ca4ed88aefea4502c7807fc016ffbe39b60d5724e863994940f2325e4e1",
+  "resource_receipt_sha256": "72feea7e2fb08d7e91ea184cdbd28630d7df92b38bff4369d73ad5d7d11e8b79",
+  "gpu_layers": 8,
+  "sample_cadence_seconds": 1,
+  "abort_reason": "gpu_pressure_gate",
+  "cap_enforcement_passed": true,
+  "cleanup_passed": true,
+  "raw_artifact_root": "experiments/mcp_skill_mesh_v0/thermal_pilot_ngl8_poll1_20260723-150319",
+  "exclusion_reason": "Restarted to test lower-overhead external telemetry uniformly.",
+  "claim": "The two rows support only runtime-feasibility and thermal-monitor diagnostics."
+}

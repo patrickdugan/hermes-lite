@@ -1,0 +1,57 @@
+{
+  "schema": "hermes.mcp_skill_mesh_runtime_addendum.v0",
+  "study_id": "bonsai_mcp_skill_mesh_complexity_v0",
+  "registration_id": "fdaa6dce3853b05e8dba52cf0b1c935b32123e25e746bdce317708616767679f",
+  "authored_at": "2026-07-23T19:08:00Z",
+  "supersedes_runtime_addendum_sha256": "36c10d0f05f26401ab8cd8c12943af40138053930b29f7f084a2c21c3e7d851d",
+  "timing_disclosure": {
+    "after_2_ngl8_poll1_rows_existed": true,
+    "model_scores_consulted_for_change": false,
+    "resource_receipt_consulted_for_change": true,
+    "outcome_based_architecture_tuning": false
+  },
+  "reason": "NGL8 still crossed the thermal gate while the external wrapper launched two nvidia-smi probes every second. Restart uniformly with five-second resource sampling to reduce monitor-induced GPU wakeups.",
+  "single_change": {
+    "external_resource_sample_seconds": {
+      "from": 1,
+      "to": 5
+    }
+  },
+  "io_semantics": {
+    "rate_window_seconds": 5,
+    "required_excess_samples": 1,
+    "minimum_sustained_excess_seconds": 5,
+    "prior_minimum_sustained_excess_seconds": 3
+  },
+  "unchanged": {
+    "model_sha256": "284a335aa3fb2ced3b1b01fcb40b08aa783e3b70832767f0dd2e3fdfa134bd54",
+    "registration": true,
+    "cases": true,
+    "arms": true,
+    "prompts": true,
+    "seeds": true,
+    "runtime_context_tokens": 6144,
+    "temperature": 0,
+    "max_output_tokens": 128,
+    "cache_type_k": "q8_0",
+    "cache_type_v": "q8_0",
+    "gpu_layers": 8,
+    "batch": 64,
+    "ubatch": 32,
+    "inter_cell_delay_seconds": 10,
+    "resource_run_provenance": true,
+    "ram_cap_mb": 2048,
+    "cpu_cap_pct": 50,
+    "io_cap_mb_s": 50,
+    "wall_cap_seconds": 1800,
+    "max_temp_c": 86
+  },
+  "excluded_poll1_lane": {
+    "completed_cells": 2,
+    "admissible_primary_cells": 0,
+    "cells_sha256": "87429ca4ed88aefea4502c7807fc016ffbe39b60d5724e863994940f2325e4e1",
+    "resource_receipt_sha256": "72feea7e2fb08d7e91ea184cdbd28630d7df92b38bff4369d73ad5d7d11e8b79",
+    "raw_artifact_root": "experiments/mcp_skill_mesh_v0/thermal_pilot_ngl8_poll1_20260723-150319"
+  },
+  "claim_boundary": "Sampling cadence changes resource observability, not model inference. Thermal and latency claims must name the cadence."
+}

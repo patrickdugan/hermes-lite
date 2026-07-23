@@ -29,6 +29,7 @@ param(
   [int]$StartupSeconds = 120,
   [int]$RequestTimeoutSeconds = 180,
   [int]$InterCellDelaySeconds = 10,
+  [int]$SampleSeconds = 5,
   [switch]$ValidateOnly,
   [switch]$JobObjectProbe
 )
@@ -182,7 +183,15 @@ foreach ($requiredPath in @($Python, $ServerExe, $ModelPath, $RegistrationDir)) 
     throw "Required path not found: $requiredPath"
   }
 }
-if ($RamMb -lt 1024 -or $CpuPct -lt 1 -or $CpuPct -gt 100 -or $IoMbS -lt 1 -or $WallSeconds -lt 60) {
+if (
+  $RamMb -lt 1024 -or
+  $CpuPct -lt 1 -or
+  $CpuPct -gt 100 -or
+  $IoMbS -lt 1 -or
+  $WallSeconds -lt 60 -or
+  $SampleSeconds -lt 1 -or
+  $SampleSeconds -gt 30
+) {
   throw "Invalid resource cap."
 }
 if ($Context -gt 12288) {
@@ -267,7 +276,7 @@ $manifest = [ordered]@{
   chunk_strategy = "one case-arm response per request"
   pressure_monitor = @{
     authority = "external_wrapper"
-    cadence_seconds = 1
+    cadence_seconds = $SampleSeconds
     evaluator_subprocess_probes = $false
   }
   owned_pids = @()
@@ -454,6 +463,7 @@ $sumRamMb = 0.0
 $sampleCount = 0
 $peakIoMbS = 0.0
 $ioExcessStreak = 0
+$requiredIoExcessSamples = [math]::Max(1, [math]::Ceiling(3.0 / $SampleSeconds))
 $lastIoBytes = 0.0
 $lastSampleAt = Get-Date
 $startAt = Get-Date
@@ -517,7 +527,7 @@ try {
   }
 
   while (-not $evaluator.HasExited) {
-    Start-Sleep -Seconds 1
+    Start-Sleep -Seconds $SampleSeconds
     $now = Get-Date
     $sample = Get-ProcessSample -OwnedPids @($server.Id, $evaluator.Id)
     $elapsed = [math]::Max(0.001, ($now - $lastSampleAt).TotalSeconds)
@@ -542,7 +552,7 @@ try {
       gpu = $gpu
       alive_pids = $sample.alive_pids
     }
-    if ($ioExcessStreak -ge 3) {
+    if ($ioExcessStreak -ge $requiredIoExcessSamples) {
       $abortReason = "sustained_io_over_cap"
       break
     }
