@@ -1,6 +1,7 @@
 param(
   [string]$RegistrationDir = "evals\registered\hermes_lite_12k_control_mesh_v1",
-  [string]$TrainingTaskId = "hermes-lite-12k-control-mesh-v1",
+  [string]$TrainingTaskId = "hermes-lite-12k-control-mesh-v1-1",
+  [string]$PublishedModelName = "control-mesh-v1-1",
   [int]$Steps = 400,
   [int]$RamEpochs = 40,
   [int]$Seed = 73011,
@@ -150,7 +151,7 @@ $completed = (
 )
 $publishedDir = ""
 if ($completed) {
-  $publishedDir = Join-Path $env:USERPROFILE ".hermes-lite\models\control-mesh-v1"
+  $publishedDir = Join-Path $env:USERPROFILE ".hermes-lite\models\$PublishedModelName"
   New-Item -ItemType Directory -Force -Path $publishedDir | Out-Null
   Copy-Item -LiteralPath (Join-Path $RunDir "ram_policy.json") -Destination (Join-Path $publishedDir "ram_policy.json") -Force
   Copy-Item -LiteralPath (Join-Path $RunDir "trm_router.pt") -Destination (Join-Path $publishedDir "trm_router.pt") -Force

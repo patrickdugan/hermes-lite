@@ -11,14 +11,17 @@ from agent.lean_control_mesh_v1 import (
     ARMS,
     SparseRAMPolicy,
     calibrate_registered,
+    canonical_json_bytes,
     canonical_operation,
     read_json,
     read_jsonl,
     register_study,
     train_ram_policy,
     train_registered,
+    typed_current_task,
     validate_typed_plan,
     verify_registration,
+    sha256_bytes,
 )
 
 
@@ -150,6 +153,7 @@ def test_ram_policy_round_trips_and_learns_registered_rows(tmp_path):
 
     assert summary["route_train_accuracy"] == 1.0
     assert summary["action_train_accuracy"] == 1.0
+    assert restored.route_support["gamma-skill"] == 0
     assert restored.to_dict() == policy.to_dict()
 
 
@@ -172,6 +176,40 @@ def test_typed_ldt_repairs_invalid_operation_to_canonical():
     assert [row["operation"] for row in repaired] == [
         canonical_operation(phase) for phase in phases
     ]
+
+
+def test_typed_ldt_repairs_allowed_but_noncanonical_operation():
+    contract = _contract("alpha-skill", "alpha")
+    plan = expected = [
+        {
+            "phase": phase["id"],
+            "module": phase["module"],
+            "operation": canonical_operation(phase),
+        }
+        for phase in contract["conveyor"]["phases"]
+    ]
+    plan = [dict(item) for item in expected]
+    plan[0]["operation"] = "verify"
+
+    repaired, receipt = validate_typed_plan(contract, plan, repair=True)
+
+    assert receipt["valid"] is True
+    assert receipt["repair_count"] == 1
+    assert receipt["errors"] == ["noncanonical_operation:INDEX:verify"]
+    assert repaired == expected
+
+
+def test_current_task_compartment_excludes_state_and_stale_hint():
+    query = (
+        "STALE_HINT=use the wrong skill\n"
+        "CURRENT_TASK=use gamma-skill to solve the current case\n"
+        "STATE=resume from checkpoint"
+    )
+
+    route_text, compartment = typed_current_task(query)
+
+    assert route_text == "use gamma-skill to solve the current case"
+    assert compartment == "current_task"
 
 
 def test_capped_training_and_calibration_emit_all_control_flows(tmp_path, monkeypatch):
@@ -197,9 +235,23 @@ def test_capped_training_and_calibration_emit_all_control_flows(tmp_path, monkey
     assert summary["status"] == "completed"
     assert summary["case_count"] == 22
     assert summary["cells"] == 22 * len(ARMS)
+    assert summary["implementation_version"] == "v1.1"
     assert {row["arm"] for row in summary["by_arm"]} == set(ARMS)
     assert all(row["context_compliance_rate"] == 1.0 for row in summary["by_arm"])
     assert summary["full_hermes_baseline_present"] is False
+
+    rows = read_jsonl(output / "calibration_cells.jsonl")
+    grouped = {}
+    for row in rows:
+        if row["kind"] == "positive":
+            key = (row["arm"], row["expected_contract_id"])
+            grouped.setdefault(key, set()).add(row["selected_contract_id"])
+    assert all(len(selections) == 1 for selections in grouped.values())
+    by_case_arm = {(row["case_id"], row["arm"]): row for row in rows}
+    for row in rows:
+        if row["kind"] == "positive" and row["arm"] == "ram_typed":
+            lexical = by_case_arm[(row["case_id"], "lexical_typed")]
+            assert row["selected_contract_id"] == lexical["selected_contract_id"]
 
 
 def test_training_refuses_uncapped_execution(tmp_path, monkeypatch):
@@ -229,3 +281,18 @@ def test_windows_wrapper_uses_job_caps_and_pid_cleanup():
     assert "LEAN_CONTROL_MESH_CAP_WRAPPER_ACTIVE" in script
     assert "post_run_int3_cleanup.ps1" in script
     assert "Stop-Process -Id $process.Id" in script
+    assert 'PublishedModelName = "control-mesh-v1-1"' in script
+
+
+def test_v11_control_addendum_is_self_attested_and_reuses_v1_gates():
+    root = Path("evals/registered/hermes_lite_12k_control_mesh_v1")
+    addendum = read_json(root / "control_addendum_v1_1.json")
+    protocol = read_json(root / "protocol.json")
+    registration = verify_registration(root)
+    claimed = addendum.pop("addendum_id")
+    definition = addendum.pop("addendum_id_definition")
+
+    assert definition.startswith("SHA-256 of canonical JSON")
+    assert sha256_bytes(canonical_json_bytes(addendum)) == claimed
+    assert addendum["parent_registration_id"] == registration["registration_id"]
+    assert addendum["unchanged"]["promotion_gates"] == protocol["promotion"]

@@ -25,7 +25,8 @@ from agent.lean_contracts import contract_phases, deterministic_route_score, rou
 
 SCHEMA = "hermes.lean_control_mesh.v1"
 REGISTRATION_SCHEMA = "hermes.lean_control_mesh_registration.v1"
-RAM_SCHEMA = "hermes.sparse_retrieval_action_memory.v1"
+RAM_SCHEMA = "hermes.sparse_retrieval_action_memory.v1_1"
+IMPLEMENTATION_VERSION = "v1.1"
 ARMS = (
     "lexical_typed",
     "trm_typed",
@@ -100,6 +101,14 @@ def sparse_features(value: str) -> tuple[str, ...]:
     features.update(f"u:{word}" for word in words)
     features.update(f"b:{left}_{right}" for left, right in zip(words, words[1:]))
     return tuple(sorted(features))
+
+
+def typed_current_task(value: str) -> tuple[str, str]:
+    """Return the authoritative route text and its compartment label."""
+    for line in value.splitlines():
+        if line.startswith("CURRENT_TASK="):
+            return line.removeprefix("CURRENT_TASK=").strip(), "current_task"
+    return value.strip(), "untyped"
 
 
 def discover_contracts(root: Path) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
@@ -200,14 +209,23 @@ def validate_typed_plan(
         candidate = by_phase.get(phase_id)
         if candidate is None:
             errors.append(f"missing_phase:{phase_id}")
-            candidate = expected[index]
-            repair_count += 1
+            if repair:
+                repaired.append(expected[index])
+                repair_count += 1
+                continue
+            candidate = {}
         operation = str(candidate.get("operation", ""))
         allowed = [str(value) for value in phase.get("allowed_operations", [])]
+        canonical = expected[index]["operation"]
         if operation not in allowed:
             errors.append(f"invalid_operation:{phase_id}:{operation}")
             if repair:
-                operation = expected[index]["operation"]
+                operation = canonical
+                repair_count += 1
+        elif operation != canonical:
+            errors.append(f"noncanonical_operation:{phase_id}:{operation}")
+            if repair:
+                operation = canonical
                 repair_count += 1
         repaired.append(
             {
@@ -220,27 +238,7 @@ def validate_typed_plan(
         errors.append("phase_order_mismatch")
         if repair:
             repair_count += 1
-    if repair:
-        repaired = [
-            {
-                "phase": item["phase"],
-                "module": item["module"],
-                "operation": (
-                    item["operation"]
-                    if item["operation"]
-                    in [str(value) for value in phases[index].get("allowed_operations", [])]
-                    else expected[index]["operation"]
-                ),
-            }
-            for index, item in enumerate(repaired)
-        ]
-    valid = (
-        [item["phase"] for item in repaired] == [str(phase["id"]) for phase in phases]
-        and all(
-            item["operation"] in [str(value) for value in phase.get("allowed_operations", [])]
-            for item, phase in zip(repaired, phases)
-        )
-    )
+    valid = repaired == expected and (repair or not errors)
     return repaired, {
         "valid": valid,
         "errors": errors,
@@ -457,6 +455,7 @@ def _git_clean(path: Path) -> bool | None:
 class SparseRAMPolicy:
     labels: list[str]
     route_weights: dict[str, dict[str, float]]
+    route_support: dict[str, int]
     action_labels: list[str]
     action_weights: dict[str, dict[str, float]]
     registration_id: str = ""
@@ -468,6 +467,7 @@ class SparseRAMPolicy:
         return cls(
             labels=label_list,
             route_weights={label: {} for label in label_list},
+            route_support={label: 0 for label in label_list},
             action_labels=action_list,
             action_weights={label: {} for label in action_list},
             registration_id=registration_id,
@@ -527,6 +527,7 @@ class SparseRAMPolicy:
             "registration_id": self.registration_id,
             "labels": self.labels,
             "route_weights": compact(self.route_weights),
+            "route_support": self.route_support,
             "action_labels": self.action_labels,
             "action_weights": compact(self.action_weights),
         }
@@ -535,11 +536,17 @@ class SparseRAMPolicy:
     def from_dict(cls, value: dict[str, Any]) -> "SparseRAMPolicy":
         if value.get("schema") != RAM_SCHEMA:
             raise ValueError("invalid RAM policy schema")
+        labels = list(map(str, value["labels"]))
+        support = value.get("route_support", {})
         return cls(
-            labels=list(map(str, value["labels"])),
+            labels=labels,
             route_weights={
                 str(label): {str(key): float(score) for key, score in weights.items()}
                 for label, weights in value["route_weights"].items()
+            },
+            route_support={
+                label: int(support.get(label, 0))
+                for label in labels
             },
             action_labels=list(map(str, value["action_labels"])),
             action_weights={
@@ -574,6 +581,9 @@ def train_ram_policy(
     )
     positives = [row for row in train_rows if row["kind"] == "positive"]
     negatives = [row for row in train_rows if row["kind"] == "negative"]
+    for row in positives:
+        label = str(row["expected_contract_id"])
+        policy.route_support[label] = policy.route_support.get(label, 0) + 1
     randomizer = random.Random(seed)
     for _ in range(epochs):
         shuffled = list(positives)
@@ -635,6 +645,8 @@ def train_ram_policy(
         "action_train_accuracy": action_correct / max(1, action_total),
         "action_train_rows": action_total,
         "nonzero_weights": nonzero,
+        "supported_labels": sum(count > 0 for count in policy.route_support.values()),
+        "unsupported_labels": sum(count == 0 for count in policy.route_support.values()),
         "epochs": epochs,
     }
 
@@ -776,6 +788,7 @@ def train_registered(
         trm_sha256 = sha256_file(output_dir / "trm_router.pt")
     summary = {
         "schema": "hermes.lean_control_mesh_training_receipt.v1",
+        "implementation_version": IMPLEMENTATION_VERSION,
         "status": status,
         "abort_reason": abort_reason,
         "registration_id": receipt["registration_id"],
@@ -812,6 +825,27 @@ def _softmax(scores: dict[str, float]) -> dict[str, float]:
     exponentials = {key: math.exp(min(40.0, value - maximum)) for key, value in scores.items()}
     denominator = sum(exponentials.values()) or 1.0
     return {key: value / denominator for key, value in exponentials.items()}
+
+
+def _score_margin(scores: dict[str, float]) -> tuple[str, float]:
+    ranked = sorted(((value, key) for key, value in scores.items()), reverse=True)
+    if not ranked:
+        return "", 0.0
+    return ranked[0][1], ranked[0][0] - (ranked[1][0] if len(ranked) > 1 else 0.0)
+
+
+def _unique_candidates(*groups: Iterable[dict[str, Any]], limit: int = 5) -> list[dict[str, Any]]:
+    result: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for group in groups:
+        for item in group:
+            name = str(item["name"])
+            if name not in seen:
+                result.append(item)
+                seen.add(name)
+            if len(result) >= limit:
+                return result
+    return result
 
 
 def _trm_probabilities(query: str, candidates: list[dict[str, Any]], model: Any) -> dict[str, float]:
@@ -851,29 +885,65 @@ def _arm_selection(
     trm: Any,
 ) -> tuple[dict[str, Any], list[dict[str, Any]], dict[str, Any]]:
     by_name = {str(item["name"]): item for item in primary}
-    lexical_scores = {str(item["name"]): deterministic_route_score(query, item) for item in primary}
-    ram_scores = ram.route_scores(query)
+    route_query, compartment = typed_current_task(query)
+    lexical_scores = {
+        str(item["name"]): deterministic_route_score(route_query, item) for item in primary
+    }
+    ram_scores = ram.route_scores(route_query)
     lexical_top = _top_contracts(lexical_scores, by_name)
     ram_top = _top_contracts(ram_scores, by_name)
+    supported_ram_top = [
+        item for item in ram_top if ram.route_support.get(str(item["name"]), 0) > 0
+    ]
+    lexical_probability = _softmax(lexical_scores)
+    lexical_leader, lexical_margin = _score_margin(lexical_probability)
+    ram_probability = _softmax(
+        {
+            name: score
+            for name, score in ram_scores.items()
+            if ram.route_support.get(name, 0) > 0
+        }
+    )
+    ram_leader, _ = _score_margin(ram_probability)
+    ram_enabled = ram.route_support.get(lexical_leader, 0) > 0
+    guarded_ram_leader = ram_leader if ram_enabled else ""
     if arm == "lexical_typed":
         candidates = lexical_top
         selected = candidates[0]
         detail = {"flow": ["lexical", "typed_ldt"]}
     elif arm == "trm_typed":
         candidates = lexical_top
-        trm_scores = _trm_probabilities(query, candidates, trm)
+        trm_scores = _trm_probabilities(route_query, candidates, trm)
         selected = by_name[max(trm_scores, key=trm_scores.get)]
         detail = {"flow": ["lexical_shortlist", "trm", "typed_ldt"], "trm": trm_scores}
     elif arm == "ram_typed":
-        candidates = ram_top
-        selected = candidates[0]
-        detail = {"flow": ["ram", "typed_ldt"]}
+        candidates = _unique_candidates(lexical_top[:1], supported_ram_top, lexical_top)
+        if (
+            guarded_ram_leader
+            and guarded_ram_leader in {str(item["name"]) for item in lexical_top}
+            and lexical_margin < 0.10
+        ):
+            selected = by_name[guarded_ram_leader]
+        else:
+            selected = by_name[lexical_leader]
+        detail = {"flow": ["lexical_support_gate", "ram_residual", "typed_ldt"]}
     elif arm == "trm_then_ram_typed":
         candidates = lexical_top
-        trm_scores = _trm_probabilities(query, candidates, trm)
-        ram_prob = _softmax({str(item["name"]): ram_scores[str(item["name"])] for item in candidates})
+        trm_scores = _trm_probabilities(route_query, candidates, trm)
+        ram_prob = (
+            _softmax(
+                {
+                    str(item["name"]): ram_scores[str(item["name"])]
+                    for item in candidates
+                    if ram.route_support.get(str(item["name"]), 0) > 0
+                }
+            )
+            if ram_enabled
+            else {}
+        )
         combined = {
-            str(item["name"]): 0.55 * trm_scores[str(item["name"])] + 0.45 * ram_prob[str(item["name"])]
+            str(item["name"]): 0.80 * trm_scores[str(item["name"])]
+            + 0.20 * ram_prob.get(str(item["name"]), 0.0)
             for item in candidates
         }
         selected = by_name[max(combined, key=combined.get)]
@@ -882,35 +952,31 @@ def _arm_selection(
             "combined": combined,
         }
     elif arm == "ram_then_trm_typed":
-        candidates = ram_top
-        trm_scores = _trm_probabilities(query, candidates, trm)
+        candidates = _unique_candidates(lexical_top, supported_ram_top[:2], limit=7)
+        trm_scores = _trm_probabilities(route_query, candidates, trm)
         selected = by_name[max(trm_scores, key=trm_scores.get)]
         detail = {"flow": ["ram_shortlist", "trm", "typed_ldt"], "trm": trm_scores}
     elif arm == "adaptive_mesh":
-        candidate_names = []
-        for item in lexical_top[:3] + ram_top[:3]:
-            if item["name"] not in candidate_names:
-                candidate_names.append(str(item["name"]))
-        candidates = [by_name[name] for name in candidate_names[:5]]
-        trm_prob = _trm_probabilities(query, candidates, trm)
-        lexical_prob = _softmax({str(item["name"]): lexical_scores[str(item["name"])] for item in candidates})
-        ram_prob = _softmax({str(item["name"]): ram_scores[str(item["name"])] for item in candidates})
-        combined = {
-            str(item["name"]): (
-                0.25 * lexical_prob[str(item["name"])]
-                + 0.40 * trm_prob[str(item["name"])]
-                + 0.35 * ram_prob[str(item["name"])]
-            )
-            for item in candidates
-        }
-        selected = by_name[max(combined, key=combined.get)]
+        candidates = _unique_candidates(lexical_top, supported_ram_top[:2], limit=7)
+        trm_prob = _trm_probabilities(route_query, candidates, trm)
+        trm_leader, trm_margin = _score_margin(trm_prob)
+        if trm_leader == lexical_leader:
+            selected_name = trm_leader
+        elif guarded_ram_leader in {trm_leader, lexical_leader}:
+            selected_name = guarded_ram_leader
+        elif trm_margin >= 0.20:
+            selected_name = trm_leader
+        else:
+            selected_name = lexical_leader
+        selected = by_name[selected_name]
         detail = {
             "flow": ["lexical_ram_union", "trm", "agreement_arbiter", "typed_ldt"],
-            "combined": combined,
-            "trm_ram_agree": max(trm_prob, key=trm_prob.get) == max(ram_prob, key=ram_prob.get),
+            "trm_ram_agree": bool(guarded_ram_leader and trm_leader == guarded_ram_leader),
+            "ram_support_gate": ram_enabled,
         }
     else:
         raise ValueError(f"unknown arm: {arm}")
+    detail["routing_compartment"] = compartment
     return selected, candidates, detail
 
 
@@ -1019,6 +1085,7 @@ def calibrate_registered(
                     "packet_tokens_est": tokens,
                     "context_compliant": tokens <= hard_context,
                     "flow": detail["flow"],
+                    "routing_compartment": detail["routing_compartment"],
                     "trm_ram_agree": detail.get("trm_ram_agree"),
                 }
             )
@@ -1048,6 +1115,7 @@ def calibrate_registered(
         )
     summary = {
         "schema": "hermes.lean_control_mesh_calibration_summary.v1",
+        "implementation_version": IMPLEMENTATION_VERSION,
         "status": "completed",
         "registration_id": receipt["registration_id"],
         "cells": len(rows),

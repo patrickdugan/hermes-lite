@@ -1,0 +1,54 @@
+{
+  "schema": "hermes.lean_control_mesh_control_addendum.v1",
+  "addendum_id": "a47183dcf42977ad0487ee35e58de53a23920bc975de7f76c37e8dbc06146662",
+  "addendum_id_definition": "SHA-256 of canonical JSON with addendum_id and addendum_id_definition omitted",
+  "study_id": "hermes-lite-12k-control-mesh-v1-1",
+  "implementation_version": "v1.1",
+  "parent_registration_id": "20affa942b608ac960a17a98d56ef6cccaa1f59c4a77346be0d69b93e798988e",
+  "authored_after_v1_outcomes": true,
+  "parent_calibration": {
+    "cells_sha256": "f41332c2bf8a136ce33805d79c4a4d5ec2783bdc85f06495846e868838c84437",
+    "summary_sha256": "643b18eb162533c39a0b9275aff0e95b6e8a97045f897679b877fde0544e5295"
+  },
+  "frozen_inputs": {
+    "contracts_sha256": "9e30e82af3f906280d5138f502c937a19ea2e8fdd852ced2986005ab7bbd0f71",
+    "train_rows_sha256": "c9b8f21cf2f6bb9e06dff05dbcad86258ab6402a03c462e3dffe9f1e3504f9cb",
+    "held_cases_sha256": "cb7f4ccf5eae3df9677a1c74aac5d5768b1eccf57f3b0eb3bf7b80ad062dd1cd"
+  },
+  "diagnosed_construction_defects": [
+    "RAM labels with zero development support could dominate or evict the lexical transfer target.",
+    "The typed LDT treated any allowed operation as exact instead of enforcing the registered canonical operation.",
+    "Checkpoint and stale-hint metadata were scored as route text despite an explicit CURRENT_TASK compartment."
+  ],
+  "changes": [
+    "Parse CURRENT_TASK as the authoritative routing compartment when present.",
+    "Persist per-label RAM support and disable the RAM residual when the lexical leader has zero support.",
+    "Retain the lexical top-five neighborhood before adding at most two RAM-supported candidates.",
+    "Repair allowed-but-noncanonical operations to the registered canonical plan."
+  ],
+  "unchanged": {
+    "held_cases": 128,
+    "arms": [
+      "lexical_typed",
+      "trm_typed",
+      "ram_typed",
+      "trm_then_ram_typed",
+      "ram_then_trm_typed",
+      "adaptive_mesh"
+    ],
+    "input_perturbations": [
+      "plain",
+      "checkpoint_state",
+      "stale_hint"
+    ],
+    "promotion_gates": {
+      "min_calibration_strict_success": 0.75,
+      "min_contract_transfer_route_accuracy": 0.5,
+      "min_negative_control_pass_rate": 0.9,
+      "max_packet_tokens": 6000,
+      "min_efficacy_fraction_vs_full_hermes": 0.65
+    },
+    "hard_window_tokens": 12000
+  },
+  "claim_boundary": "Post-outcome adaptive successor. It tests whether the diagnosed control repairs recover deterministic held routing and typed-plan validity; it is not a preregistered v1 result, an executable task result, or a full-Hermes efficacy comparison."
+}

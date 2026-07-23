@@ -89,3 +89,34 @@ python -m agent.lean_control_mesh_v1 calibrate `
 Calibration measures routing, typed schedule construction, LDT repair demand,
 negative-control rejection, transfer, and packet size. It is not the executable
 Bonsai or full-Hermes result.
+
+## Post-outcome v1.1 control addendum
+
+The frozen v1 calibration exposed two construction defects rather than a
+promotable learned controller. The RAM policy had zero route support for all six
+contract-transfer labels but was allowed to dominate or evict the lexical
+candidate, and the typed LDT accepted any allowed operation rather than the
+contract's registered canonical operation.
+
+The labeled v1.1 addendum repairs only those defects:
+
+- routing uses the authoritative `CURRENT_TASK` compartment when present;
+- RAM records per-label development support and acts only as a residual when
+  the lexical leader has support;
+- learned shortlists retain the complete lexical top-five neighborhood; and
+- the LDT repairs allowed-but-noncanonical operations to the registered plan.
+
+The v1 registration, 128 held cases, six arms, promotion thresholds, and claim
+scope remain unchanged. This successor was authored after v1 outcomes and must
+not be described as preregistered v1.
+
+Train and calibrate the successor into separate artifact locations:
+
+```powershell
+.\scripts\run_capped_lean_control_mesh_v1.ps1
+
+python -m agent.lean_control_mesh_v1 calibrate `
+  --registration-dir evals/registered/hermes_lite_12k_control_mesh_v1 `
+  --model-dir $HOME/.hermes-lite/models/control-mesh-v1-1 `
+  --output-dir experiments/lean-control-mesh-v1/calibration_v1_1
+```
