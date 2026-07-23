@@ -667,6 +667,11 @@ $completedKeys = @(
     ForEach-Object { "$($_.task_id)|$($_.arm)|$($_.seed)" } |
     Sort-Object -Unique
 )
+$expectedSteps = if ($null -ne $liveSummary -and $null -ne $liveSummary.expected_cells) {
+  [int]$liveSummary.expected_cells
+} else {
+  $null
+}
 $resourceReceipt = [ordered]@{
   schema = "hermes.bonsai_mcp_mesh_resource_receipt.v0"
   run_id = $RunId
@@ -683,7 +688,7 @@ $resourceReceipt = [ordered]@{
   cpu_pct = $CpuPct
   samples = $sampleCount
   steps_completed = $completedKeys.Count
-  expected_steps = 144
+  expected_steps = $expectedSteps
   owned_pids = $ownedPids
   cap_enforcement = @{
     job_memory_limit_mb = $RamMb

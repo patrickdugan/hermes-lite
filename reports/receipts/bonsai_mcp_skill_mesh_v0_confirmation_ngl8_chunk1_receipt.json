@@ -1,0 +1,42 @@
+{
+  "schema": "hermes.mcp_skill_mesh_primary_chunk.v0",
+  "study_id": "bonsai_mcp_skill_mesh_complexity_v0",
+  "registration_id": "fdaa6dce3853b05e8dba52cf0b1c935b32123e25e746bdce317708616767679f",
+  "run_id": "bonsai-mcp-mesh-confirmation-20260723-165618",
+  "stage": "confirmation",
+  "status": "completed",
+  "abort_reason": "",
+  "completed_cells_this_chunk": 72,
+  "completed_cells_cumulative": 72,
+  "expected_confirmation_cells": 72,
+  "seeds": [
+    17,
+    29,
+    43
+  ],
+  "cells_per_seed": 24,
+  "arms": [
+    "adaptive_hybrid"
+  ],
+  "incomplete_task_seed_cells": 0,
+  "cell_statuses": [
+    "completed"
+  ],
+  "cells_sha256_after_chunk": "1b719aff95fcf930ed3711d981da5e226241ba8a8980e0951b934efa3a927bd6",
+  "cell_receipts_manifest_sha256_after_chunk": "ea37dea17547bb85dee1770b98781e3f3825ec9d185ca54483a0722fa161107a",
+  "confirmation_summary_sha256": "6bd714152620f4f38eb8dc5b73c9dd078a6f779032775693559466c35dc184f1",
+  "resource_receipt_sha256": "dc0e911d421f98f73e39b55516b697d9e387de5cc872d19acf0c50c191031ec8",
+  "resource_events_sha256": "d889902e55d8ccccee9343123491aa8980d7ba9663c64e8acd957d11662702b2",
+  "peak_job_memory_mb": 1367.551,
+  "configured_job_memory_limit_mb": 2048,
+  "cap_enforcement_passed": true,
+  "cleanup_passed": true,
+  "max_observed_temperature_c": 79,
+  "frozen_max_temperature_c": 86,
+  "gpu_layers": 8,
+  "inter_cell_delay_seconds": 10,
+  "sample_cadence_seconds": 5,
+  "runtime_addendum_sha256": "df8a214bef3ae4bf5d4a70505dc8e0b9f0661dfda8fae7c5f6c1eb61f0ce3994",
+  "metadata_note": "The frozen wrapper receipt reports expected_steps=144 because that field was hardcoded to the screening size. The registered confirmation summary reports expected_cells=72 and exactly 72 unique completed task-seed cells are present. The wrapper was corrected prospectively without rewriting this receipt.",
+  "claim": "The promoted adaptive-hybrid arm completed all 72 registered confirmation cells across three seeds under valid resource controls."
+}

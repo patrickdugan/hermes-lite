@@ -306,3 +306,11 @@ def test_resource_attestation_binds_each_cell_to_cap_valid_wrapper(tmp_path):
     assert result["all_completed_cells_cap_valid"] is True
     assert result["completed_cells"] == 2
     assert result["resource_run_count"] == 2
+
+
+def test_wrapper_expected_steps_comes_from_stage_summary():
+    script = Path("scripts/run_capped_bonsai_mcp_mesh.ps1").read_text(encoding="utf-8")
+
+    assert "$liveSummary.expected_cells" in script
+    assert "expected_steps = $expectedSteps" in script
+    assert "expected_steps = 144" not in script
