@@ -1,0 +1,95 @@
+{
+  "schema": "hermes.lean_control_mesh_calibration_distilled_receipt.v1",
+  "study_id": "hermes_lite_12k_control_mesh_v1_1",
+  "implementation_version": "v1.1",
+  "control_addendum_id": "a47183dcf42977ad0487ee35e58de53a23920bc975de7f76c37e8dbc06146662",
+  "registration_id": "20affa942b608ac960a17a98d56ef6cccaa1f59c4a77346be0d69b93e798988e",
+  "status": "completed_with_promotion",
+  "held_case_count": 128,
+  "cell_count": 768,
+  "gates": {
+    "min_calibration_strict_success": 0.75,
+    "min_contract_transfer_route_accuracy": 0.5,
+    "min_negative_control_pass_rate": 0.9,
+    "max_packet_tokens": 6000
+  },
+  "promoted_arms": [
+    "lexical_typed",
+    "trm_typed",
+    "ram_typed",
+    "trm_then_ram_typed",
+    "adaptive_mesh"
+  ],
+  "failed_arms": {
+    "ram_then_trm_typed": [
+      "negative_control_pass_rate"
+    ]
+  },
+  "executable_stage_selection": [
+    "lexical_typed",
+    "adaptive_mesh"
+  ],
+  "pareto_control": "lexical_typed",
+  "by_arm": {
+    "lexical_typed": {
+      "strict_success_rate": 1.0,
+      "contract_transfer_route_accuracy": 1.0,
+      "negative_control_pass_rate": 1.0,
+      "max_packet_tokens": 735,
+      "ldt_repairs": 0
+    },
+    "trm_typed": {
+      "strict_success_rate": 0.9921875,
+      "contract_transfer_route_accuracy": 1.0,
+      "negative_control_pass_rate": 0.9565217391304348,
+      "max_packet_tokens": 739,
+      "ldt_repairs": 0
+    },
+    "ram_typed": {
+      "strict_success_rate": 1.0,
+      "contract_transfer_route_accuracy": 1.0,
+      "negative_control_pass_rate": 1.0,
+      "max_packet_tokens": 740,
+      "ldt_repairs": 9
+    },
+    "trm_then_ram_typed": {
+      "strict_success_rate": 0.9765625,
+      "contract_transfer_route_accuracy": 1.0,
+      "negative_control_pass_rate": 1.0,
+      "max_packet_tokens": 741,
+      "ldt_repairs": 9
+    },
+    "ram_then_trm_typed": {
+      "strict_success_rate": 0.9765625,
+      "contract_transfer_route_accuracy": 1.0,
+      "negative_control_pass_rate": 0.8695652173913043,
+      "max_packet_tokens": 856,
+      "ldt_repairs": 9
+    },
+    "adaptive_mesh": {
+      "strict_success_rate": 1.0,
+      "contract_transfer_route_accuracy": 1.0,
+      "negative_control_pass_rate": 1.0,
+      "max_packet_tokens": 862,
+      "ldt_repairs": 9
+    }
+  },
+  "v1_to_v1_1_recovered_cells": {
+    "lexical_typed": 35,
+    "trm_typed": 35,
+    "ram_typed": 106,
+    "trm_then_ram_typed": 62,
+    "ram_then_trm_typed": 93,
+    "adaptive_mesh": 65
+  },
+  "positive_perturbation_selection_invariant": true,
+  "all_packets_context_compliant": true,
+  "full_hermes_baseline_present": false,
+  "artifacts": {
+    "cells_sha256": "a0542f84d8266dbe372036d165ee68800744d16ff0bf9c5906739bc77cb3139f",
+    "summary_sha256": "5c4c541aa7512a5e1fb85350184881131c6d9f57ab8ad299f4d9a2f072573f57",
+    "ram_policy_sha256": "d7dfbac0ddffe65645f749622fc7ccaa3562e95db6068ffc330dfdc063c2466f",
+    "trm_router_sha256": "ce8fc00f23830b9650ab06044667f65af751ff467ffabfb6434ab5f5f20b6543"
+  },
+  "claim_boundary": "This is post-outcome adaptive routing and typed-plan calibration. It does not establish executable task efficacy or a fraction of 160k full-Hermes efficacy."
+}
