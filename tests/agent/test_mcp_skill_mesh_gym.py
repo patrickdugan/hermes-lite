@@ -11,6 +11,7 @@ from agent.mcp_skill_mesh_gym import (
     _extract_json_object,
     _confirmation_arms,
     _score_live_response,
+    _read_live_checkpoints,
     append_jsonl,
     build_mesh_packet,
     calibrate_registered,
@@ -20,6 +21,7 @@ from agent.mcp_skill_mesh_gym import (
     score_packet,
     select_mesh_resources,
     verify_registration,
+    write_json_atomic,
 )
 
 
@@ -210,3 +212,30 @@ def test_append_jsonl_preserves_existing_checkpoint_rows(tmp_path):
     append_jsonl(path, [{"cell": 2}])
 
     assert path.read_text(encoding="utf-8").splitlines() == ['{"cell":1}', '{"cell":2}']
+
+
+def test_live_checkpoint_receipt_recovers_missing_journal_append(tmp_path):
+    cells_path = tmp_path / "cells.jsonl"
+    receipt_dir = tmp_path / "cell_receipts"
+    row = {"task_id": "logic.l01", "arm": "typed_packet", "seed": 17, "status": "completed"}
+    receipt_path = receipt_dir / "receipt.json"
+
+    write_json_atomic(receipt_path, row)
+    recovered = _read_live_checkpoints(cells_path, receipt_dir)
+
+    assert recovered == [row]
+    assert cells_path.read_text(encoding="utf-8").splitlines() == [
+        '{"arm":"typed_packet","seed":17,"status":"completed","task_id":"logic.l01"}'
+    ]
+
+
+def test_live_checkpoint_rejects_torn_journal_even_with_receipts(tmp_path):
+    cells_path = tmp_path / "cells.jsonl"
+    receipt_dir = tmp_path / "cell_receipts"
+    receipt_dir.mkdir()
+    row = {"task_id": "logic.l01", "arm": "typed_packet", "seed": 17, "status": "completed"}
+    write_json_atomic(receipt_dir / "receipt.json", row)
+    cells_path.write_bytes(b'{"task_id":"logic.l01"}\n\x00\x00')
+
+    with pytest.raises((json.JSONDecodeError, UnicodeDecodeError)):
+        _read_live_checkpoints(cells_path, receipt_dir)

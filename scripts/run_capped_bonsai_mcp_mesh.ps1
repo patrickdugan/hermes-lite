@@ -17,7 +17,11 @@ param(
   [int]$Batch = 128,
   [int]$UBatch = 64,
   [int]$ParallelSlots = 1,
-  [int]$CacheRamMb = 512,
+  [int]$CacheRamMb = 0,
+  [ValidateSet("f32", "f16", "bf16", "q8_0", "q4_0", "q4_1", "iq4_nl", "q5_0", "q5_1")]
+  [string]$CacheTypeK = "f16",
+  [ValidateSet("f32", "f16", "bf16", "q8_0", "q4_0", "q4_1", "iq4_nl", "q5_0", "q5_1")]
+  [string]$CacheTypeV = "f16",
   [int]$MinFreeVramMb = 512,
   [int]$MaxTempC = 86,
   [int]$StartupSeconds = 120,
@@ -210,6 +214,7 @@ $manifest = [ordered]@{
   live_output_dir = $LiveRoot
   model_path = $ModelPath
   server_exe = $ServerExe
+  server_exe_sha256 = (Get-FileHash -LiteralPath $ServerExe -Algorithm SHA256).Hash.ToLowerInvariant()
   endpoint = "http://127.0.0.1:$Port/v1"
   caps = @{
     ram_mb = $RamMb
@@ -228,6 +233,8 @@ $manifest = [ordered]@{
     ubatch = $UBatch
     parallel_slots = $ParallelSlots
     cache_ram_mb = $CacheRamMb
+    cache_type_k = $CacheTypeK
+    cache_type_v = $CacheTypeV
     request_timeout_seconds = $RequestTimeoutSeconds
   }
   checkpoint_cadence = "after every live cell"
@@ -383,6 +390,8 @@ $serverArgs = @(
   "-ub", "$UBatch",
   "--parallel", "$ParallelSlots",
   "--cache-ram", "$CacheRamMb",
+  "--cache-type-k", $CacheTypeK,
+  "--cache-type-v", $CacheTypeV,
   "--no-webui",
   "--no-warmup"
 )
@@ -486,12 +495,14 @@ try {
     $sampleCount += 1
     $ioExcessStreak = if ($ioMbS -gt $IoMbS) { $ioExcessStreak + 1 } else { 0 }
     $gpu = Get-GpuSnapshot -OwnedPids @($server.Id, $evaluator.Id)
+    $kernelMemory = Get-JobMemoryAccounting -Job $job
     Write-Event @{
       ts = $now.ToUniversalTime().ToString("o")
       event = "resource_sample"
       private_mb = $sample.private_mb
       working_set_mb = $sample.working_set_mb
       io_mb_s = [math]::Round($ioMbS, 3)
+      kernel_job_memory = $kernelMemory
       gpu = $gpu
       alive_pids = $sample.alive_pids
     }
@@ -580,17 +591,29 @@ if (-not $capEnforcementPassed) {
     "cap_enforcement_failed"
   }
 }
+$liveRows = @()
+if (Test-Path -LiteralPath $liveCellsPath) {
+  try {
+    $liveRows = @(Get-Content -LiteralPath $liveCellsPath | ForEach-Object { $_ | ConvertFrom-Json })
+  } catch {
+    $abortReason = if ($abortReason) {
+      "$abortReason+checkpoint_integrity_failure"
+    } else {
+      "checkpoint_integrity_failure"
+    }
+    Write-Event @{
+      ts = (Get-Date).ToUniversalTime().ToString("o")
+      event = "checkpoint_integrity_failure"
+      message = $_.Exception.Message
+    }
+  }
+}
 $status = if ($abortReason) {
   "aborted"
 } elseif ($null -ne $liveSummary -and $liveSummary.status -eq "completed") {
   "completed"
 } else {
   "failed"
-}
-$liveRows = if (Test-Path -LiteralPath $liveCellsPath) {
-  @(Get-Content -LiteralPath $liveCellsPath | ForEach-Object { $_ | ConvertFrom-Json })
-} else {
-  @()
 }
 $completedKeys = @(
   $liveRows |

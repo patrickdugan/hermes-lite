@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import re
 import time
 from collections import defaultdict
@@ -84,6 +85,19 @@ def write_json(path: Path, value: dict[str, Any]) -> None:
     path.write_bytes(json.dumps(value, ensure_ascii=False, sort_keys=True, indent=2).encode("utf-8") + b"\n")
 
 
+def write_json_atomic(path: Path, value: dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    payload = json.dumps(value, ensure_ascii=False, sort_keys=True, indent=2).encode("utf-8") + b"\n"
+    temporary = path.with_name(f".{path.name}.{os.getpid()}.tmp")
+    try:
+        with temporary.open("wb", buffering=0) as handle:
+            handle.write(payload)
+            os.fsync(handle.fileno())
+        os.replace(temporary, path)
+    finally:
+        temporary.unlink(missing_ok=True)
+
+
 def write_jsonl(path: Path, rows: Iterable[dict[str, Any]]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("wb") as handle:
@@ -93,10 +107,55 @@ def write_jsonl(path: Path, rows: Iterable[dict[str, Any]]) -> None:
 
 def append_jsonl(path: Path, rows: Iterable[dict[str, Any]]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("ab") as handle:
+    flags = os.O_APPEND | os.O_CREAT | os.O_WRONLY | getattr(os, "O_BINARY", 0)
+    descriptor = os.open(path, flags)
+    try:
         for row in rows:
-            handle.write(canonical_json_bytes(row))
-        handle.flush()
+            payload = canonical_json_bytes(row)
+            written = os.write(descriptor, payload)
+            if written != len(payload):
+                raise OSError(f"short append to {path}: wrote {written} of {len(payload)} bytes")
+        os.fsync(descriptor)
+    finally:
+        os.close(descriptor)
+
+
+def _live_cell_key(row: dict[str, Any]) -> tuple[str, str, int]:
+    return str(row["task_id"]), str(row["arm"]), int(row["seed"])
+
+
+def _live_cell_receipt_path(receipt_dir: Path, row: dict[str, Any]) -> Path:
+    key = {"task_id": str(row["task_id"]), "arm": str(row["arm"]), "seed": int(row["seed"])}
+    return receipt_dir / f"{sha256_bytes(canonical_json_bytes(key))}.json"
+
+
+def _read_live_checkpoints(cells_path: Path, receipt_dir: Path) -> list[dict[str, Any]]:
+    journal_rows = read_jsonl(cells_path) if cells_path.exists() else []
+    receipt_rows = [read_json(path) for path in sorted(receipt_dir.glob("*.json"))] if receipt_dir.exists() else []
+    by_key: dict[tuple[str, str, int], dict[str, Any]] = {}
+    journal_keys: set[tuple[str, str, int]] = set()
+    for source, rows in (("journal", journal_rows), ("receipt", receipt_rows)):
+        for row in rows:
+            key = _live_cell_key(row)
+            prior = by_key.get(key)
+            if prior is not None and canonical_json_bytes(prior) != canonical_json_bytes(row):
+                raise ValueError(f"conflicting {source} checkpoint for {key}")
+            by_key[key] = row
+            if source == "journal":
+                journal_keys.add(key)
+    recovered = [by_key[key] for key in sorted(by_key) if key not in journal_keys]
+    if recovered:
+        append_jsonl(cells_path, recovered)
+    return [by_key[key] for key in sorted(by_key)]
+
+
+def _receipt_manifest_sha256(receipt_dir: Path) -> str:
+    digest = hashlib.sha256()
+    for path in sorted(receipt_dir.glob("*.json")):
+        digest.update(path.name.encode("utf-8"))
+        digest.update(b"\0")
+        digest.update(bytes.fromhex(sha256_file(path)))
+    return digest.hexdigest()
 
 
 def _tokens(text: str) -> set[str]:
@@ -803,9 +862,10 @@ def run_live_registered(
     arms = list(MESH_ARMS) if stage == "screening" else _confirmation_arms(output_dir, config, receipt["registration_id"])
     output_dir.mkdir(parents=True, exist_ok=True)
     cells_path = output_dir / f"live_{stage}_cells.jsonl"
-    existing = read_jsonl(cells_path) if cells_path.exists() else []
+    cell_receipt_dir = output_dir / f"live_{stage}_cell_receipts"
+    existing = _read_live_checkpoints(cells_path, cell_receipt_dir)
     completed = {
-        (str(row["task_id"]), str(row["arm"]), int(row["seed"]))
+        _live_cell_key(row)
         for row in existing
         if row.get("status") == "completed"
     }
@@ -891,6 +951,7 @@ def run_live_registered(
                     "pressure_after": pressure_after,
                 }
                 rows.append(row)
+                write_json_atomic(_live_cell_receipt_path(cell_receipt_dir, row), row)
                 append_jsonl(cells_path, [row])
                 if error:
                     abort_reason = "api_error"
@@ -962,6 +1023,8 @@ def run_live_registered(
         "api_error_cells": sum(row.get("status") == "api_error" for row in rows),
         "duration_ms": int((time.perf_counter() - start) * 1000),
         "cells_sha256": sha256_file(cells_path) if cells_path.exists() else "",
+        "cell_receipt_count": len(list(cell_receipt_dir.glob("*.json"))),
+        "cell_receipts_manifest_sha256": _receipt_manifest_sha256(cell_receipt_dir),
         "by_arm": live_by_arm,
         "promotion_policy": config["promotion_policy"],
         "smoke_receipt": str(output_dir / f"live_{stage}_smoke.json"),
