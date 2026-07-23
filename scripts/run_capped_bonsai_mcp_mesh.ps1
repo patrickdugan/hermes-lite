@@ -12,7 +12,7 @@ param(
   [int]$Port = 8801,
   [int]$Context = 6144,
   [ValidatePattern("^(auto|all|[0-9]+)$")]
-  [string]$GpuLayers = "auto",
+  [string]$GpuLayers = "8",
   [int]$Threads = 6,
   [int]$ThreadsBatch = 4,
   [int]$Batch = 64,
@@ -28,7 +28,7 @@ param(
   [int]$MaxTempC = 86,
   [int]$StartupSeconds = 120,
   [int]$RequestTimeoutSeconds = 180,
-  [int]$InterCellDelaySeconds = 5,
+  [int]$InterCellDelaySeconds = 10,
   [switch]$ValidateOnly,
   [switch]$JobObjectProbe
 )

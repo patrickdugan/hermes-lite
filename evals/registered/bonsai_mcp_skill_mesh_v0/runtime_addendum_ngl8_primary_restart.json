@@ -1,0 +1,59 @@
+{
+  "schema": "hermes.mcp_skill_mesh_runtime_addendum.v0",
+  "study_id": "bonsai_mcp_skill_mesh_complexity_v0",
+  "registration_id": "fdaa6dce3853b05e8dba52cf0b1c935b32123e25e746bdce317708616767679f",
+  "authored_at": "2026-07-23T19:05:00Z",
+  "supersedes_runtime_addendum_sha256": "27277d53ce6771f08f735c66c351d540ad740e577e3f4f4907d767a33cb8ec03",
+  "timing_disclosure": {
+    "after_7_ngl16_primary_rows_existed": true,
+    "primary_model_scores_consulted_for_change": false,
+    "resource_receipts_consulted_for_change": true,
+    "outcome_based_architecture_tuning": false
+  },
+  "reason": "NGL16 crossed the 86 C gate during active inference even with a twenty-second idle. Restart the primary lane uniformly at eight GPU layers and a ten-second idle to reduce active GPU power without raising the thermal threshold.",
+  "operational_changes": {
+    "gpu_layers": {
+      "from": 16,
+      "to": 8
+    },
+    "inter_cell_delay_seconds": {
+      "from": 20,
+      "to": 10
+    },
+    "primary_lane": {
+      "from": "7 NGL16 rows",
+      "to": "empty NGL8 lane"
+    }
+  },
+  "unchanged": {
+    "model_sha256": "284a335aa3fb2ced3b1b01fcb40b08aa783e3b70832767f0dd2e3fdfa134bd54",
+    "registration": true,
+    "cases": true,
+    "arms": true,
+    "prompts": true,
+    "seeds": true,
+    "runtime_context_tokens": 6144,
+    "temperature": 0,
+    "max_output_tokens": 128,
+    "cache_type_k": "q8_0",
+    "cache_type_v": "q8_0",
+    "batch": 64,
+    "ubatch": 32,
+    "pressure_monitor": "external_wrapper",
+    "resource_run_provenance": true,
+    "ram_cap_mb": 2048,
+    "cpu_cap_pct": 50,
+    "io_cap_mb_s": 50,
+    "wall_cap_seconds": 1800,
+    "max_temp_c": 86
+  },
+  "excluded_ngl16_lane": {
+    "completed_cells": 7,
+    "admissible_primary_cells": 0,
+    "cells_sha256": "7ea456b9999ab38af38af9f45155cbd44d0b4cb8e185202bd87bead05532a8b4",
+    "raw_artifact_root": "experiments/mcp_skill_mesh_v0/thermal_pilot_ngl16_primary_20260723",
+    "reason": "Uniform execution placement is required for the primary architecture comparison."
+  },
+  "promotion_rule": "Only fresh NGL8 cells with cap-valid wrapper receipts may enter screening effects or confirmation.",
+  "claim_boundary": "The excluded NGL16 rows remain usable only as runtime and thermal feasibility evidence."
+}
