@@ -1,0 +1,32 @@
+{
+  "schema": "hermes.mcp_skill_mesh_primary_chunk.v0",
+  "study_id": "bonsai_mcp_skill_mesh_complexity_v0",
+  "registration_id": "fdaa6dce3853b05e8dba52cf0b1c935b32123e25e746bdce317708616767679f",
+  "run_id": "bonsai-mcp-mesh-screening-20260723-164903",
+  "status": "completed",
+  "abort_reason": "",
+  "completed_cells_this_chunk": 5,
+  "completed_cells_cumulative": 144,
+  "matched_case_blocks_completed_this_chunk": 1,
+  "matched_case_blocks_cumulative": 24,
+  "incomplete_case_blocks": 0,
+  "cell_statuses": [
+    "completed"
+  ],
+  "cells_sha256_after_chunk": "a249bb165735cc6bfd2608f6da793c88bb94af6fb5170344df2a30124388b4e4",
+  "cell_receipts_manifest_sha256_after_chunk": "431b1be17addd2281129ba0adba803c34e0007b1439c32ca56daa81ce2832256",
+  "screening_summary_sha256": "8efd799fa12cba2791e959fc4de2e0aa2688e7a96a018bd48c7b77710b7d6674",
+  "resource_receipt_sha256": "f05372bd8d993acd2e90c7707dbc50830d08469d3abd4529e72ae6936af1cdff",
+  "resource_events_sha256": "ddef863b87ed5a655db7a644653841901d87f7d26557346ddc54a0d9626026be",
+  "peak_job_memory_mb": 1366.801,
+  "configured_job_memory_limit_mb": 2048,
+  "cap_enforcement_passed": true,
+  "cleanup_passed": true,
+  "max_observed_temperature_c": 82,
+  "frozen_max_temperature_c": 86,
+  "gpu_layers": 8,
+  "inter_cell_delay_seconds": 10,
+  "sample_cadence_seconds": 5,
+  "runtime_addendum_sha256": "df8a214bef3ae4bf5d4a70505dc8e0b9f0661dfda8fae7c5f6c1eb61f0ce3994",
+  "claim": "The final five primary cells complete the previously partial six-arm case. The screening lane is complete at 144 cells, 24 matched cases, and zero incomplete blocks under valid resource controls."
+}
