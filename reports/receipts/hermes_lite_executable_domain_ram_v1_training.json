@@ -1,0 +1,40 @@
+{
+  "schema": "hermes.executable_domain_ram_distilled_receipt.v1",
+  "study_id": "hermes_lite_executable_bridge_v1",
+  "registration_id": "9255e3b4e1395ab18d73f6bc33bdae05a93c165ade71ce06944f0fddfe043d00",
+  "run_id": "hermes-lite-executable-domain-ram-v1-20260723-184329",
+  "status": "completed",
+  "held_outcomes_consumed": false,
+  "training": {
+    "method": "sparse_bernoulli_log_odds_v1",
+    "seed": 8819,
+    "epochs": 40,
+    "train_cases": 16,
+    "contrast_rows": 48,
+    "supported_labels": 4,
+    "vocabulary_features": 211,
+    "route_train_accuracy": 1.0
+  },
+  "resources": {
+    "elapsed_seconds": 0.017238,
+    "process_rss_mb": 31.48,
+    "ram_cap_mb": 2048,
+    "mean_io_mb_s": 0.0,
+    "io_cap_mb_s": 50.0,
+    "cpu_cap_pct": 50,
+    "wall_cap_seconds": 300,
+    "cleanup_passed": true,
+    "owned_processes_remaining": 0,
+    "gpu_compute_apps_after": 0
+  },
+  "artifacts": {
+    "domain_ram_policy_sha256": "a4141152d1c5313aebc5bada357af012bae91042fe0500477ca16dd8a9562f68",
+    "domain_ram_policy_bytes": 28554,
+    "training_receipt_sha256": "3e83de8d12f65c5ad6af447de7c266d3c0b16349876e62bb6c7a3fa5be626ff5",
+    "wrapper_manifest_sha256": "deb71d95d15d8be2e2c9f6ff4702c69f77588665a019bd9785d3ed8642e72707",
+    "wrapper_summary_sha256": "4b27578f6ad545e2f818f1d808b00c4b67b255bc017249fa47c57d8b33397ced",
+    "cleanup_summary_sha256": "e4d42722c49822a88e287f6bbbe8e3837a84086ee4443c1e48e33181b80fc42b",
+    "published_hash_matches_run": true
+  },
+  "claim_boundary": "The sparse domain RAM fits only the 16 registered level-1/4 development tasks. This receipt contains no Bonsai or full-Hermes executable response."
+}
