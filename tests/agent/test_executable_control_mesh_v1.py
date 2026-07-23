@@ -21,6 +21,11 @@ from agent.executable_control_mesh_v1 import (
     verify_registration,
 )
 from agent.lean_control_mesh_v1 import SparseRAMPolicy
+from scripts.run_full_hermes_baseline_v1 import (
+    AgentResultError,
+    _extract_agent_response,
+    _load_api_key,
+)
 
 
 CONFIG = Path("configs/hermes_lite_executable_bridge_v1.json")
@@ -155,6 +160,46 @@ def test_full_hermes_runner_pins_context_and_disables_tools():
     assert "minimum_context_length=context_tokens" in script
     assert "full Hermes prompt batch hash mismatch" in script
     assert "print(key)" not in script
+
+
+def test_full_hermes_runner_rejects_empty_or_failed_agent_results():
+    with pytest.raises(AgentResultError, match="empty_final_response"):
+        _extract_agent_response({"final_response": "", "completed": True})
+    with pytest.raises(AgentResultError, match="agent_result_failed"):
+        _extract_agent_response(
+            {
+                "final_response": None,
+                "completed": False,
+                "failed": True,
+                "error": "provider detail must not enter the receipt",
+            }
+        )
+
+
+def test_full_hermes_runner_extracts_response_and_usage():
+    content, usage = _extract_agent_response(
+        {
+            "final_response": "  {\"actions\": []}  ",
+            "completed": True,
+            "input_tokens": 11,
+            "output_tokens": 7,
+            "total_tokens": 18,
+        }
+    )
+
+    assert content == '{"actions": []}'
+    assert usage["input_tokens"] == 11
+    assert usage["total_tokens"] == 18
+
+
+def test_full_hermes_runner_loads_named_dotenv_key(tmp_path):
+    credential = tmp_path / ".env"
+    credential.write_text(
+        "# fixture\nOPENROUTER_API_KEY='not-a-real-key'\n",
+        encoding="utf-8",
+    )
+
+    assert _load_api_key(credential, "OPENROUTER_API_KEY") == "not-a-real-key"
 
 
 def test_cap_wrappers_have_explicit_executable_bridge_modes():

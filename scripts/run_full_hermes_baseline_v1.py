@@ -5,7 +5,6 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-import os
 import sys
 import time
 from pathlib import Path
@@ -34,11 +33,59 @@ def _sha256_file(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def _load_bare_key(path: Path) -> str:
-    value = path.read_text(encoding="utf-8").strip()
-    if not value.startswith("sk-"):
-        raise ValueError("GPT API credential is not a bare OpenAI key")
+def _load_api_key(path: Path, variable: str = "") -> str:
+    text = path.read_text(encoding="utf-8")
+    if variable:
+        value = ""
+        for raw_line in text.splitlines():
+            line = raw_line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            name, candidate = line.split("=", 1)
+            if name.strip() == variable:
+                value = candidate.strip().strip("\"'")
+                break
+        if not value:
+            raise ValueError(f"credential variable is absent: {variable}")
+        return value
+    value = text.strip()
+    if not value:
+        raise ValueError("credential file is empty")
     return value
+
+
+class AgentResultError(RuntimeError):
+    """A controlled failure returned as an AIAgent result dictionary."""
+
+
+def _extract_agent_response(result: Any) -> tuple[str, dict[str, Any]]:
+    if not isinstance(result, dict):
+        raise AgentResultError("invalid_agent_result")
+    if result.get("failed") or result.get("error"):
+        raise AgentResultError("agent_result_failed")
+    if result.get("interrupted"):
+        raise AgentResultError("agent_result_interrupted")
+    if result.get("partial"):
+        raise AgentResultError("agent_result_partial")
+    content = str(result.get("final_response") or "").strip()
+    if not content:
+        raise AgentResultError("empty_final_response")
+    usage = result.get("usage")
+    if not isinstance(usage, dict):
+        usage = {
+            name: result.get(name, 0)
+            for name in (
+                "input_tokens",
+                "output_tokens",
+                "cache_read_tokens",
+                "cache_write_tokens",
+                "reasoning_tokens",
+                "prompt_tokens",
+                "completion_tokens",
+                "total_tokens",
+            )
+        }
+    return content, usage
 
 
 def run(
@@ -47,6 +94,9 @@ def run(
     *,
     hermes_root: Path,
     api_key_path: Path,
+    api_key_variable: str,
+    provider: str,
+    base_url: str,
     model: str,
     context_tokens: int,
     max_tokens: int,
@@ -63,7 +113,7 @@ def run(
     if any(row.get("status") != "completed" for row in existing):
         raise ValueError("non-completed full Hermes checkpoint requires a fresh output lane")
     completed = {str(row["task_id"]) for row in existing}
-    key = os.getenv("OPENAI_API_KEY", "").strip() or _load_bare_key(api_key_path)
+    key = _load_api_key(api_key_path, api_key_variable)
     started = time.perf_counter()
     for prompt in prompts:
         task_id = str(prompt["task_id"])
@@ -76,8 +126,8 @@ def run(
         try:
             agent = AIAgent(
                 api_key=key,
-                base_url="https://api.openai.com/v1",
-                provider="openai",
+                base_url=base_url,
+                provider=provider,
                 model=model,
                 max_iterations=1,
                 enabled_toolsets=["__no_tools__"],
@@ -97,10 +147,13 @@ def run(
                 task_id=task_id,
                 sync_honcho=False,
             )
-            content = str(result.get("final_response") or "")
-            usage = result.get("usage", {}) if isinstance(result, dict) else {}
+            content, usage = _extract_agent_response(result)
         except Exception as exc:
-            error = f"{type(exc).__name__}: {exc}"
+            error = (
+                f"{type(exc).__name__}: {exc}"
+                if isinstance(exc, AgentResultError)
+                else type(exc).__name__
+            )
         row = {
             "schema": "hermes.full_hermes_raw_result.v1",
             "task_id": task_id,
@@ -110,6 +163,9 @@ def run(
             "packet_tokens_est": int(prompt["packet_tokens_est"]),
             "usage": usage,
             "raw_content": content[:4000],
+            "provider": provider,
+            "model": model,
+            "context_tokens": context_tokens,
         }
         _append_jsonl(output_path, row)
         if error:
@@ -123,6 +179,8 @@ def run(
         "completed": sum(row["status"] == "completed" for row in rows),
         "api_errors": sum(row["status"] != "completed" for row in rows),
         "duration_ms": int((time.perf_counter() - started) * 1000),
+        "provider": provider,
+        "base_url": base_url,
         "model": model,
         "context_tokens": context_tokens,
         "prompts_sha256": prompts_sha256,
@@ -136,6 +194,9 @@ def main() -> None:
     parser.add_argument("--output-path", required=True)
     parser.add_argument("--hermes-root", required=True)
     parser.add_argument("--api-key-path", required=True)
+    parser.add_argument("--api-key-variable", default="")
+    parser.add_argument("--provider", default="openai")
+    parser.add_argument("--base-url", default="https://api.openai.com/v1")
     parser.add_argument("--model", default="gpt-4.1")
     parser.add_argument("--context-tokens", type=int, default=160000)
     parser.add_argument("--max-tokens", type=int, default=128)
@@ -147,6 +208,9 @@ def main() -> None:
         Path(args.output_path),
         hermes_root=Path(args.hermes_root),
         api_key_path=Path(args.api_key_path),
+        api_key_variable=args.api_key_variable,
+        provider=args.provider,
+        base_url=args.base_url,
         model=args.model,
         context_tokens=args.context_tokens,
         max_tokens=args.max_tokens,

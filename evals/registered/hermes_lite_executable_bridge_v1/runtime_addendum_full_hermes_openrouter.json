@@ -1,0 +1,43 @@
+{
+  "schema": "hermes.full_hermes_runtime_addendum.v1",
+  "addendum_id": "3e08e850285086e1ec924ad5281b571f39b2b0327ff97023d3741198cb27af82",
+  "addendum_id_definition": "SHA-256 of canonical JSON with addendum_id and addendum_id_definition omitted",
+  "study_id": "hermes_lite_executable_bridge_v1",
+  "registration_id": "9255e3b4e1395ab18d73f6bc33bdae05a93c165ade71ce06944f0fddfe043d00",
+  "authored_after_failed_attempt": true,
+  "full_hermes_responses_consumed": 0,
+  "failed_attempt": {
+    "provider": "openai",
+    "model": "gpt-4.1",
+    "attempted_cells": 8,
+    "valid_model_responses": 0,
+    "failure_class": "authentication",
+    "runner_summary_sha256": "c2291113aa7abad31946832d8223a8a64262d1f33011f14139506208987b626c",
+    "raw_results_sha256": "6089de3ddfe3afb914bd6618649b328668d87923b200f80138aeffde8103426d"
+  },
+  "prospective_change": {
+    "provider": "openrouter",
+    "base_url": "https://openrouter.ai/api/v1",
+    "model": "openai/gpt-4.1",
+    "credential_source": "~/.hermes/.env:OPENROUTER_API_KEY",
+    "fresh_output_lane": "full_hermes_openrouter",
+    "response_validation": "Treat failed, partial, interrupted, or empty AIAgent results as API errors and stop the lane."
+  },
+  "model_catalog_preflight": {
+    "checked_before_outcomes": true,
+    "model_id": "openai/gpt-4.1",
+    "reported_context_length": 1047576,
+    "registered_context_cap": 160000
+  },
+  "unchanged": {
+    "prompts_sha256": "93017a1cd71885dd654d323b51d8833832f30b604f8d3904a69bc83572b3ad5e",
+    "prompt_count": 8,
+    "model_family": "GPT-4.1",
+    "context_tokens": 160000,
+    "max_tokens": 128,
+    "tool_surface": "none",
+    "scorer": "frozen executable bridge v1 scorer",
+    "task_split": "frozen executable bridge v1 held split"
+  },
+  "claim_boundary": "This addendum changes the API route and model identifier syntax after an authentication construction failure with zero valid model responses. It does not change prompts, model family, context, decoding, tool authority, held tasks, or scoring."
+}

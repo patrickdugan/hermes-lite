@@ -722,7 +722,10 @@ def score_full_hermes(
         if task_id in seen or task_id not in cases:
             raise ValueError(f"invalid or duplicate full Hermes task: {task_id}")
         seen.add(task_id)
-        parsed = _extract_json_object(str(result.get("raw_content", "")))
+        raw_content = str(result.get("raw_content", ""))
+        if result.get("status") == "completed" and not raw_content.strip():
+            raise ValueError(f"completed full Hermes task has empty response: {task_id}")
+        parsed = _extract_json_object(raw_content)
         score = _score_live_response(cases[task_id], parsed)
         rows.append(
             {
@@ -734,8 +737,11 @@ def score_full_hermes(
                 "error": result.get("error", ""),
                 "latency_ms": result.get("latency_ms", 0),
                 "usage": result.get("usage", {}),
-                "raw_content": str(result.get("raw_content", ""))[:2000],
+                "raw_content": raw_content[:2000],
                 "packet_tokens_est": int(result.get("packet_tokens_est", 0)),
+                "provider": str(result.get("provider", "")),
+                "model": str(result.get("model", "")),
+                "context_tokens": int(result.get("context_tokens", 0)),
             }
         )
     expected_ids = set(cases)
@@ -744,13 +750,25 @@ def score_full_hermes(
     cells_path = output_dir / "live_full_hermes_cells.jsonl"
     write_jsonl(cells_path, rows)
     completed = [row for row in rows if row["status"] == "completed"]
+    runtime_models = {row["model"] for row in completed if row["model"]}
+    runtime_providers = {row["provider"] for row in completed if row["provider"]}
+    runtime_contexts = {row["context_tokens"] for row in completed if row["context_tokens"]}
+    if len(runtime_models) > 1 or len(runtime_providers) > 1 or len(runtime_contexts) > 1:
+        raise ValueError("full Hermes result lane mixes runtime identities")
     summary = {
         "schema": FULL_SUMMARY_SCHEMA,
         "status": "completed" if not missing and len(completed) == len(cases) else "incomplete",
         "study_id": protocol["study_id"],
         "registration_id": receipt["registration_id"],
-        "model": protocol["inference"]["full_hermes_model"],
-        "context_tokens": protocol["inference"]["full_hermes_context_tokens"],
+        "provider": next(iter(runtime_providers), "unreported"),
+        "model": next(
+            iter(runtime_models),
+            protocol["inference"]["full_hermes_model"],
+        ),
+        "context_tokens": next(
+            iter(runtime_contexts),
+            protocol["inference"]["full_hermes_context_tokens"],
+        ),
         "expected_cells": len(cases),
         "completed_cells": len(completed),
         "missing_task_ids": missing,

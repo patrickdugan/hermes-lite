@@ -1,0 +1,21 @@
+{
+  "schema": "hermes.full_hermes_construction_failure.v1",
+  "study_id": "hermes_lite_executable_bridge_v1",
+  "registration_id": "9255e3b4e1395ab18d73f6bc33bdae05a93c165ade71ce06944f0fddfe043d00",
+  "status": "construction_failure",
+  "attempted_cells": 8,
+  "completed_cells": 0,
+  "api_error_cells": 8,
+  "model_responses_consumed": 0,
+  "failure": "The direct OpenAI credential was rejected. Full Hermes returned failed result dictionaries with empty final_response values, which the original runner incorrectly labeled completed.",
+  "invalidated_output": {
+    "scored_task_success_rate": 0.0,
+    "reason": "The score was computed from eight empty responses and is excluded from every efficacy denominator."
+  },
+  "artifacts": {
+    "prompts_sha256": "93017a1cd71885dd654d323b51d8833832f30b604f8d3904a69bc83572b3ad5e",
+    "runner_summary_sha256": "c2291113aa7abad31946832d8223a8a64262d1f33011f14139506208987b626c",
+    "raw_results_sha256": "6089de3ddfe3afb914bd6618649b328668d87923b200b80138aeffde8103426d"
+  },
+  "prospective_fix": "Reject failed, partial, interrupted, or empty AIAgent results; record only a controlled error class; retry in a fresh lane through OpenRouter with openai/gpt-4.1."
+}
