@@ -20,6 +20,7 @@ param(
   [int]$MinFreeVramMb = 512,
   [int]$MaxTempC = 86,
   [int]$StartupSeconds = 120,
+  [int]$RequestTimeoutSeconds = 180,
   [switch]$ValidateOnly
 )
 
@@ -99,7 +100,8 @@ function Stop-OwnedProcess {
 
 function Get-ProcessSample {
   param([int[]]$OwnedPids)
-  $rssBytes = 0.0
+  $workingSetBytes = 0.0
+  $privateBytes = 0.0
   $ioBytes = 0.0
   $alive = @()
   foreach ($ownedPid in $OwnedPids) {
@@ -111,7 +113,8 @@ function Get-ProcessSample {
       continue
     }
     $alive += $ownedPid
-    $rssBytes += [double]$process.WorkingSet64
+    $workingSetBytes += [double]$process.WorkingSet64
+    $privateBytes += [double]$process.PrivateMemorySize64
     $readBytes = if ($null -ne $process.PSObject.Properties["IOReadBytes"]) {
       [double]$process.IOReadBytes
     } else {
@@ -126,7 +129,8 @@ function Get-ProcessSample {
   }
   return @{
     alive_pids = $alive
-    rss_mb = [math]::Round($rssBytes / 1MB, 3)
+    private_mb = [math]::Round($privateBytes / 1MB, 3)
+    working_set_mb = [math]::Round($workingSetBytes / 1MB, 3)
     io_bytes = $ioBytes
   }
 }
@@ -221,6 +225,7 @@ $manifest = [ordered]@{
     batch = $Batch
     ubatch = $UBatch
     cache_ram_mb = $CacheRamMb
+    request_timeout_seconds = $RequestTimeoutSeconds
   }
   checkpoint_cadence = "after every live cell"
   chunk_strategy = "one case-arm response per request"
@@ -313,7 +318,7 @@ $evalArgs = @(
   "--base-url", "http://127.0.0.1:$Port/v1",
   "--model", "local/bonsai-8b",
   "--stage", $Stage,
-  "--timeout-s", "90",
+  "--timeout-s", "$RequestTimeoutSeconds",
   "--max-tokens", "128",
   "--min-free-mb", "$MinFreeVramMb",
   "--max-temp-c", "$MaxTempC"
@@ -323,6 +328,7 @@ $server = $null
 $evaluator = $null
 $abortReason = ""
 $peakRamMb = 0.0
+$peakWorkingSetMb = 0.0
 $sumRamMb = 0.0
 $sampleCount = 0
 $peakIoMbS = 0.0
@@ -397,16 +403,18 @@ try {
     $ioMbS = [math]::Max(0.0, ($sample.io_bytes - $lastIoBytes) / 1MB / $elapsed)
     $lastIoBytes = $sample.io_bytes
     $lastSampleAt = $now
-    $peakRamMb = [math]::Max($peakRamMb, [double]$sample.rss_mb)
+    $peakRamMb = [math]::Max($peakRamMb, [double]$sample.private_mb)
+    $peakWorkingSetMb = [math]::Max($peakWorkingSetMb, [double]$sample.working_set_mb)
     $peakIoMbS = [math]::Max($peakIoMbS, $ioMbS)
-    $sumRamMb += [double]$sample.rss_mb
+    $sumRamMb += [double]$sample.private_mb
     $sampleCount += 1
     $ioExcessStreak = if ($ioMbS -gt $IoMbS) { $ioExcessStreak + 1 } else { 0 }
     $gpu = Get-GpuSnapshot -OwnedPids @($server.Id, $evaluator.Id)
     Write-Event @{
       ts = $now.ToUniversalTime().ToString("o")
       event = "resource_sample"
-      rss_mb = $sample.rss_mb
+      private_mb = $sample.private_mb
+      working_set_mb = $sample.working_set_mb
       io_mb_s = [math]::Round($ioMbS, 3)
       gpu = $gpu
       alive_pids = $sample.alive_pids
@@ -495,6 +503,7 @@ $resourceReceipt = [ordered]@{
   caps = $manifest.caps
   peak_ram_mb = [math]::Round($peakRamMb, 3)
   avg_ram_mb = if ($sampleCount) { [math]::Round($sumRamMb / $sampleCount, 3) } else { 0 }
+  peak_working_set_mb = [math]::Round($peakWorkingSetMb, 3)
   peak_io_mb_s = [math]::Round($peakIoMbS, 3)
   cpu_pct = $CpuPct
   samples = $sampleCount

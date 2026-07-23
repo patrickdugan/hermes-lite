@@ -127,3 +127,9 @@ unowned port, places its server and evaluator PIDs in one Windows Job Object,
 and enforces 2,048 MB RAM, 50% CPU, 50 MB/s sustained I/O, and a 1,800-second
 wall limit by default. It records one resource sample per second, treats an
 abort as a valid result, and terminates only its recorded PIDs.
+
+The first live segment used the original 90-second per-request timeout. After
+it completed all 36 storyworld cells, the first logic full-context request was
+right-censored by that timeout. Subsequent resumptions use a labeled
+180-second operational timeout addendum; the registration, tasks, arms,
+model, seed, context, and resource caps are unchanged.
