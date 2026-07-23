@@ -1,0 +1,64 @@
+{
+  "schema": "hermes.mcp_skill_mesh_runtime_addendum.v0",
+  "study_id": "bonsai_mcp_skill_mesh_complexity_v0",
+  "registration_id": "fdaa6dce3853b05e8dba52cf0b1c935b32123e25e746bdce317708616767679f",
+  "authored_at": "2026-07-23T18:54:00Z",
+  "supersedes_runtime_addendum_sha256": "dbc5f13d6d06ffd821c4b5c7026eaefc4e1bb732fb8820b938017b89beccecc9",
+  "timing_disclosure": {
+    "after_batch64_context12288_api_error": true,
+    "before_any_admissible_cuda_model_outcome": true,
+    "outcome_based_tuning": false
+  },
+  "reason": "Batch64 reproduced the CUDA failure, so dynamic allocation is governed by the 12288-token context. Allocate a 6144-token runtime window, which remains more than five times the largest registered packet and above the 5000-token working budget.",
+  "single_change": {
+    "runtime_context_tokens": {
+      "from": 12288,
+      "to": 6144
+    }
+  },
+  "registered_context_interpretation": {
+    "hard_context_tokens": 12000,
+    "role": "ceiling",
+    "largest_registered_packet_tokens_est": 1101,
+    "working_budget_tokens": 5000,
+    "runtime_window_covers_every_registered_packet": true
+  },
+  "unchanged": {
+    "model_sha256": "284a335aa3fb2ced3b1b01fcb40b08aa783e3b70832767f0dd2e3fdfa134bd54",
+    "llama_cpp_release": "b10064",
+    "cuda_runtime": "12.4",
+    "registration": true,
+    "cases": true,
+    "arms": true,
+    "prompts": true,
+    "seeds": true,
+    "temperature": 0,
+    "max_output_tokens": 128,
+    "cache_type_k": "q8_0",
+    "cache_type_v": "q8_0",
+    "gpu_layers": 16,
+    "batch": 64,
+    "ubatch": 32,
+    "parallel_slots": 1,
+    "prompt_cache_ram_mb": 0,
+    "pressure_monitor": "external_wrapper",
+    "ram_cap_mb": 2048,
+    "cpu_cap_pct": 50,
+    "io_cap_mb_s": 50,
+    "wall_cap_seconds": 1800,
+    "execution_mode": "supervised_foreground_only"
+  },
+  "trigger_receipt": {
+    "run_id": "bonsai-mcp-mesh-screening-20260723-144825",
+    "status": "aborted",
+    "abort_reason": "api_error",
+    "completed_cells": 0,
+    "api_error_cells": 1,
+    "request_packet_tokens_est": 1091,
+    "terminal_peak_job_memory_mb": 2048.133,
+    "cap_enforcement_passed": true,
+    "cleanup_passed": true,
+    "server_error": "CUDA error followed by connection reset"
+  },
+  "claim_boundary": "The runtime window is matched across arms and covers all materialized prompts. No claim is made about behavior for packets above 6144 tokens."
+}

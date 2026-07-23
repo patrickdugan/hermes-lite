@@ -10,7 +10,7 @@ param(
   [int]$IoMbS = 50,
   [int]$WallSeconds = 1800,
   [int]$Port = 8801,
-  [int]$Context = 12288,
+  [int]$Context = 6144,
   [ValidatePattern("^(auto|all|[0-9]+)$")]
   [string]$GpuLayers = "auto",
   [int]$Threads = 6,
