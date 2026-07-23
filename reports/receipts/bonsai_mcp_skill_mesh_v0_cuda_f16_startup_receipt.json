@@ -1,0 +1,19 @@
+{
+  "schema": "hermes.mcp_skill_mesh_resource_stop.v0",
+  "study_id": "bonsai_mcp_skill_mesh_complexity_v0",
+  "registration_id": "fdaa6dce3853b05e8dba52cf0b1c935b32123e25e746bdce317708616767679f",
+  "run_id": "bonsai-mcp-mesh-screening-20260723-143553",
+  "status": "aborted",
+  "abort_reason": "server_startup_failure",
+  "completed_cells": 0,
+  "expected_cells": 144,
+  "peak_job_memory_mb": 2008.875,
+  "configured_job_memory_limit_mb": 2048,
+  "limit_flags": 768,
+  "cap_enforcement_passed": true,
+  "cleanup_passed": true,
+  "cuda_allocation_request_mb": 1728,
+  "cuda_failure": "KV cache allocation failed with cudaMalloc out of memory",
+  "runtime_addendum_sha256": "e93eaaee890f2c478a3672ccdc7f83b8c40b84989c71186585edff4c61a27030",
+  "claim": "The f16-KV CUDA runtime is infeasible for a 12288-token context on the available 4096 MiB GPU under this configuration; no model outcome was observed."
+}
