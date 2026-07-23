@@ -1,0 +1,11 @@
+{
+  "calibration_summary_sha256": "79b0250e045b7c842ad699af4787dd025f0cbdb2335d5f282e97e7e87540b5e5",
+  "cell_count": 144,
+  "deterministic_cells_sha256": "af39013684f6e7704560d62804574d45fd5a81fac2c0adb53ac457e607253969",
+  "integrity_failures": 0,
+  "raw_artifact_root": "experiments/mcp_skill_mesh_v0/calibration",
+  "registered_construction_commit": "3783118",
+  "registration_id": "fdaa6dce3853b05e8dba52cf0b1c935b32123e25e746bdce317708616767679f",
+  "schema": "hermes.mcp_skill_mesh_result_receipt.v0",
+  "status": "deterministic_calibration_only"
+}
