@@ -41,5 +41,13 @@ wandb/
 # Project memory (generated at runtime)
 .hermes/
 
+# Local agent/session state. These directories may contain credentials.
+/.airis-pilot/
+/codex-chat-sessions/
+
+# Experiment runs remain local unless explicitly distilled into a report.
+/experiments/*
+!/experiments/README.md
+
 # Node (for demo projects)
 node_modules/
