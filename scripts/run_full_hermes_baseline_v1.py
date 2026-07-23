@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import sys
@@ -23,6 +24,10 @@ def _append_jsonl(path: Path, row: dict[str, Any]) -> None:
         handle.write("\n")
 
 
+def _sha256_file(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
 def _load_bare_key(path: Path) -> str:
     value = path.read_text(encoding="utf-8").strip()
     if not value.startswith("sk-"):
@@ -39,10 +44,14 @@ def run(
     model: str,
     context_tokens: int,
     max_tokens: int,
+    expected_prompts_sha256: str,
 ) -> dict[str, Any]:
     sys.path.insert(0, str(hermes_root.resolve()))
     from run_agent import AIAgent
 
+    prompts_sha256 = _sha256_file(prompts_path)
+    if prompts_sha256 != expected_prompts_sha256:
+        raise ValueError("full Hermes prompt batch hash mismatch")
     prompts = _read_jsonl(prompts_path)
     existing = _read_jsonl(output_path) if output_path.exists() else []
     if any(row.get("status") != "completed" for row in existing):
@@ -108,6 +117,10 @@ def run(
         "completed": sum(row["status"] == "completed" for row in rows),
         "api_errors": sum(row["status"] != "completed" for row in rows),
         "duration_ms": int((time.perf_counter() - started) * 1000),
+        "model": model,
+        "context_tokens": context_tokens,
+        "prompts_sha256": prompts_sha256,
+        "results_sha256": _sha256_file(output_path) if output_path.exists() else "",
     }
 
 
@@ -120,6 +133,8 @@ def main() -> None:
     parser.add_argument("--model", default="gpt-4.1")
     parser.add_argument("--context-tokens", type=int, default=160000)
     parser.add_argument("--max-tokens", type=int, default=128)
+    parser.add_argument("--expected-prompts-sha256", required=True)
+    parser.add_argument("--summary-path", required=True)
     args = parser.parse_args()
     result = run(
         Path(args.prompts_path),
@@ -129,6 +144,11 @@ def main() -> None:
         model=args.model,
         context_tokens=args.context_tokens,
         max_tokens=args.max_tokens,
+        expected_prompts_sha256=args.expected_prompts_sha256,
+    )
+    Path(args.summary_path).write_text(
+        json.dumps(result, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
     )
     print(json.dumps(result, indent=2, sort_keys=True))
 

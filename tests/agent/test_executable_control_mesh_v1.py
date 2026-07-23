@@ -153,6 +153,7 @@ def test_full_hermes_runner_pins_context_and_disables_tools():
     assert 'enabled_toolsets=["__no_tools__"]' in script
     assert "context_length_override=context_tokens" in script
     assert "minimum_context_length=context_tokens" in script
+    assert "full Hermes prompt batch hash mismatch" in script
     assert "print(key)" not in script
 
 

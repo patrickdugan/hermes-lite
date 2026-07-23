@@ -1,0 +1,15 @@
+{
+  "schema": "hermes.full_hermes_prompt_manifest.v1",
+  "study_id": "hermes_lite_executable_bridge_v1",
+  "registration_id": "9255e3b4e1395ab18d73f6bc33bdae05a93c165ade71ce06944f0fddfe043d00",
+  "authored_after_bonsai_outcomes": true,
+  "full_hermes_outcomes_consumed": false,
+  "prompt_count": 8,
+  "prompts_sha256": "93017a1cd71885dd654d323b51d8833832f30b604f8d3904a69bc83572b3ad5e",
+  "max_packet_tokens_est": 7048,
+  "model": "gpt-4.1",
+  "provider": "openai",
+  "context_tokens": 160000,
+  "tool_surface": "none",
+  "claim_boundary": "This manifest freezes the full-Hermes input batch after Bonsai outcomes but before any full-Hermes response. The relative-efficacy denominator is therefore prospective with respect to the baseline model."
+}
