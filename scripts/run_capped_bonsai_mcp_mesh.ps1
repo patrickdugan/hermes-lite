@@ -42,6 +42,11 @@ param(
 $ErrorActionPreference = "Stop"
 $RepoRoot = Split-Path -Parent $PSScriptRoot
 $Python = Join-Path $RepoRoot ".venv\Scripts\python.exe"
+$EvaluatorPython = if ($StudyMode -eq "executable_bridge_v1") {
+  (Get-Command python -ErrorAction Stop).Source
+} else {
+  $Python
+}
 $ServerExe = Join-Path $LlamaDir "llama-server.exe"
 $RegistrationDir = if ([IO.Path]::IsPathRooted($RegistrationDir)) {
   [IO.Path]::GetFullPath($RegistrationDir)
@@ -208,13 +213,19 @@ function Get-GpuSnapshot {
   return $result
 }
 
-$requiredPaths = @($Python, $ServerExe, $ModelPath, $RegistrationDir)
+$requiredPaths = @($Python, $EvaluatorPython, $ServerExe, $ModelPath, $RegistrationDir)
 if ($StudyMode -eq "executable_bridge_v1") {
   $requiredPaths += @($BaseModelDir, $DomainModelDir)
 }
 foreach ($requiredPath in $requiredPaths) {
   if (-not (Test-Path -LiteralPath $requiredPath)) {
     throw "Required path not found: $requiredPath"
+  }
+}
+if ($StudyMode -eq "executable_bridge_v1") {
+  & $EvaluatorPython -c "import psutil, torch" 2>$null
+  if ($LASTEXITCODE -ne 0) {
+    throw "Executable bridge evaluator requires the optional neural environment with torch and psutil."
   }
 }
 if (
@@ -280,6 +291,8 @@ $manifest = [ordered]@{
   live_output_dir = $LiveRoot
   model_path = $ModelPath
   server_exe = $ServerExe
+  evaluator_python = $EvaluatorPython
+  evaluator_python_sha256 = (Get-FileHash -LiteralPath $EvaluatorPython -Algorithm SHA256).Hash.ToLowerInvariant()
   server_exe_sha256 = (Get-FileHash -LiteralPath $ServerExe -Algorithm SHA256).Hash.ToLowerInvariant()
   runtime_files = $runtimeEvidence
   endpoint = "http://127.0.0.1:$Port/v1"
@@ -549,7 +562,7 @@ try {
   }
 
   $evaluator = Start-Process `
-    -FilePath $Python `
+    -FilePath $EvaluatorPython `
     -ArgumentList $evalArgs `
     -WorkingDirectory $RepoRoot `
     -PassThru `

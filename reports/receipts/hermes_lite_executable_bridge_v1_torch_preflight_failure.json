@@ -1,0 +1,24 @@
+{
+  "schema": "hermes.executable_control_mesh_construction_failure.v1",
+  "study_id": "hermes_lite_executable_bridge_v1",
+  "registration_id": "9255e3b4e1395ab18d73f6bc33bdae05a93c165ade71ce06944f0fddfe043d00",
+  "run_id": "hermes-lite-executable-bridge-screening-20260723-184443",
+  "status": "construction_failure",
+  "failure": "The wrapper selected the dependency-light repo venv for an evaluator that imports the v1.1 Torch TRM.",
+  "completed_cells": 0,
+  "outcomes_consumed": false,
+  "resources": {
+    "peak_job_memory_mb": 1023.891,
+    "ram_cap_mb": 2048,
+    "cap_enforcement_passed": true,
+    "cleanup_passed": true,
+    "lingering_owned_pids": 0,
+    "owned_gpu_memory_mb_after": 0
+  },
+  "artifacts": {
+    "resource_receipt_sha256": "721e2dc87cf3ecd5c5c3c1e802ded06af23e2ef00a181ea9e8343be4aa7fcf71",
+    "wrapper_manifest_sha256": "cd5630fe1968f27eeb4cbb081395267511a8f627ee56b2c441206263de6a2abd",
+    "evaluator_stderr_sha256": "9d8ab99c98c66d8860c7e02f3b4df29e8bbc64cfdf91eca9db9c0c285256b96e"
+  },
+  "prospective_fix": "Resolve and hash a separate Torch-capable evaluator Python, require torch and psutil in preflight, and leave the llama.cpp server on the existing validated runtime."
+}
