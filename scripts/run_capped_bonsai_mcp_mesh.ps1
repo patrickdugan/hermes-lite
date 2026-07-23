@@ -21,7 +21,8 @@ param(
   [int]$MaxTempC = 86,
   [int]$StartupSeconds = 120,
   [int]$RequestTimeoutSeconds = 180,
-  [switch]$ValidateOnly
+  [switch]$ValidateOnly,
+  [switch]$JobObjectProbe
 )
 
 $ErrorActionPreference = "Stop"
@@ -232,6 +233,7 @@ $manifest = [ordered]@{
   owned_pids = @()
   created_at = (Get-Date).ToUniversalTime().ToString("o")
   validate_only = [bool]$ValidateOnly
+  job_object_probe = [bool]$JobObjectProbe
 }
 Write-JsonFile -Path $ManifestPath -Value $manifest
 
@@ -257,6 +259,7 @@ public static class BonsaiMeshJob {
   [DllImport("kernel32.dll", CharSet = CharSet.Unicode)] public static extern IntPtr CreateJobObject(IntPtr a, string n);
   [DllImport("kernel32.dll")] public static extern bool AssignProcessToJobObject(IntPtr j, IntPtr p);
   [DllImport("kernel32.dll")] public static extern bool SetInformationJobObject(IntPtr j, int t, IntPtr i, uint s);
+  [DllImport("kernel32.dll", SetLastError = true)] public static extern bool QueryInformationJobObject(IntPtr j, int t, IntPtr i, uint s, out uint r);
   public const int Extended = 9; public const int Cpu = 15;
   public const uint ProcessMemory = 0x100; public const uint JobMemory = 0x200;
   public const uint CpuEnable = 0x1; public const uint CpuHardCap = 0x4;
@@ -264,6 +267,20 @@ public static class BonsaiMeshJob {
   [StructLayout(LayoutKind.Sequential)] public struct BASIC { public long a,b; public uint flags; public UIntPtr c,d; public uint e; public long f; public uint g,h; }
   [StructLayout(LayoutKind.Sequential)] public struct EXTENDED { public BASIC basic; public IO_COUNTERS io; public UIntPtr processMemory; public UIntPtr jobMemory; public UIntPtr peakProcess; public UIntPtr peakJob; }
   [StructLayout(LayoutKind.Sequential)] public struct CPU_RATE { public uint flags; public uint rate; }
+  public static bool QueryExtended(IntPtr job, out EXTENDED value) {
+    uint returned;
+    IntPtr pointer = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(EXTENDED)));
+    try {
+      if (!QueryInformationJobObject(job, Extended, pointer, (uint)Marshal.SizeOf(typeof(EXTENDED)), out returned)) {
+        value = new EXTENDED();
+        return false;
+      }
+      value = (EXTENDED)Marshal.PtrToStructure(pointer, typeof(EXTENDED));
+      return true;
+    } finally {
+      Marshal.FreeHGlobal(pointer);
+    }
+  }
 }
 '@
 }
@@ -282,6 +299,25 @@ function Set-JobStruct {
   }
 }
 
+function Get-JobMemoryAccounting {
+  param($Job)
+  $accounting = New-Object BonsaiMeshJob+EXTENDED
+  if (-not [BonsaiMeshJob]::QueryExtended($Job, [ref]$accounting)) {
+    return @{
+      available = $false
+      error_code = [System.Runtime.InteropServices.Marshal]::GetLastWin32Error()
+      peak_process_memory_mb = 0
+      peak_job_memory_mb = 0
+    }
+  }
+  return @{
+    available = $true
+    error_code = 0
+    peak_process_memory_mb = [math]::Round($accounting.peakProcess.ToUInt64() / 1MB, 3)
+    peak_job_memory_mb = [math]::Round($accounting.peakJob.ToUInt64() / 1MB, 3)
+  }
+}
+
 $job = [BonsaiMeshJob]::CreateJobObject([IntPtr]::Zero, $RunId)
 if ($job -eq [IntPtr]::Zero) {
   throw "CreateJobObject failed."
@@ -295,6 +331,35 @@ $cpu = New-Object BonsaiMeshJob+CPU_RATE
 $cpu.flags = [BonsaiMeshJob]::CpuEnable -bor [BonsaiMeshJob]::CpuHardCap
 $cpu.rate = [uint32]($CpuPct * 100)
 Set-JobStruct -Job $job -Type ([BonsaiMeshJob]::Cpu) -Value $cpu
+
+if ($JobObjectProbe) {
+  $probeProcess = Start-Process `
+    -FilePath "powershell.exe" `
+    -ArgumentList @("-NoProfile", "-Command", "Start-Sleep -Milliseconds 500") `
+    -PassThru `
+    -WindowStyle Hidden
+  try {
+    if (-not [BonsaiMeshJob]::AssignProcessToJobObject($job, $probeProcess.Handle)) {
+      throw "AssignProcessToJobObject failed for probe PID $($probeProcess.Id)."
+    }
+    $probeProcess.WaitForExit()
+    $probeAccounting = Get-JobMemoryAccounting -Job $job
+  } finally {
+    Stop-OwnedProcess -OwnedPid $probeProcess.Id | Out-Null
+  }
+  $probeResult = @{
+    status = if ($probeAccounting.available) { "job_object_probe_passed" } else { "job_object_probe_failed" }
+    run_id = $RunId
+    pid = $probeProcess.Id
+    accounting = $probeAccounting
+  }
+  Write-JsonFile -Path $ResourceReceiptPath -Value $probeResult
+  $probeResult | ConvertTo-Json -Depth 6
+  if (-not $probeAccounting.available) {
+    exit 1
+  }
+  exit 0
+}
 
 $serverArgs = @(
   "--host", "127.0.0.1",
@@ -479,12 +544,20 @@ if ($null -ne $evaluator) {
   $ownedPids += $evaluator.Id
 }
 $gpuAfter = Get-GpuSnapshot -OwnedPids $ownedPids
+$jobMemory = Get-JobMemoryAccounting -Job $job
+$capEnforcementPassed = (
+  $jobMemory.available -and
+  [double]$jobMemory.peak_job_memory_mb -le ([double]$RamMb + 1.0)
+)
 $lingeringPids = @(
   $ownedPids | Where-Object { $null -ne (Get-Process -Id $_ -ErrorAction SilentlyContinue) }
 )
 $cleanupPassed = $lingeringPids.Count -eq 0 -and $gpuAfter.owned_gpu_memory_mb -eq 0
 if (-not $cleanupPassed -and -not $abortReason) {
   $abortReason = "cleanup_failed"
+}
+if (-not $capEnforcementPassed -and -not $abortReason) {
+  $abortReason = "cap_enforcement_failed"
 }
 $status = if ($abortReason) {
   "aborted"
@@ -501,8 +574,9 @@ $resourceReceipt = [ordered]@{
   status = $status
   abort_reason = $abortReason
   caps = $manifest.caps
-  peak_ram_mb = [math]::Round($peakRamMb, 3)
+  peak_ram_mb = $jobMemory.peak_job_memory_mb
   avg_ram_mb = if ($sampleCount) { [math]::Round($sumRamMb / $sampleCount, 3) } else { 0 }
+  sampled_peak_private_mb = [math]::Round($peakRamMb, 3)
   peak_working_set_mb = [math]::Round($peakWorkingSetMb, 3)
   peak_io_mb_s = [math]::Round($peakIoMbS, 3)
   cpu_pct = $CpuPct
@@ -510,6 +584,11 @@ $resourceReceipt = [ordered]@{
   steps_completed = if ($null -ne $liveSummary) { [int]$liveSummary.completed_cells } else { 0 }
   expected_steps = if ($null -ne $liveSummary) { [int]$liveSummary.expected_cells } else { 144 }
   owned_pids = $ownedPids
+  cap_enforcement = @{
+    job_memory_limit_mb = $RamMb
+    kernel_accounting = $jobMemory
+    passed = $capEnforcementPassed
+  }
   cleanup = @{
     stopped_pids = $cleanupStopped
     lingering_pids = $lingeringPids

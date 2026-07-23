@@ -133,3 +133,8 @@ it completed all 36 storyworld cells, the first logic full-context request was
 right-censored by that timeout. Subsequent resumptions use a labeled
 180-second operational timeout addendum; the registration, tasks, arms,
 model, seed, context, and resource caps are unchanged.
+
+Resource receipts distinguish sampled process-private and working-set totals
+from the kernel's Job Object memory accounting. `peak_ram_mb` is the queried
+peak job commit used for cap verification; sampled private and mapped working
+set are retained as separate diagnostic fields.
