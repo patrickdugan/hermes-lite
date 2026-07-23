@@ -1,0 +1,19 @@
+{
+  "schema": "hermes.mcp_skill_mesh_preflight_interruption.v0",
+  "study_id": "bonsai_mcp_skill_mesh_complexity_v0",
+  "registration_id": "fdaa6dce3853b05e8dba52cf0b1c935b32123e25e746bdce317708616767679f",
+  "attempted_run_id": "bonsai-mcp-mesh-screening-20260723-152911",
+  "status": "interrupted_preflight",
+  "outcomes_produced": false,
+  "model_server_started": false,
+  "evaluator_started": false,
+  "resource_receipt_produced": false,
+  "owned_processes_remaining_at_audit": 0,
+  "server_port_open_at_audit": false,
+  "preflight_log_sha256": "602ee682ce10665047b1cddc10a73ba5ad58d601d0547981f90365ea6c64a0dc",
+  "live_cells_before_attempt": 48,
+  "live_cells_after_attempt": 48,
+  "live_cells_sha256_after_attempt": "2602b59c93ca29e91a8ea74f3d33736d4dd365e4bcb125989a44c6e727642082",
+  "audited_at_utc": "2026-07-23T20:15:09.5254111Z",
+  "claim": "The continuation was interrupted during registration preflight, before model or evaluator startup. It produced no benchmark outcomes and left the sealed 48-cell primary lane unchanged."
+}
