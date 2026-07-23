@@ -1,0 +1,34 @@
+{
+  "arms": [
+    "lexical_typed",
+    "trm_typed",
+    "ram_typed",
+    "trm_then_ram_typed",
+    "ram_then_trm_typed",
+    "adaptive_mesh"
+  ],
+  "config_sha256": "436da7cba11bfd0e6fb8bf26b1aefd9c1da5bf2428bcf872f894813241a95669",
+  "contract_count": 25,
+  "contracts_sha256": "9e30e82af3f906280d5138f502c937a19ea2e8fdd852ced2986005ab7bbd0f71",
+  "full_hermes_baseline_required": true,
+  "hard_context_tokens": 12000,
+  "held_case_count": 128,
+  "held_cases_sha256": "cb7f4ccf5eae3df9677a1c74aac5d5768b1eccf57f3b0eb3bf7b80ad062dd1cd",
+  "held_contract_ids": [
+    "comprehensive-storyworld-building",
+    "intellect3-logic-hermes",
+    "mcp-trm-retrieval-optimization",
+    "metta-trm-meta-skill",
+    "primehub-hard-reasoning-logic-hermes",
+    "pure-trm-trainer"
+  ],
+  "overlay_count": 2,
+  "registration_id": "20affa942b608ac960a17a98d56ef6cccaa1f59c4a77346be0d69b93e798988e",
+  "routable_contract_count": 23,
+  "schema": "hermes.lean_control_mesh_registration.v1",
+  "split_overlap_count": 0,
+  "status": "registered_no_outcomes",
+  "study_id": "hermes_lite_12k_control_mesh_v1",
+  "train_row_count": 57,
+  "train_rows_sha256": "c9b8f21cf2f6bb9e06dff05dbcad86258ab6402a03c462e3dffe9f1e3504f9cb"
+}

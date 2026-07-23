@@ -1,0 +1,52 @@
+{
+  "arms": [
+    "lexical_typed",
+    "trm_typed",
+    "ram_typed",
+    "trm_then_ram_typed",
+    "ram_then_trm_typed",
+    "adaptive_mesh"
+  ],
+  "claim_scope": "This study measures typed skill routing and schedule construction under a 12k Hermes Lite packet budget, with an explicit 160k full-Hermes baseline lane. It does not establish general reasoning, alignment, or tool-execution efficacy until the executable live stage and baseline receipt both pass.",
+  "context": {
+    "active_working_set_tokens": 6000,
+    "full_hermes_baseline_tokens": 160000,
+    "hard_window_tokens": 12000,
+    "reserve_tokens": 6000
+  },
+  "full_hermes_baseline": {
+    "agent_root": "C:/projects/hermes-agent",
+    "context_tokens": 160000,
+    "required": true,
+    "result_receipt_required_before_final_claim": true
+  },
+  "held_contract_ids": [
+    "comprehensive-storyworld-building",
+    "intellect3-logic-hermes",
+    "mcp-trm-retrieval-optimization",
+    "metta-trm-meta-skill",
+    "primehub-hard-reasoning-logic-hermes",
+    "pure-trm-trainer"
+  ],
+  "minimum_contract_count": 25,
+  "perturbation_seed": 91037,
+  "promotion": {
+    "max_packet_tokens": 6000,
+    "min_calibration_strict_success": 0.75,
+    "min_contract_transfer_route_accuracy": 0.5,
+    "min_efficacy_fraction_vs_full_hermes": 0.65,
+    "min_negative_control_pass_rate": 0.9
+  },
+  "schema": "hermes.lean_control_mesh.v1",
+  "source_contract_root": "C:/projects/Hermes-Skills/Hermes Skills",
+  "study_id": "hermes_lite_12k_control_mesh_v1",
+  "training": {
+    "cpu_pct": 50,
+    "io_mb_s": 50,
+    "ram_epochs": 40,
+    "ram_mb": 2048,
+    "seed": 73011,
+    "trm_steps": 400,
+    "wall_seconds": 900
+  }
+}

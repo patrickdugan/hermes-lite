@@ -1,0 +1,183 @@
+{
+  "contracts": [
+    {
+      "bytes": 5626,
+      "name": "intellect3-logic-hermes",
+      "normalized_sha256": "ddf3472544bd133ea12354f3ad13750ccc6639a77e61072c09ef90b0ee28fe45",
+      "raw_sha256": "445604213b1e53a49b6e3045aba3eee1545bdada0c57934e1f238dfec1301986",
+      "relative_path": "intellect3-logic-hermes/ULTRA_LEAN.json"
+    },
+    {
+      "bytes": 4930,
+      "name": "intellect3-math-hermes",
+      "normalized_sha256": "72e8f8bff5fd1fcce4f1dd0e8f2507966d3cb4f3781ec89491d6f108b27f7fd9",
+      "raw_sha256": "95e91d0a2719ed2c00efc5be9f63ba1f56c290f04f96602dbfca8534343ac42e",
+      "relative_path": "intellect3-math-hermes/ULTRA_LEAN.json"
+    },
+    {
+      "bytes": 4759,
+      "name": "mcp-trm-retrieval-optimization",
+      "normalized_sha256": "b04f96b99390570e541033948325e2ebbf7765ce4e5fc3b1dbe606ddaf79e934",
+      "raw_sha256": "fed2c061c2e55df198cc9781b506377afa3dadf7ef89e60ab4606c7bf5887e92",
+      "relative_path": "mcp-trm-retrieval-optimization/ULTRA_LEAN.json"
+    },
+    {
+      "bytes": 4819,
+      "name": "metta-composition-hermes",
+      "normalized_sha256": "b505db1dd127b59f1744a0dba91f85854f34de49e07f58880b0a6dbbf035d745",
+      "raw_sha256": "cc3cfde3cd33013c12ef27813a475efea3ece83d06667712484becf27a816a0d",
+      "relative_path": "metta-composition-hermes/ULTRA_LEAN.json"
+    },
+    {
+      "bytes": 4541,
+      "name": "metta-eval-optimizer-hermes",
+      "normalized_sha256": "655eb4c03cf35923379c0ce5992f18a8144df608da9fb6af3e2bf2d7f1c2979a",
+      "raw_sha256": "5e8e022f37a727190614ab8020e33c4bbaf0f3afc265ca0b2710944714524361",
+      "relative_path": "metta-eval-optimizer-hermes/ULTRA_LEAN.json"
+    },
+    {
+      "bytes": 4510,
+      "name": "metta-trm-hermes-pipeline",
+      "normalized_sha256": "237af2e7d9a4008ab17ad288531b6cdcf0636f47e9d8df85a1c03c643cba26c6",
+      "raw_sha256": "692b9c9ef92eeab9a9941e6421bfa31f6da44f3f2fa7771af2788ae678f97f13",
+      "relative_path": "metta-trm-hermes-pipeline/ULTRA_LEAN.json"
+    },
+    {
+      "bytes": 4767,
+      "name": "metta-trm-meta-skill",
+      "normalized_sha256": "07ab9de078d9f9b174ef261e8da56190ff8078d48ccb1b8df4f1b4d50e105865",
+      "raw_sha256": "4928848c9e313548aa23c58e204f26b66ba5f7b5896e5603b97ae81a816e67c9",
+      "relative_path": "metta-trm-meta-skill/ULTRA_LEAN.json"
+    },
+    {
+      "bytes": 4712,
+      "name": "primehub-abstain-guard-hermes",
+      "normalized_sha256": "477ee1ac4941efaacf9e2450396532c583ece1822d7e58a8da4c5d966871569f",
+      "raw_sha256": "dd37088f6bba1b59813a3709d86bdc3f0671656e62e741e8ff8b2645f71469ba",
+      "relative_path": "primehub-abstain-guard-hermes/ULTRA_LEAN.json"
+    },
+    {
+      "bytes": 4836,
+      "name": "primehub-choice-contract-hermes",
+      "normalized_sha256": "0f0064fe43d7cb1725b284c1e26e4d680db3ad53bd8625929c387e7ab6c02b29",
+      "raw_sha256": "c0ee08873ecbe2170a8c25cfdccdc338bfce7943db6b6420787303fd2458cf27",
+      "relative_path": "primehub-choice-contract-hermes/ULTRA_LEAN.json"
+    },
+    {
+      "bytes": 4751,
+      "name": "primehub-constraint-summarize-hermes",
+      "normalized_sha256": "662e78003b5e92ee5bf02f3ece54ff57a2cd47a701b2db351f2c303255fd3a12",
+      "raw_sha256": "7c3a2a39aa66a38978c02067b4a4505d2c75a1bac065db8ed1f9563f78d1ca04",
+      "relative_path": "primehub-constraint-summarize-hermes/ULTRA_LEAN.json"
+    },
+    {
+      "bytes": 4503,
+      "name": "primehub-constraint-summary-hermes",
+      "normalized_sha256": "ce55657aededad6ded07096a55270c5ce79d120cc247d1237f0c3efa9ff8c9a8",
+      "raw_sha256": "58688243016c797aa65f48b91e3500c15a150985636be3ad451968368922d47b",
+      "relative_path": "primehub-constraint-summary-hermes/ULTRA_LEAN.json"
+    },
+    {
+      "bytes": 4654,
+      "name": "primehub-hard-reasoning-logic-hermes",
+      "normalized_sha256": "f62e84c027a52a687bc2ccac100cad6464cc01fc51a43d4ee084c44f9fc6b23a",
+      "raw_sha256": "c721fccf6a49ad5589f701e3a71a74ebe3e502fa980343f2be0f763aea13dcee",
+      "relative_path": "primehub-hard-reasoning-logic-hermes/ULTRA_LEAN.json"
+    },
+    {
+      "bytes": 4551,
+      "name": "primehub-hard-reasoning-numeric-hermes",
+      "normalized_sha256": "b8ba4e4f2fdb8425b9cfe5673f229f5c93208f9c1e8c71a3a4b5e813cab7e379",
+      "raw_sha256": "0da299c38c35df3c3967f40a84ceef4d48a37cadf8ba0639bf52240c29af8cf0",
+      "relative_path": "primehub-hard-reasoning-numeric-hermes/ULTRA_LEAN.json"
+    },
+    {
+      "bytes": 4568,
+      "name": "primehub-internal-action-hermes",
+      "normalized_sha256": "de0b823216ac2c82a07a0784aa443c19eb6915408a801c712cc2f1765f6d27c3",
+      "raw_sha256": "acb91cfbb5f97776576aa668bcfc5e7d618f40547c52dfb9ed37f6deb05e9ac2",
+      "relative_path": "primehub-internal-action-hermes/ULTRA_LEAN.json"
+    },
+    {
+      "bytes": 4582,
+      "name": "primehub-open-analysis-hermes",
+      "normalized_sha256": "aa560d7cedc9931b61eaa7f3fd5de6511bb226d1a2e73742cd70ad268a28b547",
+      "raw_sha256": "5bbf915799ff0353a38ba5197c4aaa0fd59629c00fd5ba6e84fa348b4c796d02",
+      "relative_path": "primehub-open-analysis-hermes/ULTRA_LEAN.json"
+    },
+    {
+      "bytes": 4445,
+      "name": "primehub-pairwise-judge-hermes",
+      "normalized_sha256": "0bcac984254e51156d616c1070cb53bd1f79b320b5403a3d1ed793a35bc20958",
+      "raw_sha256": "b9b39e92a63bb54ddad6dcd796cb18c20a9fe9379c3b40eb0ab826563d9dd71d",
+      "relative_path": "primehub-pairwise-judge-hermes/ULTRA_LEAN.json"
+    },
+    {
+      "bytes": 4630,
+      "name": "primehub-structured-map-hermes",
+      "normalized_sha256": "bac655ae05ceaee81156fbff934cf212cc8e6af12d160299760ad1ca6545c0a9",
+      "raw_sha256": "a872674c87029cc17c819881f74a212cef739a9f23f791bc5304436eabe1cf75",
+      "relative_path": "primehub-structured-map-hermes/ULTRA_LEAN.json"
+    },
+    {
+      "bytes": 4542,
+      "name": "primehub-writing-discipline-hermes",
+      "normalized_sha256": "cfecc5b4e1a576390a890dc6276582b18e7d782b8befd5ed1f081defaa61909f",
+      "raw_sha256": "8b4c3dab28f248ddead8f6e675af2dd2f606cf11c39ca45917f875be2a3b3f6e",
+      "relative_path": "primehub-writing-discipline-hermes/ULTRA_LEAN.json"
+    },
+    {
+      "bytes": 4446,
+      "name": "primehub-xml-reorder-hermes",
+      "normalized_sha256": "616f43245b758790a4dec8a0fadf5a3b176fbfedaa14cda326dee5e9c7e46f15",
+      "raw_sha256": "75a15a0e53208922436672296655b6d8111638f0fc67346ee4d4ee20f4409317",
+      "relative_path": "primehub-xml-reorder-hermes/ULTRA_LEAN.json"
+    },
+    {
+      "bytes": 5297,
+      "name": "pure-trm-trainer",
+      "normalized_sha256": "f26bf6b99fb04828afcd8212ebae5057edcd7388708851187ffd1d7fbdbe06a4",
+      "raw_sha256": "1b61846df680bc6548b3d3f3c3e874298196d41330bacbeceffa2ae23556355e",
+      "relative_path": "pure-trm-trainer/ULTRA_LEAN.json"
+    },
+    {
+      "bytes": 4865,
+      "name": "comprehensive-storyworld-building",
+      "normalized_sha256": "371770afe3c0bbfd3fcb666f4a92d171dbf0128f707b58b835af98724fef8227",
+      "raw_sha256": "fdd01ed5c7019b23e22d79a219d2de8a58e51aa715de603fc19023ce3ef85ac1",
+      "relative_path": "storyworld-conveyor/skills/comprehensive-storyworld-building/ULTRA_LEAN.json"
+    },
+    {
+      "bytes": 5036,
+      "name": "storyworld-conveyor-runner",
+      "normalized_sha256": "046397e19cb2f82a393eeb6f5949bd0ea07094b3bbbc79317e0c145984a6a871",
+      "raw_sha256": "8269fe1c9fed9764d0c8917f951261ed4770b3dcc2311dd0264919d136bf506d",
+      "relative_path": "storyworld-conveyor/skills/storyworld-conveyor-runner/ULTRA_LEAN.json"
+    },
+    {
+      "bytes": 5104,
+      "name": "trm-mcp",
+      "normalized_sha256": "61af5ec819faaaaaf701b5a7f8d8ca3599725b9b63d9431539bc6ca25c5c54fb",
+      "raw_sha256": "d3ce61676de54b8b2878fca705cb4cde294a01972e2143721a6de213a94dce6e",
+      "relative_path": "trm-mcp/ULTRA_LEAN.json"
+    },
+    {
+      "bytes": 4805,
+      "name": "trm-observability-workflow",
+      "normalized_sha256": "9abc2b0a017455c993db7e14784282275d5997fff12034169b648344d76c5858",
+      "raw_sha256": "5176f606a607b0ac81f5f3c091b040817107e097e79f13c8132094abec350cb3",
+      "relative_path": "trm-observability-workflow/ULTRA_LEAN.json"
+    },
+    {
+      "bytes": 4431,
+      "name": "trm-public-rationale-chain",
+      "normalized_sha256": "d1bee78b493cc2c45e5495c9563ff71101405b5c14663e26eeaf7f2c42eab8b4",
+      "raw_sha256": "ad7c4a7601934b162771573b084be73c6ccc66d428d35333ec7452742aa13bc9",
+      "relative_path": "trm-public-rationale-chain/ULTRA_LEAN.json"
+    }
+  ],
+  "schema": "hermes.lean_control_mesh_source_manifest.v1",
+  "source_git_head": "07a177f2751c2adb1cc16dc819c1173c0cd57ad5",
+  "source_root": "D:\\projects\\Hermes-Skills\\Hermes Skills",
+  "source_worktree_clean": false
+}
