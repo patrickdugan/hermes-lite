@@ -11,7 +11,8 @@ param(
   [int]$WallSeconds = 1800,
   [int]$Port = 8801,
   [int]$Context = 12288,
-  [int]$GpuLayers = 99,
+  [ValidatePattern("^(auto|all|[0-9]+)$")]
+  [string]$GpuLayers = "auto",
   [int]$Threads = 6,
   [int]$ThreadsBatch = 4,
   [int]$Batch = 128,
@@ -22,6 +23,7 @@ param(
   [string]$CacheTypeK = "f16",
   [ValidateSet("f32", "f16", "bf16", "q8_0", "q4_0", "q4_1", "iq4_nl", "q5_0", "q5_1")]
   [string]$CacheTypeV = "f16",
+  [int]$FitTargetMb = 1024,
   [int]$MinFreeVramMb = 512,
   [int]$MaxTempC = 86,
   [int]$StartupSeconds = 120,
@@ -255,6 +257,8 @@ $manifest = [ordered]@{
     cache_ram_mb = $CacheRamMb
     cache_type_k = $CacheTypeK
     cache_type_v = $CacheTypeV
+    fit = "on"
+    fit_target_mb = $FitTargetMb
     request_timeout_seconds = $RequestTimeoutSeconds
   }
   checkpoint_cadence = "after every live cell"
@@ -412,6 +416,8 @@ $serverArgs = @(
   "--cache-ram", "$CacheRamMb",
   "--cache-type-k", $CacheTypeK,
   "--cache-type-v", $CacheTypeV,
+  "--fit", "on",
+  "--fit-target", "$FitTargetMb",
   "--no-webui",
   "--no-warmup"
 )
