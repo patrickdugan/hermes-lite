@@ -294,7 +294,7 @@ def test_resource_attestation_binds_each_cell_to_cap_valid_wrapper(tmp_path):
                     "cleanup": {"passed": True},
                 }
             ),
-            encoding="utf-8",
+            encoding="utf-8-sig" if run_id == "chunk-a" else "utf-8",
         )
 
     result = attest_live_resources(
