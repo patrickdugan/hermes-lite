@@ -91,6 +91,14 @@ def write_jsonl(path: Path, rows: Iterable[dict[str, Any]]) -> None:
             handle.write(canonical_json_bytes(row))
 
 
+def append_jsonl(path: Path, rows: Iterable[dict[str, Any]]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("ab") as handle:
+        for row in rows:
+            handle.write(canonical_json_bytes(row))
+        handle.flush()
+
+
 def _tokens(text: str) -> set[str]:
     return set(TOKEN_RE.findall(text.lower()))
 
@@ -873,7 +881,7 @@ def run_live_registered(
                     "pressure_after": pressure_after,
                 }
                 rows.append(row)
-                write_jsonl(cells_path, rows)
+                append_jsonl(cells_path, [row])
                 if error:
                     abort_reason = "api_error"
                     break

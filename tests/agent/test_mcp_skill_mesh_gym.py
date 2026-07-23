@@ -11,6 +11,7 @@ from agent.mcp_skill_mesh_gym import (
     _extract_json_object,
     _confirmation_arms,
     _score_live_response,
+    append_jsonl,
     build_mesh_packet,
     calibrate_registered,
     materialize_cases,
@@ -176,3 +177,12 @@ def test_confirmation_promotes_only_arms_passing_frozen_gates(tmp_path):
     (tmp_path / "live_screening_summary.json").write_text(json.dumps(summary), encoding="utf-8")
 
     assert _confirmation_arms(tmp_path, config, "registered-id") == ["adaptive_hybrid"]
+
+
+def test_append_jsonl_preserves_existing_checkpoint_rows(tmp_path):
+    path = tmp_path / "cells.jsonl"
+
+    append_jsonl(path, [{"cell": 1}])
+    append_jsonl(path, [{"cell": 2}])
+
+    assert path.read_text(encoding="utf-8").splitlines() == ['{"cell":1}', '{"cell":2}']
