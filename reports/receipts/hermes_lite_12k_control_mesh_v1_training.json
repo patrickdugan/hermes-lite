@@ -1,0 +1,46 @@
+{
+  "schema": "hermes.lean_control_mesh_training_distilled_receipt.v1",
+  "study_id": "hermes_lite_12k_control_mesh_v1",
+  "registration_id": "20affa942b608ac960a17a98d56ef6cccaa1f59c4a77346be0d69b93e798988e",
+  "run_id": "hermes-lite-12k-control-mesh-v1-20260723-175750",
+  "status": "completed",
+  "held_outcomes_consumed": false,
+  "training": {
+    "seed": 73011,
+    "steps_completed": 400,
+    "expected_steps": 400,
+    "elapsed_seconds": 19.583,
+    "route_train_rows": 34,
+    "negative_train_rows": 23,
+    "action_train_rows": 86,
+    "ram_route_train_accuracy": 1.0,
+    "ram_action_train_accuracy": 1.0,
+    "ram_nonzero_weights": 2847,
+    "trm_train_accuracy": 1.0,
+    "trm_last_loss": 0.00002346848850720562,
+    "trm_parameter_count": 6338
+  },
+  "resources": {
+    "peak_ram_mb": 427.574,
+    "ram_cap_mb": 2048,
+    "peak_io_mb_s": 1.754,
+    "io_cap_mb_s": 50.0,
+    "cpu_cap_pct": 50,
+    "wall_cap_seconds": 900,
+    "cleanup_passed": true,
+    "owned_processes_remaining": 0,
+    "gpu_compute_apps_after": 0
+  },
+  "artifacts": {
+    "ram_policy_sha256": "9b3268db07da4196619327850df70fdad502d4de792e16ff068ef0d7a378d160",
+    "ram_policy_bytes": 82326,
+    "trm_router_sha256": "ce8fc00f23830b9650ab06044667f65af751ff467ffabfb6434ab5f5f20b6543",
+    "trm_router_bytes": 29028,
+    "training_receipt_sha256": "2a8fe7e19bdd501784a443afadeb678df571d32807f019b2fc3f93a49549508b",
+    "wrapper_manifest_sha256": "93c9e7546320955611c8468ec74fbc86f24013725d442d4df280933c2eeda44e",
+    "wrapper_summary_sha256": "9fff2c68f17f60e3146b46f417aa31d48e434bd801648213795186e3acf929e5",
+    "cleanup_summary_sha256": "c5a7b34df431a3321234cfdecd7ea8989e1165297475da344d3f1307d98fbadf",
+    "published_hashes_match_run": true
+  },
+  "claim": "The RAM and TRM modules fit only the registered development rows under hard resource caps. This receipt contains no held calibration or full-Hermes baseline outcome."
+}
