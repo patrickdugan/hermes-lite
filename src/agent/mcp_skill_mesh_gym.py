@@ -753,6 +753,16 @@ def _confirmation_arms(output_dir: Path, config: dict[str, Any], registration_id
         raise ValueError("screening summary registration ID mismatch")
     if screening.get("status") != "completed":
         raise ValueError("confirmation requires a non-aborted screening run")
+    attestation_path = output_dir / "live_screening_resource_attestation.json"
+    if not attestation_path.exists():
+        raise ValueError("confirmation requires an all-cell resource attestation")
+    attestation = read_json(attestation_path)
+    if (
+        attestation.get("registration_id") != registration_id
+        or attestation.get("all_completed_cells_cap_valid") is not True
+        or int(attestation.get("completed_cells", 0)) != int(screening.get("expected_cells", 0))
+    ):
+        raise ValueError("screening resource attestation does not cover every registered cell")
     thresholds = config["promotion_policy"]["confirmation_requires"]
     promoted: list[str] = []
     for row in screening.get("by_arm", []):

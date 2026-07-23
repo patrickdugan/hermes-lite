@@ -174,9 +174,33 @@ def test_confirmation_promotes_only_arms_passing_frozen_gates(tmp_path):
             },
         ],
     }
+    attestation = {
+        "registration_id": "registered-id",
+        "all_completed_cells_cap_valid": True,
+        "completed_cells": 2,
+    }
+    summary["expected_cells"] = 2
     (tmp_path / "live_screening_summary.json").write_text(json.dumps(summary), encoding="utf-8")
+    (tmp_path / "live_screening_resource_attestation.json").write_text(
+        json.dumps(attestation),
+        encoding="utf-8",
+    )
 
     assert _confirmation_arms(tmp_path, config, "registered-id") == ["adaptive_hybrid"]
+
+
+def test_confirmation_rejects_missing_resource_attestation(tmp_path):
+    config = read_json(CONFIG_PATH)
+    summary = {
+        "registration_id": "registered-id",
+        "status": "completed",
+        "expected_cells": 144,
+        "by_arm": [],
+    }
+    (tmp_path / "live_screening_summary.json").write_text(json.dumps(summary), encoding="utf-8")
+
+    with pytest.raises(ValueError, match="all-cell resource attestation"):
+        _confirmation_arms(tmp_path, config, "registered-id")
 
 
 def test_append_jsonl_preserves_existing_checkpoint_rows(tmp_path):

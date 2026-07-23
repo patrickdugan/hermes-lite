@@ -145,3 +145,6 @@ against the intended 2,048 MB cap. Those live cells remain in the audit trail
 but are not promotion-eligible. Subsequent cap-validation runs set
 `--parallel 1`, abort when sampled private memory exceeds the cap, and require
 the queried Job limit and peak to pass before any result can be promoted.
+The confirmation command also refuses to run without
+`live_screening_resource_attestation.json` proving that all 144 completed
+screening cells have cap-valid receipts.
