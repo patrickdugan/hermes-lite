@@ -1,0 +1,16 @@
+{
+  "schema": "hermes.full_hermes_construction_failure.v1",
+  "study_id": "hermes_lite_executable_bridge_v1",
+  "registration_id": "9255e3b4e1395ab18d73f6bc33bdae05a93c165ade71ce06944f0fddfe043d00",
+  "status": "construction_failure",
+  "completed_cells": 0,
+  "api_error_cells": 1,
+  "model_responses_consumed": 0,
+  "failure": "Full Hermes attempted to emit Unicode status text to a CP1252 redirected Windows stream before the first model response.",
+  "artifacts": {
+    "prompts_sha256": "93017a1cd71885dd654d323b51d8833832f30b604f8d3904a69bc83572b3ad5e",
+    "runner_summary_sha256": "9a0bd3b135d5f35eb18fea2ea6b6c9d1b3fdb1901f6d24c6d0d0b89cfa8d8f05",
+    "raw_results_sha256": "5653cd200c9a99da1fb3d5ab2bb5886b903ff5e1e4251287cae07e0406206830"
+  },
+  "prospective_fix": "Force UTF-8 on runner stdout and stderr and restart in a fresh output lane."
+}

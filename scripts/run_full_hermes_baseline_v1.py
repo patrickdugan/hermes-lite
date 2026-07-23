@@ -12,6 +12,12 @@ from pathlib import Path
 from typing import Any
 
 
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8")
+
+
 def _read_jsonl(path: Path) -> list[dict[str, Any]]:
     with path.open("r", encoding="utf-8") as handle:
         return [json.loads(line) for line in handle if line.strip()]
