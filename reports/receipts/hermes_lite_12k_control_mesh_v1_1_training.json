@@ -1,0 +1,50 @@
+{
+  "schema": "hermes.lean_control_mesh_training_distilled_receipt.v1",
+  "study_id": "hermes_lite_12k_control_mesh_v1_1",
+  "implementation_version": "v1.1",
+  "control_addendum_id": "a47183dcf42977ad0487ee35e58de53a23920bc975de7f76c37e8dbc06146662",
+  "registration_id": "20affa942b608ac960a17a98d56ef6cccaa1f59c4a77346be0d69b93e798988e",
+  "run_id": "hermes-lite-12k-control-mesh-v1-1-20260723-181832",
+  "status": "completed",
+  "held_outcomes_consumed": false,
+  "training": {
+    "seed": 73011,
+    "steps_completed": 400,
+    "expected_steps": 400,
+    "elapsed_seconds": 5.641,
+    "route_train_rows": 34,
+    "negative_train_rows": 23,
+    "action_train_rows": 86,
+    "ram_supported_labels": 17,
+    "ram_unsupported_labels": 6,
+    "ram_route_train_accuracy": 1.0,
+    "ram_action_train_accuracy": 1.0,
+    "ram_nonzero_weights": 2847,
+    "trm_train_accuracy": 1.0,
+    "trm_last_loss": 0.00002346848850720562,
+    "trm_parameter_count": 6338
+  },
+  "resources": {
+    "peak_ram_mb": 428.758,
+    "ram_cap_mb": 2048,
+    "peak_io_mb_s": 1.991,
+    "io_cap_mb_s": 50.0,
+    "cpu_cap_pct": 50,
+    "wall_cap_seconds": 900,
+    "cleanup_passed": true,
+    "owned_processes_remaining": 0,
+    "gpu_compute_apps_after": 0
+  },
+  "artifacts": {
+    "ram_policy_sha256": "d7dfbac0ddffe65645f749622fc7ccaa3562e95db6068ffc330dfdc063c2466f",
+    "ram_policy_bytes": 83244,
+    "trm_router_sha256": "ce8fc00f23830b9650ab06044667f65af751ff467ffabfb6434ab5f5f20b6543",
+    "trm_router_bytes": 29028,
+    "training_receipt_sha256": "33aeb4cd9be6fc13be4cb73f665b235b398b007375ca68fb7c4b8beab914db5b",
+    "wrapper_manifest_sha256": "f3759c35ac516f069a366f9288dcacbdba3ba51863d4df67ae699f59a98e051c",
+    "wrapper_summary_sha256": "cbfdc20077ab6aa58bf1d86d24d3989527eac1fe91fd4f87938a00dc54100f65",
+    "cleanup_summary_sha256": "09a64c0beeda2c4010809f49ccf05c631921f099d1e6e023b27747f7e136b59c",
+    "published_hashes_match_run": true
+  },
+  "claim": "The v1.1 RAM and TRM modules fit only the unchanged registered development rows under hard resource caps. This receipt contains no held calibration, executable Bonsai outcome, or full-Hermes baseline outcome."
+}
