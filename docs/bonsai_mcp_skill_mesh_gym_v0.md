@@ -113,3 +113,17 @@ Screening uses the first frozen seed across all 144 case-arm cells.
 Confirmation uses all three seeds only after the frozen promotion gates are
 evaluated. The live runner checkpoints after every cell and stops on API or
 GPU-pressure failure.
+
+On Windows, use the capped operator wrapper rather than launching the server
+and evaluator independently:
+
+```powershell
+.\scripts\run_capped_bonsai_mcp_mesh.ps1 -ValidateOnly
+.\scripts\run_capped_bonsai_mcp_mesh.ps1 -Stage screening
+```
+
+The wrapper verifies the registration before launch, refuses an occupied
+unowned port, places its server and evaluator PIDs in one Windows Job Object,
+and enforces 2,048 MB RAM, 50% CPU, 50 MB/s sustained I/O, and a 1,800-second
+wall limit by default. It records one resource sample per second, treats an
+abort as a valid result, and terminates only its recorded PIDs.

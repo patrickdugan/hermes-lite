@@ -144,6 +144,9 @@ complexity ladder. It seals construction before outcomes and compares full
 context, static top-k, typed packets, TRM reranking, LDT verification, and
 adaptive hybrid expansion. See
 [`docs/bonsai_mcp_skill_mesh_gym_v0.md`](docs/bonsai_mcp_skill_mesh_gym_v0.md).
+Use `scripts\run_capped_bonsai_mcp_mesh.ps1` for live Windows runs so the
+owned server and evaluator share hard RAM and CPU caps and PID-specific
+cleanup.
 
 ## Multi-agent mode
 

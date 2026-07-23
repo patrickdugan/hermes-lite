@@ -151,3 +151,28 @@ def test_confirmation_requires_completed_screening_receipt(tmp_path):
 
     with pytest.raises(ValueError, match="requires a completed screening"):
         _confirmation_arms(tmp_path, config, "registered-id")
+
+
+def test_confirmation_promotes_only_arms_passing_frozen_gates(tmp_path):
+    config = read_json(CONFIG_PATH)
+    summary = {
+        "registration_id": "registered-id",
+        "status": "completed",
+        "by_arm": [
+            {
+                "arm": "adaptive_hybrid",
+                "task_success_rate": 0.75,
+                "mean_model_wrong_skill_activation_rate": 0.0,
+                "token_savings_vs_full_context": 0.5,
+            },
+            {
+                "arm": "typed_packet",
+                "task_success_rate": 0.75,
+                "mean_model_wrong_skill_activation_rate": 0.2,
+                "token_savings_vs_full_context": 0.5,
+            },
+        ],
+    }
+    (tmp_path / "live_screening_summary.json").write_text(json.dumps(summary), encoding="utf-8")
+
+    assert _confirmation_arms(tmp_path, config, "registered-id") == ["adaptive_hybrid"]
