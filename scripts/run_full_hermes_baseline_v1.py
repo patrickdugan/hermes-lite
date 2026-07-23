@@ -42,7 +42,7 @@ def _load_api_key(path: Path, variable: str = "") -> str:
             if not line or line.startswith("#") or "=" not in line:
                 continue
             name, candidate = line.split("=", 1)
-            if name.strip() == variable:
+            if name.strip().lstrip("\ufeff") == variable:
                 value = candidate.strip().strip("\"'")
                 break
         if not value:

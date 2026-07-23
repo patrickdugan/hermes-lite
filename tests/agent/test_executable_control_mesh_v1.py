@@ -196,7 +196,7 @@ def test_full_hermes_runner_loads_named_dotenv_key(tmp_path):
     credential = tmp_path / ".env"
     credential.write_text(
         "# fixture\nOPENROUTER_API_KEY='not-a-real-key'\n",
-        encoding="utf-8",
+        encoding="utf-8-sig",
     )
 
     assert _load_api_key(credential, "OPENROUTER_API_KEY") == "not-a-real-key"

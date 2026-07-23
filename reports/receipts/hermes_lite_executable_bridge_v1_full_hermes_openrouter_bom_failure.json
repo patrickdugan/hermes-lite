@@ -1,0 +1,15 @@
+{
+  "schema": "hermes.full_hermes_construction_failure.v1",
+  "study_id": "hermes_lite_executable_bridge_v1",
+  "registration_id": "9255e3b4e1395ab18d73f6bc33bdae05a93c165ade71ce06944f0fddfe043d00",
+  "status": "construction_failure",
+  "attempted_cells": 0,
+  "completed_cells": 0,
+  "api_error_cells": 0,
+  "model_responses_consumed": 0,
+  "failure": "The prospective OpenRouter lane stopped during credential preflight because the dotenv file begins with a UTF-8 BOM and the runner compared the first variable name literally.",
+  "artifacts": {
+    "prompts_sha256": "93017a1cd71885dd654d323b51d8833832f30b604f8d3904a69bc83572b3ad5e"
+  },
+  "prospective_fix": "Strip a leading UTF-8 BOM from dotenv variable names, regression-test the parser, and retry in the still-empty full_hermes_openrouter lane."
+}
