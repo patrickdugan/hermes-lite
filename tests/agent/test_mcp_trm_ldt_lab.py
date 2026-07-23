@@ -166,6 +166,24 @@ def test_run_live_smoke_records_timings_and_pressure():
     assert result["pressure_after"]["passed"] is True
 
 
+def test_run_live_smoke_can_delegate_pressure_to_external_wrapper():
+    response = {"choices": [{"message": {"content": "ok"}}]}
+
+    with patch(
+        "agent.mcp_trm_ldt_lab.gpu_pressure_snapshot",
+        side_effect=AssertionError("in-process pressure probe must not run"),
+    ), patch("agent.mcp_trm_ldt_lab._post_json", return_value=response):
+        result = run_live_smoke(
+            base_url="http://127.0.0.1:8801/v1",
+            timeout_s=5,
+            sample_pressure=False,
+        )
+
+    assert result["passed"] is True
+    assert result["pressure_before"]["source"] == "external_wrapper"
+    assert result["pressure_after"]["source"] == "external_wrapper"
+
+
 def test_run_live_case_probe_requires_task_id_line():
     response = {
         "choices": [{"message": {"content": "task_id=story_001 get_context_card page_0042 context_card"}}],

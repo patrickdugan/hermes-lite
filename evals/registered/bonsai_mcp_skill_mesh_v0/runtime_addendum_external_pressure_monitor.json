@@ -1,0 +1,61 @@
+{
+  "schema": "hermes.mcp_skill_mesh_runtime_addendum.v0",
+  "study_id": "bonsai_mcp_skill_mesh_complexity_v0",
+  "registration_id": "fdaa6dce3853b05e8dba52cf0b1c935b32123e25e746bdce317708616767679f",
+  "authored_at": "2026-07-23T18:49:00Z",
+  "supersedes_runtime_addendum_sha256": "2e4f458d89dd3bb76f5a187f2133127a87bb10d752bc77435d3f2a7030d5e330",
+  "timing_disclosure": {
+    "after_16_layer_smoke_telemetry_stop": true,
+    "before_any_admissible_cuda_model_outcome": true,
+    "outcome_based_tuning": false
+  },
+  "reason": "The 16-layer model loaded and generated the expected smoke response, but nvidia-smi launched inside the evaluator inherited the nearly full Job and failed with exit 255. Delegate duplicate evaluator telemetry to the already authoritative external wrapper monitor.",
+  "single_change": {
+    "gpu_pressure_probe": {
+      "from": "external wrapper plus evaluator subprocess",
+      "to": "external wrapper only"
+    }
+  },
+  "unchanged": {
+    "model_sha256": "284a335aa3fb2ced3b1b01fcb40b08aa783e3b70832767f0dd2e3fdfa134bd54",
+    "llama_cpp_release": "b10064",
+    "cuda_runtime": "12.4",
+    "registration": true,
+    "cases": true,
+    "arms": true,
+    "prompts": true,
+    "seeds": true,
+    "context_size": 12288,
+    "temperature": 0,
+    "max_output_tokens": 128,
+    "cache_type_k": "q8_0",
+    "cache_type_v": "q8_0",
+    "gpu_layers": 16,
+    "parallel_slots": 1,
+    "prompt_cache_ram_mb": 0,
+    "ram_cap_mb": 2048,
+    "cpu_cap_pct": 50,
+    "io_cap_mb_s": 50,
+    "wall_cap_seconds": 1800,
+    "execution_mode": "supervised_foreground_only"
+  },
+  "pressure_authority": {
+    "process": "run_capped_bonsai_mcp_mesh.ps1",
+    "cadence_seconds": 1,
+    "gpu_thresholds_unchanged": true,
+    "host_job_hard_cap_unchanged": true,
+    "evaluator_receipt_marker": "external_wrapper"
+  },
+  "trigger_receipt": {
+    "run_id": "bonsai-mcp-mesh-screening-20260723-144152",
+    "status": "aborted",
+    "abort_reason": "local_model_smoke_failure+cap_enforcement_failed",
+    "completed_cells": 0,
+    "smoke_content": "ok",
+    "smoke_generation_tokens_per_second": 26.505864,
+    "job_peak_before_evaluator_nvidia_smi_mb": 2037.516,
+    "terminal_peak_job_memory_mb": 2052.32,
+    "cleanup_passed": true
+  },
+  "claim_boundary": "The monitor relocation removes duplicated telemetry overhead only. It does not relax any threshold or change model requests, packets, outputs, or scoring."
+}

@@ -263,6 +263,11 @@ $manifest = [ordered]@{
   }
   checkpoint_cadence = "after every live cell"
   chunk_strategy = "one case-arm response per request"
+  pressure_monitor = @{
+    authority = "external_wrapper"
+    cadence_seconds = 1
+    evaluator_subprocess_probes = $false
+  }
   owned_pids = @()
   created_at = (Get-Date).ToUniversalTime().ToString("o")
   validate_only = [bool]$ValidateOnly
@@ -432,7 +437,8 @@ $evalArgs = @(
   "--timeout-s", "$RequestTimeoutSeconds",
   "--max-tokens", "128",
   "--min-free-mb", "$MinFreeVramMb",
-  "--max-temp-c", "$MaxTempC"
+  "--max-temp-c", "$MaxTempC",
+  "--external-pressure-monitor"
 )
 
 $server = $null

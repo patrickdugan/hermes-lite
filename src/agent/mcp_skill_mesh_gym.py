@@ -852,6 +852,7 @@ def run_live_registered(
     max_tokens: int,
     min_free_mb: int,
     max_temp_c: int,
+    external_pressure_monitor: bool = False,
 ) -> dict[str, Any]:
     receipt = verify_registration(registration_dir, confirm_registration_id)
     config = read_json(registration_dir / "protocol.json")
@@ -880,6 +881,7 @@ def run_live_registered(
         timeout_s=timeout_s,
         min_free_mb=min_free_mb,
         max_temp_c=max_temp_c,
+        sample_pressure=not external_pressure_monitor,
     )
     write_json(output_dir / f"live_{stage}_smoke.json", smoke)
     if not smoke.get("passed", False):
@@ -891,7 +893,11 @@ def run_live_registered(
                 cell_key = (str(case["task_id"]), arm, int(seed))
                 if cell_key in completed:
                     continue
-                pressure_before = gpu_pressure_snapshot(min_free_mb=min_free_mb, max_temp_c=max_temp_c)
+                pressure_before = (
+                    {"available": True, "passed": True, "source": "external_wrapper"}
+                    if external_pressure_monitor
+                    else gpu_pressure_snapshot(min_free_mb=min_free_mb, max_temp_c=max_temp_c)
+                )
                 if not pressure_before.get("passed", False):
                     abort_reason = "resource_pressure_gate"
                     break
@@ -932,7 +938,11 @@ def run_live_registered(
                         content = str(message.get("content") or "")
                 parsed = _extract_json_object(content)
                 live_score = _score_live_response(case, parsed)
-                pressure_after = gpu_pressure_snapshot(min_free_mb=min_free_mb, max_temp_c=max_temp_c)
+                pressure_after = (
+                    {"available": True, "passed": True, "source": "external_wrapper"}
+                    if external_pressure_monitor
+                    else gpu_pressure_snapshot(min_free_mb=min_free_mb, max_temp_c=max_temp_c)
+                )
                 deterministic = score_packet(case, packet, packet_data)
                 row = {
                     **deterministic,
@@ -1029,6 +1039,7 @@ def run_live_registered(
         "promotion_policy": config["promotion_policy"],
         "smoke_receipt": str(output_dir / f"live_{stage}_smoke.json"),
         "claim_boundary": config["claim_scope"],
+        "pressure_monitor": "external_wrapper" if external_pressure_monitor else "in_process",
     }
     write_json(output_dir / f"live_{stage}_summary.json", summary)
     return summary
@@ -1061,6 +1072,7 @@ def build_parser() -> argparse.ArgumentParser:
     live.add_argument("--max-tokens", type=int, default=128)
     live.add_argument("--min-free-mb", type=int, default=512)
     live.add_argument("--max-temp-c", type=int, default=86)
+    live.add_argument("--external-pressure-monitor", action="store_true")
     return parser
 
 
@@ -1084,6 +1096,7 @@ def main(argv: Optional[list[str]] = None) -> int:
             max_tokens=args.max_tokens,
             min_free_mb=args.min_free_mb,
             max_temp_c=args.max_temp_c,
+            external_pressure_monitor=args.external_pressure_monitor,
         )
     print(json.dumps(result, indent=2, sort_keys=True))
     return 0 if result.get("status") not in {"aborted", "construction_failure"} else 1

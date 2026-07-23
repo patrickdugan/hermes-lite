@@ -538,10 +538,16 @@ def run_live_smoke(
     timeout_s: int = 90,
     min_free_mb: int = 512,
     max_temp_c: int = 86,
+    sample_pressure: bool = True,
 ) -> Dict[str, Any]:
     """Run one bounded local-model smoke request and record pressure/timing."""
     url = base_url.rstrip("/") + "/chat/completions"
-    pressure_before = gpu_pressure_snapshot(min_free_mb=min_free_mb, max_temp_c=max_temp_c)
+    external_pressure = {"available": True, "passed": True, "source": "external_wrapper"}
+    pressure_before = (
+        gpu_pressure_snapshot(min_free_mb=min_free_mb, max_temp_c=max_temp_c)
+        if sample_pressure
+        else external_pressure
+    )
     payload = {
         "model": model,
         "messages": [{"role": "user", "content": prompt}],
@@ -556,7 +562,11 @@ def run_live_smoke(
         response = {}
         error = str(exc)
     elapsed_ms = int((time.perf_counter() - start) * 1000)
-    pressure_after = gpu_pressure_snapshot(min_free_mb=min_free_mb, max_temp_c=max_temp_c)
+    pressure_after = (
+        gpu_pressure_snapshot(min_free_mb=min_free_mb, max_temp_c=max_temp_c)
+        if sample_pressure
+        else external_pressure
+    )
 
     content = ""
     choices = response.get("choices")
@@ -584,6 +594,7 @@ def run_live_smoke(
             "timeout_s": timeout_s,
             "min_free_mb": min_free_mb,
             "max_temp_c": max_temp_c,
+            "sample_pressure": sample_pressure,
         },
     }
 
