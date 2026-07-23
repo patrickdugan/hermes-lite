@@ -16,6 +16,7 @@ param(
   [int]$ThreadsBatch = 4,
   [int]$Batch = 128,
   [int]$UBatch = 64,
+  [int]$ParallelSlots = 1,
   [int]$CacheRamMb = 512,
   [int]$MinFreeVramMb = 512,
   [int]$MaxTempC = 86,
@@ -225,6 +226,7 @@ $manifest = [ordered]@{
     threads_batch = $ThreadsBatch
     batch = $Batch
     ubatch = $UBatch
+    parallel_slots = $ParallelSlots
     cache_ram_mb = $CacheRamMb
     request_timeout_seconds = $RequestTimeoutSeconds
   }
@@ -306,6 +308,9 @@ function Get-JobMemoryAccounting {
     return @{
       available = $false
       error_code = [System.Runtime.InteropServices.Marshal]::GetLastWin32Error()
+      limit_flags = 0
+      configured_process_memory_limit_mb = 0
+      configured_job_memory_limit_mb = 0
       peak_process_memory_mb = 0
       peak_job_memory_mb = 0
     }
@@ -313,6 +318,9 @@ function Get-JobMemoryAccounting {
   return @{
     available = $true
     error_code = 0
+    limit_flags = [uint32]$accounting.basic.flags
+    configured_process_memory_limit_mb = [math]::Round($accounting.processMemory.ToUInt64() / 1MB, 3)
+    configured_job_memory_limit_mb = [math]::Round($accounting.jobMemory.ToUInt64() / 1MB, 3)
     peak_process_memory_mb = [math]::Round($accounting.peakProcess.ToUInt64() / 1MB, 3)
     peak_job_memory_mb = [math]::Round($accounting.peakJob.ToUInt64() / 1MB, 3)
   }
@@ -323,7 +331,9 @@ if ($job -eq [IntPtr]::Zero) {
   throw "CreateJobObject failed."
 }
 $memory = New-Object BonsaiMeshJob+EXTENDED
-$memory.basic.flags = [BonsaiMeshJob]::ProcessMemory -bor [BonsaiMeshJob]::JobMemory
+$basicLimits = $memory.basic
+$basicLimits.flags = [BonsaiMeshJob]::ProcessMemory -bor [BonsaiMeshJob]::JobMemory
+$memory.basic = $basicLimits
 $memory.processMemory = [UIntPtr]([UInt64]$RamMb * 1MB)
 $memory.jobMemory = [UIntPtr]([UInt64]$RamMb * 1MB)
 Set-JobStruct -Job $job -Type ([BonsaiMeshJob]::Extended) -Value $memory
@@ -371,6 +381,7 @@ $serverArgs = @(
   "-tb", "$ThreadsBatch",
   "-b", "$Batch",
   "-ub", "$UBatch",
+  "--parallel", "$ParallelSlots",
   "--cache-ram", "$CacheRamMb",
   "--no-webui",
   "--no-warmup"
@@ -488,6 +499,10 @@ try {
       $abortReason = "sustained_io_over_cap"
       break
     }
+    if ([double]$sample.private_mb -gt [double]$RamMb) {
+      $abortReason = "ram_cap_exceeded"
+      break
+    }
     if ($gpu.available -and ($gpu.temperature_c -gt $MaxTempC -or $gpu.memory_free_mb -lt $MinFreeVramMb)) {
       $abortReason = "gpu_pressure_gate"
       break
@@ -531,6 +546,7 @@ try {
 }
 
 $liveSummaryPath = Join-Path $LiveRoot "live_$Stage`_summary.json"
+$liveCellsPath = Join-Path $LiveRoot "live_$Stage`_cells.jsonl"
 $liveSummary = if (Test-Path -LiteralPath $liveSummaryPath) {
   Get-Content -LiteralPath $liveSummaryPath -Raw | ConvertFrom-Json
 } else {
@@ -547,6 +563,7 @@ $gpuAfter = Get-GpuSnapshot -OwnedPids $ownedPids
 $jobMemory = Get-JobMemoryAccounting -Job $job
 $capEnforcementPassed = (
   $jobMemory.available -and
+  [double]$jobMemory.configured_job_memory_limit_mb -eq [double]$RamMb -and
   [double]$jobMemory.peak_job_memory_mb -le ([double]$RamMb + 1.0)
 )
 $lingeringPids = @(
@@ -556,8 +573,12 @@ $cleanupPassed = $lingeringPids.Count -eq 0 -and $gpuAfter.owned_gpu_memory_mb -
 if (-not $cleanupPassed -and -not $abortReason) {
   $abortReason = "cleanup_failed"
 }
-if (-not $capEnforcementPassed -and -not $abortReason) {
-  $abortReason = "cap_enforcement_failed"
+if (-not $capEnforcementPassed) {
+  $abortReason = if ($abortReason) {
+    "$abortReason+cap_enforcement_failed"
+  } else {
+    "cap_enforcement_failed"
+  }
 }
 $status = if ($abortReason) {
   "aborted"
@@ -566,6 +587,17 @@ $status = if ($abortReason) {
 } else {
   "failed"
 }
+$liveRows = if (Test-Path -LiteralPath $liveCellsPath) {
+  @(Get-Content -LiteralPath $liveCellsPath | ForEach-Object { $_ | ConvertFrom-Json })
+} else {
+  @()
+}
+$completedKeys = @(
+  $liveRows |
+    Where-Object status -eq "completed" |
+    ForEach-Object { "$($_.task_id)|$($_.arm)|$($_.seed)" } |
+    Sort-Object -Unique
+)
 $resourceReceipt = [ordered]@{
   schema = "hermes.bonsai_mcp_mesh_resource_receipt.v0"
   run_id = $RunId
@@ -581,8 +613,8 @@ $resourceReceipt = [ordered]@{
   peak_io_mb_s = [math]::Round($peakIoMbS, 3)
   cpu_pct = $CpuPct
   samples = $sampleCount
-  steps_completed = if ($null -ne $liveSummary) { [int]$liveSummary.completed_cells } else { 0 }
-  expected_steps = if ($null -ne $liveSummary) { [int]$liveSummary.expected_cells } else { 144 }
+  steps_completed = $completedKeys.Count
+  expected_steps = 144
   owned_pids = $ownedPids
   cap_enforcement = @{
     job_memory_limit_mb = $RamMb

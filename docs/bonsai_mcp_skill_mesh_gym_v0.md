@@ -138,3 +138,10 @@ Resource receipts distinguish sampled process-private and working-set totals
 from the kernel's Job Object memory accounting. `peak_ram_mb` is the queried
 peak job commit used for cap verification; sampled private and mapped working
 set are retained as separate diagnostic fields.
+
+The first three exploratory segments used llama.cpp's default four slots.
+Direct accounting in the third segment measured 2,432 MB peak job memory
+against the intended 2,048 MB cap. Those live cells remain in the audit trail
+but are not promotion-eligible. Subsequent cap-validation runs set
+`--parallel 1`, abort when sampled private memory exceeds the cap, and require
+the queried Job limit and peak to pass before any result can be promoted.
