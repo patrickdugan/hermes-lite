@@ -1,5 +1,7 @@
 param(
   [string]$RegistrationDir = "evals\registered\hermes_lite_12k_control_mesh_v1",
+  [ValidateSet("base_control_mesh", "executable_domain_ram")]
+  [string]$TrainingKind = "base_control_mesh",
   [string]$TrainingTaskId = "hermes-lite-12k-control-mesh-v1-1",
   [string]$PublishedModelName = "control-mesh-v1-1",
   [int]$Steps = 400,
@@ -83,16 +85,28 @@ $env:CUDA_VISIBLE_DEVICES = "-1"
 $env:PYTHONPATH = (Join-Path $RepoRoot "src")
 $stdout = Join-Path $RunDir "trainer.stdout.log"
 $stderr = Join-Path $RunDir "trainer.stderr.log"
-$arguments = @(
-  "-m", "agent.lean_control_mesh_v1", "train",
-  "--registration-dir", $RegistrationDir,
-  "--output-dir", $RunDir,
-  "--steps", "$Steps",
-  "--ram-epochs", "$RamEpochs",
-  "--seed", "$Seed",
-  "--ram-cap-mb", "$RamMb",
-  "--io-cap-mb-s", "$IoMbS"
-)
+$arguments = if ($TrainingKind -eq "executable_domain_ram") {
+  @(
+    "-m", "agent.executable_control_mesh_v1", "train",
+    "--registration-dir", $RegistrationDir,
+    "--output-dir", $RunDir,
+    "--epochs", "$RamEpochs",
+    "--seed", "$Seed",
+    "--ram-cap-mb", "$RamMb",
+    "--io-cap-mb-s", "$IoMbS"
+  )
+} else {
+  @(
+    "-m", "agent.lean_control_mesh_v1", "train",
+    "--registration-dir", $RegistrationDir,
+    "--output-dir", $RunDir,
+    "--steps", "$Steps",
+    "--ram-epochs", "$RamEpochs",
+    "--seed", "$Seed",
+    "--ram-cap-mb", "$RamMb",
+    "--io-cap-mb-s", "$IoMbS"
+  )
+}
 $manifest = @{
   schema = "hermes.lean_control_mesh_wrapper_manifest.v1"
   training_task_id = $TrainingTaskId
@@ -105,7 +119,12 @@ $manifest = @{
     io_mb_s = $IoMbS
     wall_seconds = $WallSeconds
   }
-  chunk_strategy = "sparse RAM updates plus 16-row CPU TRM minibatches"
+  training_kind = $TrainingKind
+  chunk_strategy = if ($TrainingKind -eq "executable_domain_ram") {
+    "sparse four-label Bernoulli log-odds memory fit"
+  } else {
+    "sparse RAM updates plus 16-row CPU TRM minibatches"
+  }
   checkpoint_cadence = "final artifact only; bounded run under 15 minutes"
   started_at = (Get-Date).ToUniversalTime().ToString("o")
 }
@@ -153,8 +172,12 @@ $publishedDir = ""
 if ($completed) {
   $publishedDir = Join-Path $env:USERPROFILE ".hermes-lite\models\$PublishedModelName"
   New-Item -ItemType Directory -Force -Path $publishedDir | Out-Null
-  Copy-Item -LiteralPath (Join-Path $RunDir "ram_policy.json") -Destination (Join-Path $publishedDir "ram_policy.json") -Force
-  Copy-Item -LiteralPath (Join-Path $RunDir "trm_router.pt") -Destination (Join-Path $publishedDir "trm_router.pt") -Force
+  if ($TrainingKind -eq "executable_domain_ram") {
+    Copy-Item -LiteralPath (Join-Path $RunDir "domain_ram_policy.json") -Destination (Join-Path $publishedDir "domain_ram_policy.json") -Force
+  } else {
+    Copy-Item -LiteralPath (Join-Path $RunDir "ram_policy.json") -Destination (Join-Path $publishedDir "ram_policy.json") -Force
+    Copy-Item -LiteralPath (Join-Path $RunDir "trm_router.pt") -Destination (Join-Path $publishedDir "trm_router.pt") -Force
+  }
   Copy-Item -LiteralPath $trainingReceiptPath -Destination (Join-Path $publishedDir "training_receipt.json") -Force
 }
 $summary = @{

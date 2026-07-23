@@ -1,6 +1,11 @@
 param(
   [string]$RegistrationDir = "evals\registered\bonsai_mcp_skill_mesh_v0",
   [string]$RegistrationId = "fdaa6dce3853b05e8dba52cf0b1c935b32123e25e746bdce317708616767679f",
+  [ValidateSet("mcp_skill_mesh_v0", "executable_bridge_v1")]
+  [string]$StudyMode = "mcp_skill_mesh_v0",
+  [string]$LiveRootOverride = "",
+  [string]$BaseModelDir = "$HOME\.hermes-lite\models\control-mesh-v1-1",
+  [string]$DomainModelDir = "$HOME\.hermes-lite\models\executable-domain-ram-v1",
   [string]$LlamaDir = "D:\models\Tesseract\runtime\llama.cpp\b10064\payload",
   [string]$ModelPath = "D:\models\Tesseract\bonsai-8b-q1\Bonsai-8B-Q1_0.gguf",
   [ValidateSet("screening", "confirmation")]
@@ -43,8 +48,33 @@ $RegistrationDir = if ([IO.Path]::IsPathRooted($RegistrationDir)) {
 } else {
   [IO.Path]::GetFullPath((Join-Path $RepoRoot $RegistrationDir))
 }
-$RunId = "bonsai-mcp-mesh-$Stage-$(Get-Date -Format 'yyyyMMdd-HHmmss')"
-$LiveRoot = Join-Path $RepoRoot "experiments\mcp_skill_mesh_v0\live"
+$EvaluatorModule = if ($StudyMode -eq "executable_bridge_v1") {
+  "agent.executable_control_mesh_v1"
+} else {
+  "agent.mcp_skill_mesh_gym"
+}
+$StudyId = if ($StudyMode -eq "executable_bridge_v1") {
+  "hermes_lite_executable_bridge_v1"
+} else {
+  "bonsai_mcp_skill_mesh_complexity_v0"
+}
+$RunPrefix = if ($StudyMode -eq "executable_bridge_v1") {
+  "hermes-lite-executable-bridge"
+} else {
+  "bonsai-mcp-mesh"
+}
+$RunId = "$RunPrefix-$Stage-$(Get-Date -Format 'yyyyMMdd-HHmmss')"
+$LiveRoot = if ($LiveRootOverride) {
+  if ([IO.Path]::IsPathRooted($LiveRootOverride)) {
+    [IO.Path]::GetFullPath($LiveRootOverride)
+  } else {
+    [IO.Path]::GetFullPath((Join-Path $RepoRoot $LiveRootOverride))
+  }
+} elseif ($StudyMode -eq "executable_bridge_v1") {
+  Join-Path $RepoRoot "experiments\lean-control-mesh-v1\executable"
+} else {
+  Join-Path $RepoRoot "experiments\mcp_skill_mesh_v0\live"
+}
 $RunDir = Join-Path $LiveRoot "wrappers\$RunId"
 $EventsPath = Join-Path $RunDir "resource_events.jsonl"
 $ManifestPath = Join-Path $RunDir "wrapper_manifest.json"
@@ -178,7 +208,11 @@ function Get-GpuSnapshot {
   return $result
 }
 
-foreach ($requiredPath in @($Python, $ServerExe, $ModelPath, $RegistrationDir)) {
+$requiredPaths = @($Python, $ServerExe, $ModelPath, $RegistrationDir)
+if ($StudyMode -eq "executable_bridge_v1") {
+  $requiredPaths += @($BaseModelDir, $DomainModelDir)
+}
+foreach ($requiredPath in $requiredPaths) {
   if (-not (Test-Path -LiteralPath $requiredPath)) {
     throw "Required path not found: $requiredPath"
   }
@@ -203,7 +237,7 @@ if (Test-TcpPort -HostName "127.0.0.1" -TcpPort $Port) {
 
 New-Item -ItemType Directory -Force -Path $RunDir | Out-Null
 $verifyArgs = @(
-  "-m", "agent.mcp_skill_mesh_gym", "verify",
+  "-m", $EvaluatorModule, "verify",
   "--registration-dir", $RegistrationDir,
   "--registration-id", $RegistrationId
 )
@@ -238,7 +272,8 @@ $runtimeEvidence = @(
 
 $manifest = [ordered]@{
   run_id = $RunId
-  study_id = "bonsai_mcp_skill_mesh_complexity_v0"
+  study_id = $StudyId
+  study_mode = $StudyMode
   registration_id = $RegistrationId
   stage = $Stage
   registration_dir = $RegistrationDir
@@ -438,7 +473,7 @@ $serverArgs = @(
   "--no-warmup"
 )
 $evalArgs = @(
-  "-m", "agent.mcp_skill_mesh_gym", "live",
+  "-m", $EvaluatorModule, "live",
   "--registration-dir", $RegistrationDir,
   "--output-dir", $LiveRoot,
   "--confirm-registration-id", $RegistrationId,
@@ -453,6 +488,12 @@ $evalArgs = @(
   "--resource-run-id", $RunId,
   "--inter-cell-delay-s", "$InterCellDelaySeconds"
 )
+if ($StudyMode -eq "executable_bridge_v1") {
+  $evalArgs += @(
+    "--base-model-dir", ([IO.Path]::GetFullPath($BaseModelDir)),
+    "--domain-model-dir", ([IO.Path]::GetFullPath($DomainModelDir))
+  )
+}
 
 $server = $null
 $evaluator = $null
@@ -673,7 +714,11 @@ $expectedSteps = if ($null -ne $liveSummary -and $null -ne $liveSummary.expected
   $null
 }
 $resourceReceipt = [ordered]@{
-  schema = "hermes.bonsai_mcp_mesh_resource_receipt.v0"
+  schema = if ($StudyMode -eq "executable_bridge_v1") {
+    "hermes.executable_control_mesh_resource_receipt.v1"
+  } else {
+    "hermes.bonsai_mcp_mesh_resource_receipt.v0"
+  }
   run_id = $RunId
   registration_id = $RegistrationId
   stage = $Stage

@@ -1,0 +1,63 @@
+{
+  "schema": "hermes.executable_control_mesh_protocol.v1",
+  "study_id": "hermes_lite_executable_bridge_v1",
+  "parent_control_addendum_id": "a47183dcf42977ad0487ee35e58de53a23920bc975de7f76c37e8dbc06146662",
+  "parent_calibration_cells_sha256": "a0542f84d8266dbe372036d165ee68800744d16ff0bf9c5906739bc77cb3139f",
+  "source_cases_path": "evals/registered/bonsai_mcp_skill_mesh_v0/cases.jsonl",
+  "source_cases_sha256": "2962f78597bfd3c9955491df45558c24ca94c5dcf25f79f899a4448441879cca",
+  "contracts_path": "evals/registered/hermes_lite_12k_control_mesh_v1/contracts.jsonl",
+  "contracts_file_sha256": "a0418d61a5f0cfa51a5bf53e392b55ac70a9f68fc09fe13dafb4ae26a5b28294",
+  "base_model_artifacts": {
+    "ram_policy_sha256": "d7dfbac0ddffe65645f749622fc7ccaa3562e95db6068ffc330dfdc063c2466f",
+    "trm_router_sha256": "ce8fc00f23830b9650ab06044667f65af751ff467ffabfb6434ab5f5f20b6543"
+  },
+  "split": {
+    "domain_ram_train_levels": [1, 2, 3, 4],
+    "held_executable_levels": [5, 6]
+  },
+  "arms": [
+    "lexical_typed",
+    "adaptive_mesh"
+  ],
+  "domain_specialists": {
+    "storyworld": "comprehensive-storyworld-building",
+    "logic": "intellect3-logic-hermes",
+    "repository": "mcp-trm-retrieval-optimization",
+    "data_provenance": "pure-trm-trainer"
+  },
+  "control_flow": {
+    "inner_resource_arm": "adaptive_hybrid",
+    "domain_ram_role": "support-bounded specialist override after the v1.1 adaptive router",
+    "domain_ram_min_margin": 0.0,
+    "typed_action_namespace": "Only canonical Action token values from current selected resources are legal outputs.",
+    "typed_ldt": "The selected specialist plan is repaired to its registered canonical operations."
+  },
+  "training": {
+    "seed": 8819,
+    "domain_ram_epochs": 40,
+    "ram_mb": 2048,
+    "cpu_pct": 50,
+    "io_mb_s": 50,
+    "wall_seconds": 300
+  },
+  "inference": {
+    "seed": 101,
+    "temperature": 0,
+    "max_completion_tokens": 128,
+    "bonsai_model": "local/bonsai-8b",
+    "bonsai_context_tokens": 12000,
+    "bonsai_working_tokens": 6000,
+    "full_hermes_model": "gpt-4.1",
+    "full_hermes_provider": "openai",
+    "full_hermes_context_tokens": 160000,
+    "full_hermes_root": "C:/projects/hermes-agent"
+  },
+  "promotion": {
+    "min_bonsai_task_success": 0.6,
+    "min_adaptive_domain_specialist_accuracy": 0.75,
+    "min_efficacy_fraction_vs_full_hermes": 0.65,
+    "max_bonsai_packet_tokens": 6000,
+    "require_zero_api_errors": true
+  },
+  "claim_scope": "This post-outcome bridge study measures strict action-sequence success on eight held level-5/6 synthetic MCP tasks. It compares a 12k Bonsai Hermes Lite packet with a separately receipted full Hermes gpt-4.1 lane configured for 160k context. It does not establish general agent capability, tool execution, stochastic robustness, or that RAM improves beyond this frozen task family."
+}

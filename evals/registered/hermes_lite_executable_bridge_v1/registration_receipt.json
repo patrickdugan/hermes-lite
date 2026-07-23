@@ -1,0 +1,22 @@
+{
+  "arms": [
+    "lexical_typed",
+    "adaptive_mesh"
+  ],
+  "claim_scope": "This post-outcome bridge study measures strict action-sequence success on eight held level-5/6 synthetic MCP tasks. It compares a 12k Bonsai Hermes Lite packet with a separately receipted full Hermes gpt-4.1 lane configured for 160k context. It does not establish general agent capability, tool execution, stochastic robustness, or that RAM improves beyond this frozen task family.",
+  "contracts_file_sha256": "a0418d61a5f0cfa51a5bf53e392b55ac70a9f68fc09fe13dafb4ae26a5b28294",
+  "domains": [
+    "data_provenance",
+    "logic",
+    "repository",
+    "storyworld"
+  ],
+  "held_case_count": 8,
+  "registration_id": "9255e3b4e1395ab18d73f6bc33bdae05a93c165ade71ce06944f0fddfe043d00",
+  "schema": "hermes.executable_control_mesh_registration.v1",
+  "source_cases_sha256": "2962f78597bfd3c9955491df45558c24ca94c5dcf25f79f899a4448441879cca",
+  "split_manifest_sha256": "556a3983f4f72ec2c401eddf1dddc304cf706e95eb9762b52b01abd5138e3e4a",
+  "status": "registered_no_executable_outcomes",
+  "study_id": "hermes_lite_executable_bridge_v1",
+  "train_case_count": 16
+}

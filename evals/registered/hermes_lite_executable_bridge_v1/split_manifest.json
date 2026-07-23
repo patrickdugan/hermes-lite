@@ -1,0 +1,61 @@
+{
+  "held_query_sha256": [
+    "eed36555889f9510bd84ad8cbd6170d349ba50b43be61fa5768705394f346122",
+    "dda7e75b2f6c02caee1781924cba983e6967918cf5e8d248afaa1f8079001b6f",
+    "5cfc062ddcc2f0fa8657a84c5bfb951eb16464c7ec665acb016e3b1e04ce7b11",
+    "d76d717c544d2d27d513af5eef1adf5cf7ea96c17614d9271aa32e473aa8a3e2",
+    "b616d2e5e95e4296482259549c8dc2f1a31fabe0b5b2c48b5b5716959630a847",
+    "84903e019adf3abcede1b916b250fa848b7d5bc3b6f0a33a6f6a07f72a325bb8",
+    "c1251a19c6d91968da44fc61ccdb81e40957318c41ab6f5491d0a1ebc9da7a42",
+    "31a6be184746df3c7f939e2b5efaa990ed936dc340ae31b014793628e388998c"
+  ],
+  "held_task_ids": [
+    "storyworld.l05",
+    "storyworld.l06",
+    "logic.l05",
+    "logic.l06",
+    "repository.l05",
+    "repository.l06",
+    "data_provenance.l05",
+    "data_provenance.l06"
+  ],
+  "query_overlap_count": 0,
+  "schema": "hermes.executable_control_mesh_split.v1",
+  "task_overlap_count": 0,
+  "train_query_sha256": [
+    "fca845e3695d43f3f6c6b5e9380b87ef2070331fdef80bd98fcf69d78f836a2b",
+    "0e855161718bfdf8f0d9a0e5152f6f85a45302c3cc6c7e5d785ebad8d1d3eb5f",
+    "80ed588d24b2c19b3a88d6252e8a33d5868e582e838dfdadc57194b30fb46d66",
+    "90267f54c17473c8637e6250a32347d63401797d236312ef9bb54b50a0bbbf6b",
+    "dc2c44ead4926558bab65c1b14c3bda1fdb1345cabcecb924d97867d17921a20",
+    "2d81bd45856227dc9a604e7651adc82605100412b329bafc0bcbc769a92f44dc",
+    "3aa91d0d602a7068c36a350730a37d96825145547a7792fcd427ebc54346fd8d",
+    "dfb534e2371db053ddf4e82c7c13ab1db9058c231324fe7035d61a59a9e8bd07",
+    "6152c1a03965e24e7e7e80d44bed696d084792a3275f1a7a8c2b127f82cf800a",
+    "5d5df2da61cbbe75687d3ecfe8b82eaa194bd7023ba768a13f7cdba7db0d6ca2",
+    "e559e0496269f29c0c3f1f54d083032fb97e1c55d712ffd623fc93848ef64467",
+    "e0a27e08c0f2f118e9fddbc9a2443025341bd7f819e1976a2294e7b8327008cc",
+    "8b249d2121cce9590f181266a3c13bd290ff4edab9e294a43820268c8f8e34f7",
+    "a74f20a42b9a7f3968dff025941144fd8de2a72c0abce914fcbf4777c0ea3a2d",
+    "946d4bfca80b16864bc32507aac393394b6a2da8752a71fdfb8e95aa665783a7",
+    "ec093f30271f583d0967c2214ffee85aac053ee4a1f5024e35b5a4081dcaad64"
+  ],
+  "train_task_ids": [
+    "storyworld.l01",
+    "storyworld.l02",
+    "storyworld.l03",
+    "storyworld.l04",
+    "logic.l01",
+    "logic.l02",
+    "logic.l03",
+    "logic.l04",
+    "repository.l01",
+    "repository.l02",
+    "repository.l03",
+    "repository.l04",
+    "data_provenance.l01",
+    "data_provenance.l02",
+    "data_provenance.l03",
+    "data_provenance.l04"
+  ]
+}
