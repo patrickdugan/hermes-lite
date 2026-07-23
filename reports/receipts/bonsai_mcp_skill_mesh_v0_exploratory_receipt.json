@@ -1,0 +1,15 @@
+{
+  "all_completed_cells_cap_valid": false,
+  "cap_valid_completed_cells": 7,
+  "cells_sha256": "a5678bb3a2f20238ca28e1397b13e6f2593e60b9a5348b845fdcc11e2ecb7397",
+  "completed_cells": 144,
+  "error_rows": 1,
+  "final_cap_valid_resource_receipt_sha256": "964d283c74e2cec991c49939c820310dbd8e2a3d493e810971dadae673323f57",
+  "promotion_eligible": false,
+  "raw_artifact_root": "experiments/mcp_skill_mesh_v0/exploratory_mixed_cap_20260723",
+  "registration_id": "fdaa6dce3853b05e8dba52cf0b1c935b32123e25e746bdce317708616767679f",
+  "schema": "hermes.mcp_skill_mesh_exploratory_receipt.v0",
+  "smoke_sha256": "2185f723c4aedadd1ad86f76b30efdf1e03ce992eacc17fe70d2dabc379dce62",
+  "status": "completed_exploratory_mixed_cap",
+  "summary_sha256": "fe557a6393187131bbd2cc5bb80413a2751a65c53ef6c2d9ccc24741a8e1b837"
+}
