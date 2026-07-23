@@ -15,8 +15,8 @@ param(
   [string]$GpuLayers = "auto",
   [int]$Threads = 6,
   [int]$ThreadsBatch = 4,
-  [int]$Batch = 128,
-  [int]$UBatch = 64,
+  [int]$Batch = 64,
+  [int]$UBatch = 32,
   [int]$ParallelSlots = 1,
   [int]$CacheRamMb = 0,
   [ValidateSet("f32", "f16", "bf16", "q8_0", "q4_0", "q4_1", "iq4_nl", "q5_0", "q5_1")]

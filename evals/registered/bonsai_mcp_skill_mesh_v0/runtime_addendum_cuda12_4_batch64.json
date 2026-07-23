@@ -1,0 +1,58 @@
+{
+  "schema": "hermes.mcp_skill_mesh_runtime_addendum.v0",
+  "study_id": "bonsai_mcp_skill_mesh_complexity_v0",
+  "registration_id": "fdaa6dce3853b05e8dba52cf0b1c935b32123e25e746bdce317708616767679f",
+  "authored_at": "2026-07-23T18:52:00Z",
+  "supersedes_runtime_addendum_sha256": "c245b526842ee36ca91e08de158ab0105b6bbc08a79a0a24f25bdb48939b1ed6",
+  "timing_disclosure": {
+    "after_batch128_full_context_api_error": true,
+    "before_any_admissible_cuda_model_outcome": true,
+    "outcome_based_tuning": false
+  },
+  "reason": "The 16-layer runtime passed smoke but emitted a CUDA error while processing the first 1091-token prompt. Halve logical and physical batch buffers to reduce transient host and device allocation.",
+  "single_change": {
+    "batch_geometry": {
+      "batch_from": 128,
+      "batch_to": 64,
+      "ubatch_from": 64,
+      "ubatch_to": 32
+    }
+  },
+  "unchanged": {
+    "model_sha256": "284a335aa3fb2ced3b1b01fcb40b08aa783e3b70832767f0dd2e3fdfa134bd54",
+    "llama_cpp_release": "b10064",
+    "cuda_runtime": "12.4",
+    "registration": true,
+    "cases": true,
+    "arms": true,
+    "prompts": true,
+    "seeds": true,
+    "context_size": 12288,
+    "temperature": 0,
+    "max_output_tokens": 128,
+    "cache_type_k": "q8_0",
+    "cache_type_v": "q8_0",
+    "gpu_layers": 16,
+    "parallel_slots": 1,
+    "prompt_cache_ram_mb": 0,
+    "pressure_monitor": "external_wrapper",
+    "ram_cap_mb": 2048,
+    "cpu_cap_pct": 50,
+    "io_cap_mb_s": 50,
+    "wall_cap_seconds": 1800,
+    "execution_mode": "supervised_foreground_only"
+  },
+  "trigger_receipt": {
+    "run_id": "bonsai-mcp-mesh-screening-20260723-144438",
+    "status": "aborted",
+    "abort_reason": "api_error",
+    "completed_cells": 0,
+    "api_error_cells": 1,
+    "request_packet_tokens_est": 1091,
+    "terminal_peak_job_memory_mb": 2048.266,
+    "cap_enforcement_passed": true,
+    "cleanup_passed": true,
+    "server_error": "CUDA error followed by connection reset"
+  },
+  "claim_boundary": "Batch geometry is an execution-feasibility setting, not an architecture arm. The failed API row is archived and cannot be reused or pooled."
+}

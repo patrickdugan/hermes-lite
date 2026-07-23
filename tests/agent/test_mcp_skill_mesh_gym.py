@@ -239,3 +239,13 @@ def test_live_checkpoint_rejects_torn_journal_even_with_receipts(tmp_path):
 
     with pytest.raises((json.JSONDecodeError, UnicodeDecodeError)):
         _read_live_checkpoints(cells_path, receipt_dir)
+
+
+def test_live_checkpoint_preserves_non_completed_status_for_lane_rejection(tmp_path):
+    cells_path = tmp_path / "cells.jsonl"
+    receipt_dir = tmp_path / "cell_receipts"
+    row = {"task_id": "logic.l01", "arm": "typed_packet", "seed": 17, "status": "api_error"}
+    append_jsonl(cells_path, [row])
+    write_json_atomic(receipt_dir / "receipt.json", row)
+
+    assert _read_live_checkpoints(cells_path, receipt_dir) == [row]

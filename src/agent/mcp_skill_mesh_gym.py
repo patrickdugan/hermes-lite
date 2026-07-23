@@ -865,6 +865,8 @@ def run_live_registered(
     cells_path = output_dir / f"live_{stage}_cells.jsonl"
     cell_receipt_dir = output_dir / f"live_{stage}_cell_receipts"
     existing = _read_live_checkpoints(cells_path, cell_receipt_dir)
+    if any(row.get("status") != "completed" for row in existing):
+        raise ValueError("non-completed live checkpoint requires a fresh output lane")
     completed = {
         _live_cell_key(row)
         for row in existing
