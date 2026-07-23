@@ -1,0 +1,57 @@
+{
+  "schema": "hermes.mcp_skill_mesh_runtime_addendum.v0",
+  "study_id": "bonsai_mcp_skill_mesh_complexity_v0",
+  "registration_id": "fdaa6dce3853b05e8dba52cf0b1c935b32123e25e746bdce317708616767679f",
+  "authored_at": "2026-07-23T19:02:00Z",
+  "supersedes_runtime_addendum_sha256": "6c7481411017888c1ba085d639790bc8fe77fcff5b03c44207eefd52248d0047",
+  "timing_disclosure": {
+    "after_6_primary_cells_existed": true,
+    "primary_model_scores_consulted_for_change": false,
+    "resource_receipt_consulted_for_change": true,
+    "outcome_based_architecture_tuning": false
+  },
+  "reason": "A five-second idle still reached 87 C after one complete six-arm case block. Increase the idle to twenty seconds for subsequent matched case blocks while preserving the same inference and scoring configuration.",
+  "single_change": {
+    "inter_cell_delay_seconds": {
+      "from": 5,
+      "to": 20
+    }
+  },
+  "unchanged": {
+    "model_sha256": "284a335aa3fb2ced3b1b01fcb40b08aa783e3b70832767f0dd2e3fdfa134bd54",
+    "registration": true,
+    "cases": true,
+    "arms": true,
+    "prompts": true,
+    "seeds": true,
+    "runtime_context_tokens": 6144,
+    "temperature": 0,
+    "max_output_tokens": 128,
+    "cache_type_k": "q8_0",
+    "cache_type_v": "q8_0",
+    "gpu_layers": 16,
+    "batch": 64,
+    "ubatch": 32,
+    "pressure_monitor": "external_wrapper",
+    "resource_run_provenance": true,
+    "ram_cap_mb": 2048,
+    "cpu_cap_pct": 50,
+    "io_cap_mb_s": 50,
+    "wall_cap_seconds": 1800,
+    "max_temp_c": 86
+  },
+  "completed_chunk": {
+    "run_id": "bonsai-mcp-mesh-screening-20260723-145624",
+    "status": "aborted",
+    "abort_reason": "gpu_pressure_gate",
+    "completed_cells": 6,
+    "matched_case_blocks": 1,
+    "cells_sha256": "7872b5c29dddb3a025269ad07e0faba1c06890c55782770bddc276832cae325f",
+    "cell_receipts_manifest_sha256": "3be10f7f50411d59dac67fbef902d5129a5ebeac96f9051746dfdd705f781dfb",
+    "peak_job_memory_mb": 1561.516,
+    "cap_enforcement_passed": true,
+    "cleanup_passed": true
+  },
+  "analysis_rule": "Task success and routing metrics may pool across cap-valid chunks. Raw latency may not be treated as an architecture effect across different delay regimes.",
+  "claim_boundary": "Duty-cycle adaptation is operational and was selected from resource telemetry only. The first six primary cells remain admissible because they form a complete matched six-arm block with a cap-valid wrapper receipt."
+}

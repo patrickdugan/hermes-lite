@@ -1,0 +1,21 @@
+{
+  "schema": "hermes.mcp_skill_mesh_primary_chunk.v0",
+  "study_id": "bonsai_mcp_skill_mesh_complexity_v0",
+  "registration_id": "fdaa6dce3853b05e8dba52cf0b1c935b32123e25e746bdce317708616767679f",
+  "run_id": "bonsai-mcp-mesh-screening-20260723-145624",
+  "status": "aborted",
+  "abort_reason": "gpu_pressure_gate",
+  "completed_cells": 6,
+  "matched_case_blocks": 1,
+  "cells_sha256_after_chunk": "7872b5c29dddb3a025269ad07e0faba1c06890c55782770bddc276832cae325f",
+  "cell_receipts_manifest_sha256_after_chunk": "3be10f7f50411d59dac67fbef902d5129a5ebeac96f9051746dfdd705f781dfb",
+  "peak_job_memory_mb": 1561.516,
+  "configured_job_memory_limit_mb": 2048,
+  "cap_enforcement_passed": true,
+  "cleanup_passed": true,
+  "max_observed_temperature_c": 87,
+  "frozen_max_temperature_c": 86,
+  "inter_cell_delay_seconds": 5,
+  "runtime_addendum_sha256": "6c7481411017888c1ba085d639790bc8fe77fcff5b03c44207eefd52248d0047",
+  "claim": "Six primary cells form one complete matched case block and are resource-admissible; the chunk stopped at the frozen thermal gate."
+}
