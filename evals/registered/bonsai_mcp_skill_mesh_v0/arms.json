@@ -1,0 +1,41 @@
+{
+  "arms": [
+    {
+      "adaptive_expansion": false,
+      "arm": "full_context",
+      "initial_selection": "all candidate resources",
+      "verification": "none"
+    },
+    {
+      "adaptive_expansion": false,
+      "arm": "static_topk",
+      "initial_selection": "lexical top-2",
+      "verification": "none"
+    },
+    {
+      "adaptive_expansion": false,
+      "arm": "typed_packet",
+      "initial_selection": "one lexical candidate per typed interface requirement",
+      "verification": "none"
+    },
+    {
+      "adaptive_expansion": false,
+      "arm": "trm_rerank",
+      "initial_selection": "task/replay/provenance reranked top-3",
+      "verification": "none"
+    },
+    {
+      "adaptive_expansion": false,
+      "arm": "ldt_verified",
+      "initial_selection": "typed candidates",
+      "verification": "freshness, provenance, and contract coverage"
+    },
+    {
+      "adaptive_expansion": true,
+      "arm": "adaptive_hybrid",
+      "initial_selection": "TRM-ranked typed candidates",
+      "verification": "freshness, provenance, and contract coverage"
+    }
+  ],
+  "schema": "hermes.mcp_skill_mesh_arms.v0"
+}

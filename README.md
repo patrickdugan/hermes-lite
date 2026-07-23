@@ -138,6 +138,13 @@ compares `baseline`, `trm`, `ldt`, `hybrid`, and `hybrid_reranked`, then writes
 `run_manifest.json`, `events.jsonl`, `leaderboard.csv`, `retrieval_policy.json`,
 `summary.json`, and `report.md` under the selected run directory.
 
+For domain-general Bonsai 8B comparisons, `hermes-lite-mcp-mesh-gym` crosses
+storyworld, logic, repository, and data/provenance skills over a six-level
+complexity ladder. It seals construction before outcomes and compares full
+context, static top-k, typed packets, TRM reranking, LDT verification, and
+adaptive hybrid expansion. See
+[`docs/bonsai_mcp_skill_mesh_gym_v0.md`](docs/bonsai_mcp_skill_mesh_gym_v0.md).
+
 ## Multi-agent mode
 
 The Rust TUI supports multiple agent panes, each running an independent subprocess with its own session, model, and conversation.

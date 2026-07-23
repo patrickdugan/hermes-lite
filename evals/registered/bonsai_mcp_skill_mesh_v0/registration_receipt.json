@@ -1,0 +1,57 @@
+{
+  "arm_count": 6,
+  "case_count": 24,
+  "claim_scope": "This fixed-model study evaluates retrieval and control architectures for Bonsai 8B under matched task, seed, tool, and context conditions. It does not establish general model capability, general alignment, or oversight sufficiency.",
+  "complexity_level_count": 6,
+  "component_hashes": {
+    "arms_sha256": "959fa5356f439eef29634c77420e3a47bdba30e300fa202b4918e73518c1b5c0",
+    "cases_sha256": "2962f78597bfd3c9955491df45558c24ca94c5dcf25f79f899a4448441879cca",
+    "protocol_sha256": "542d9d9faf376a583e3d4f22542b02d48d499d7d0fe979a7c222a742fb2b37cb",
+    "source_config_sha256": "542d9d9faf376a583e3d4f22542b02d48d499d7d0fe979a7c222a742fb2b37cb"
+  },
+  "domain_count": 4,
+  "live_outcomes_present": false,
+  "registered_at": "2026-07-23T15:25:28.558563+00:00",
+  "registration_id": "fdaa6dce3853b05e8dba52cf0b1c935b32123e25e746bdce317708616767679f",
+  "schema": "hermes.mcp_skill_mesh_registration.v0",
+  "seeds": [
+    17,
+    29,
+    43
+  ],
+  "split_overlap_count": 0,
+  "splits": {
+    "calibration": [
+      "logic.l01",
+      "logic.l02",
+      "logic.l03",
+      "logic.l04",
+      "logic.l05",
+      "logic.l06",
+      "storyworld.l01",
+      "storyworld.l02",
+      "storyworld.l03",
+      "storyworld.l04",
+      "storyworld.l05",
+      "storyworld.l06"
+    ],
+    "heldout": [
+      "data_provenance.l01",
+      "data_provenance.l02",
+      "data_provenance.l03",
+      "data_provenance.l04",
+      "data_provenance.l05",
+      "data_provenance.l06"
+    ],
+    "transfer": [
+      "repository.l01",
+      "repository.l02",
+      "repository.l03",
+      "repository.l04",
+      "repository.l05",
+      "repository.l06"
+    ]
+  },
+  "status": "registered_no_outcomes",
+  "study_id": "bonsai_mcp_skill_mesh_complexity_v0"
+}

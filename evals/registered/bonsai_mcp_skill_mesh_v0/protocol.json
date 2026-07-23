@@ -1,0 +1,466 @@
+{
+  "arms": [
+    "full_context",
+    "static_topk",
+    "typed_packet",
+    "trm_rerank",
+    "ldt_verified",
+    "adaptive_hybrid"
+  ],
+  "claim_scope": "This fixed-model study evaluates retrieval and control architectures for Bonsai 8B under matched task, seed, tool, and context conditions. It does not establish general model capability, general alignment, or oversight sufficiency.",
+  "complexity_levels": [
+    {
+      "has_conflict": false,
+      "has_distractors": false,
+      "level": 1,
+      "name": "single_skill_lookup",
+      "requires_provenance": false,
+      "stateful": false
+    },
+    {
+      "has_conflict": false,
+      "has_distractors": true,
+      "level": 2,
+      "name": "skill_selection",
+      "requires_provenance": false,
+      "stateful": false
+    },
+    {
+      "has_conflict": false,
+      "has_distractors": true,
+      "level": 3,
+      "name": "two_skill_composition",
+      "requires_provenance": false,
+      "stateful": false
+    },
+    {
+      "has_conflict": true,
+      "has_distractors": true,
+      "level": 4,
+      "name": "conflicting_evidence",
+      "requires_provenance": false,
+      "stateful": false
+    },
+    {
+      "has_conflict": true,
+      "has_distractors": true,
+      "level": 5,
+      "name": "stale_provenance",
+      "requires_provenance": true,
+      "stateful": false
+    },
+    {
+      "has_conflict": true,
+      "has_distractors": true,
+      "level": 6,
+      "name": "stateful_cross_skill_workflow",
+      "requires_provenance": true,
+      "stateful": true
+    }
+  ],
+  "domains": [
+    {
+      "allowed_tools": [
+        "read_storyworld",
+        "patch_storyworld",
+        "validate_storyworld",
+        "write_receipt"
+      ],
+      "domain_id": "storyworld",
+      "goals": [
+        {
+          "instruction": "Validate the current storyworld schema before making any edits.",
+          "level": 1,
+          "required_skills": [
+            "validate"
+          ]
+        },
+        {
+          "instruction": "Choose the correct procedure to repair an invalid encounter option without changing unrelated scenes.",
+          "level": 2,
+          "required_skills": [
+            "edit"
+          ]
+        },
+        {
+          "instruction": "Add a gated secret ending and validate the resulting storyworld.",
+          "level": 3,
+          "required_skills": [
+            "edit",
+            "validate"
+          ]
+        },
+        {
+          "instruction": "Inspect the current schema and resolve a conflict with legacy encounter guidance before editing.",
+          "level": 4,
+          "required_skills": [
+            "inspect",
+            "edit"
+          ]
+        },
+        {
+          "instruction": "Validate an edited secret-ending path and seal a provenance receipt using only current attested guidance.",
+          "level": 5,
+          "required_skills": [
+            "validate",
+            "receipt"
+          ]
+        },
+        {
+          "instruction": "Inspect, edit, validate, and receipt a stateful storyworld change while preserving encounter order.",
+          "level": 6,
+          "required_skills": [
+            "inspect",
+            "edit",
+            "validate",
+            "receipt"
+          ]
+        }
+      ],
+      "skills": [
+        {
+          "action": "inspect_world_schema",
+          "legacy_note": "The old shape omits reaction-state invariants.",
+          "procedure": "Read the world and enumerate schema, encounter, and reaction-state constraints without mutation.",
+          "resource_type": "schema",
+          "skill_id": "inspect",
+          "title": "Storyworld schema inspection"
+        },
+        {
+          "action": "patch_encounter_graph",
+          "legacy_note": "The old editor rewrites adjacent encounter identifiers.",
+          "procedure": "Patch only the targeted encounter and preserve all unrelated identifiers and secret gates.",
+          "resource_type": "editor",
+          "skill_id": "edit",
+          "title": "Storyworld encounter editing"
+        },
+        {
+          "action": "validate_world_invariants",
+          "legacy_note": "The old validator ignores unreachable reactions.",
+          "procedure": "Run schema, reachability, option, reaction, and secret-ending invariant checks.",
+          "resource_type": "validator",
+          "skill_id": "validate",
+          "title": "Storyworld validation"
+        },
+        {
+          "action": "seal_storyworld_receipt",
+          "legacy_note": "The old receipt records a path but no content digest.",
+          "procedure": "Hash the validated world and record source, validator, and patch provenance.",
+          "resource_type": "receipt",
+          "skill_id": "receipt",
+          "title": "Storyworld receipt sealing"
+        }
+      ],
+      "split": "calibration"
+    },
+    {
+      "allowed_tools": [
+        "read_logic_state",
+        "apply_logic_rule",
+        "verify_derivation",
+        "submit_logic_answer"
+      ],
+      "domain_id": "logic",
+      "goals": [
+        {
+          "instruction": "Inspect the current logic state and identify the active constraints.",
+          "level": 1,
+          "required_skills": [
+            "inspect"
+          ]
+        },
+        {
+          "instruction": "Select the valid transformation rule for the active Intellect-style logic state.",
+          "level": 2,
+          "required_skills": [
+            "apply"
+          ]
+        },
+        {
+          "instruction": "Apply the valid rule and verify the resulting derivation.",
+          "level": 3,
+          "required_skills": [
+            "apply",
+            "verify"
+          ]
+        },
+        {
+          "instruction": "Resolve conflicting legacy and current rule descriptions before applying a transformation.",
+          "level": 4,
+          "required_skills": [
+            "inspect",
+            "apply"
+          ]
+        },
+        {
+          "instruction": "Verify the derivation and submit an answer with current proof provenance.",
+          "level": 5,
+          "required_skills": [
+            "verify",
+            "submit"
+          ]
+        },
+        {
+          "instruction": "Inspect, transform, verify, and submit a multi-step logic state without skipping proof obligations.",
+          "level": 6,
+          "required_skills": [
+            "inspect",
+            "apply",
+            "verify",
+            "submit"
+          ]
+        }
+      ],
+      "skills": [
+        {
+          "action": "inspect_constraint_state",
+          "legacy_note": "The old reader drops negative constraints.",
+          "procedure": "Read symbols, positive and negative constraints, goals, and state version before choosing a rule.",
+          "resource_type": "state",
+          "skill_id": "inspect",
+          "title": "Logic state inspection"
+        },
+        {
+          "action": "apply_admissible_rule",
+          "legacy_note": "The old rule table permits transformations without checking preconditions.",
+          "procedure": "Choose one rule whose preconditions match the current state and emit the transformed state.",
+          "resource_type": "rule",
+          "skill_id": "apply",
+          "title": "Logic rule application"
+        },
+        {
+          "action": "verify_logic_derivation",
+          "legacy_note": "The old verifier checks only the final symbol.",
+          "procedure": "Replay every rule application and verify preconditions, state transitions, and the final goal.",
+          "resource_type": "verifier",
+          "skill_id": "verify",
+          "title": "Logic derivation verification"
+        },
+        {
+          "action": "submit_attested_answer",
+          "legacy_note": "The old submission format omits the derivation digest.",
+          "procedure": "Submit the answer with state version, derivation digest, and verifier result.",
+          "resource_type": "submission",
+          "skill_id": "submit",
+          "title": "Logic answer submission"
+        }
+      ],
+      "split": "calibration"
+    },
+    {
+      "allowed_tools": [
+        "read_repo",
+        "patch_repo",
+        "run_tests",
+        "write_change_receipt"
+      ],
+      "domain_id": "repository",
+      "goals": [
+        {
+          "instruction": "Inspect repository instructions and identify the allowed edit surface.",
+          "level": 1,
+          "required_skills": [
+            "inspect"
+          ]
+        },
+        {
+          "instruction": "Choose the minimal patch procedure for a localized source defect.",
+          "level": 2,
+          "required_skills": [
+            "patch"
+          ]
+        },
+        {
+          "instruction": "Patch the localized defect and run the relevant regression tests.",
+          "level": 3,
+          "required_skills": [
+            "patch",
+            "test"
+          ]
+        },
+        {
+          "instruction": "Resolve conflicting local and legacy repository instructions before editing.",
+          "level": 4,
+          "required_skills": [
+            "inspect",
+            "patch"
+          ]
+        },
+        {
+          "instruction": "Run the required tests and seal a current change receipt with source provenance.",
+          "level": 5,
+          "required_skills": [
+            "test",
+            "receipt"
+          ]
+        },
+        {
+          "instruction": "Inspect constraints, patch, test, and receipt a repository change without touching unrelated files.",
+          "level": 6,
+          "required_skills": [
+            "inspect",
+            "patch",
+            "test",
+            "receipt"
+          ]
+        }
+      ],
+      "skills": [
+        {
+          "action": "inspect_repository_contract",
+          "legacy_note": "The old instructions allow broad edits outside the task surface.",
+          "procedure": "Read repository instructions, status, and target files before selecting an edit.",
+          "resource_type": "instructions",
+          "skill_id": "inspect",
+          "title": "Repository contract inspection"
+        },
+        {
+          "action": "apply_minimal_patch",
+          "legacy_note": "The old workflow rewrites whole files for small defects.",
+          "procedure": "Apply the smallest reviewable patch and preserve unrelated working-tree changes.",
+          "resource_type": "patcher",
+          "skill_id": "patch",
+          "title": "Minimal repository patching"
+        },
+        {
+          "action": "run_targeted_then_full_tests",
+          "legacy_note": "The old procedure runs only a smoke command.",
+          "procedure": "Run targeted regressions first, then the registered non-integration suite.",
+          "resource_type": "tests",
+          "skill_id": "test",
+          "title": "Repository test execution"
+        },
+        {
+          "action": "seal_change_receipt",
+          "legacy_note": "The old receipt omits the test command and commit identity.",
+          "procedure": "Record changed files, tests, hashes, and commit identity in the change receipt.",
+          "resource_type": "receipt",
+          "skill_id": "receipt",
+          "title": "Repository change receipt"
+        }
+      ],
+      "split": "transfer"
+    },
+    {
+      "allowed_tools": [
+        "inspect_dataset",
+        "transform_dataset",
+        "validate_dataset",
+        "seal_dataset_manifest"
+      ],
+      "domain_id": "data_provenance",
+      "goals": [
+        {
+          "instruction": "Inspect the current dataset schema and source manifest.",
+          "level": 1,
+          "required_skills": [
+            "inspect"
+          ]
+        },
+        {
+          "instruction": "Select the exact bounded transform for the declared dataset schema.",
+          "level": 2,
+          "required_skills": [
+            "transform"
+          ]
+        },
+        {
+          "instruction": "Transform the dataset and validate row-level invariants.",
+          "level": 3,
+          "required_skills": [
+            "transform",
+            "validate"
+          ]
+        },
+        {
+          "instruction": "Resolve a conflict between current schema evidence and a stale transform note before execution.",
+          "level": 4,
+          "required_skills": [
+            "inspect",
+            "transform"
+          ]
+        },
+        {
+          "instruction": "Validate transformed rows and seal an attested manifest without accepting stale provenance.",
+          "level": 5,
+          "required_skills": [
+            "validate",
+            "manifest"
+          ]
+        },
+        {
+          "instruction": "Inspect, transform, validate, and seal a stateful dataset workflow with exact source lineage.",
+          "level": 6,
+          "required_skills": [
+            "inspect",
+            "transform",
+            "validate",
+            "manifest"
+          ]
+        }
+      ],
+      "skills": [
+        {
+          "action": "inspect_data_contract",
+          "legacy_note": "The old schema omits nullable and provenance fields.",
+          "procedure": "Read column types, nullability, invariants, source hashes, and partition boundaries.",
+          "resource_type": "schema",
+          "skill_id": "inspect",
+          "title": "Dataset contract inspection"
+        },
+        {
+          "action": "apply_bounded_transform",
+          "legacy_note": "The old transform mutates source partitions in place.",
+          "procedure": "Stream rows through the declared transform and write a separate bounded output.",
+          "resource_type": "transform",
+          "skill_id": "transform",
+          "title": "Bounded dataset transformation"
+        },
+        {
+          "action": "validate_row_invariants",
+          "legacy_note": "The old validator samples rows without recording coverage.",
+          "procedure": "Validate schema, row counts, invariants, split overlap, and rejected-row accounting.",
+          "resource_type": "validator",
+          "skill_id": "validate",
+          "title": "Dataset invariant validation"
+        },
+        {
+          "action": "seal_data_manifest",
+          "legacy_note": "The old manifest records filenames but no content hashes.",
+          "procedure": "Seal source, transform, output, and validation hashes in a canonical manifest.",
+          "resource_type": "manifest",
+          "skill_id": "manifest",
+          "title": "Dataset manifest sealing"
+        }
+      ],
+      "split": "heldout"
+    }
+  ],
+  "hard_context_tokens": 12000,
+  "model": "local/bonsai-8b",
+  "promotion_policy": {
+    "confirmation_requires": {
+      "max_wrong_skill_activation_rate": 0.1,
+      "min_screening_task_success_rate": 0.6,
+      "min_token_savings_vs_full_context": 0.2
+    },
+    "screening_seeds": 1
+  },
+  "schema": "hermes.mcp_skill_mesh_gym.v0",
+  "seeds": [
+    17,
+    29,
+    43
+  ],
+  "static_top_k": 2,
+  "stopping_rules": [
+    "registration_hash_mismatch",
+    "local_model_smoke_failure",
+    "gpu_pressure_gate",
+    "api_error",
+    "context_ceiling_violation"
+  ],
+  "study_id": "bonsai_mcp_skill_mesh_complexity_v0",
+  "trm_top_k": 3,
+  "working_budget_tokens": 5000
+}
