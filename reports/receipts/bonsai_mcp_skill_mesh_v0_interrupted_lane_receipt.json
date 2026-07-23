@@ -1,0 +1,23 @@
+{
+  "schema": "hermes.mcp_skill_mesh_construction_failure.v0",
+  "study_id": "bonsai_mcp_skill_mesh_complexity_v0",
+  "registration_id": "fdaa6dce3853b05e8dba52cf0b1c935b32123e25e746bdce317708616767679f",
+  "run_id": "bonsai-mcp-mesh-screening-20260723-133544",
+  "status": "construction_failure",
+  "reason": "detached_supervisor_terminated_without_terminal_receipt",
+  "raw_artifact_root": "experiments/mcp_skill_mesh_v0/interrupted_supervision_20260723-133544",
+  "valid_json_rows": 3,
+  "admissible_outcome_rows": 0,
+  "cells_sha256": "55ab85b30706fe5aa0a897c412984373741b4d208c8509aaacf1ad40f7198147",
+  "cells_nul_bytes": 2077,
+  "events_sha256": "49f6af31d0ba09caa8a65cf0635766562335384468ba847359d01ab56752c9d6",
+  "events_nul_bytes": 257,
+  "terminal_resource_receipt_present": false,
+  "owned_pids": [
+    29376,
+    29796,
+    30148
+  ],
+  "owned_pids_lingering": [],
+  "claim": "No row from this lane is admissible for screening or promotion."
+}

@@ -1,0 +1,98 @@
+{
+  "schema": "hermes.mcp_skill_mesh_runtime_addendum.v0",
+  "study_id": "bonsai_mcp_skill_mesh_complexity_v0",
+  "registration_id": "fdaa6dce3853b05e8dba52cf0b1c935b32123e25e746bdce317708616767679f",
+  "authored_at": "2026-07-23T18:35:00Z",
+  "timing_disclosure": {
+    "after_exploratory_mixed_cap_outcomes": true,
+    "after_interrupted_primary_rows_were_observable": true,
+    "before_any_admissible_primary_outcome": true,
+    "outcome_based_tuning": false
+  },
+  "reason": "Replace the CPU-only b10064 payload with the official matching-version CUDA 12.4 payload for operational throughput. Restart the primary lane because its detached supervisor ended without a terminal resource receipt and left a torn journal.",
+  "invariants": {
+    "model_sha256": "284a335aa3fb2ced3b1b01fcb40b08aa783e3b70832767f0dd2e3fdfa134bd54",
+    "registration_unchanged": true,
+    "cases_unchanged": true,
+    "arms_unchanged": true,
+    "prompts_unchanged": true,
+    "seeds_unchanged": true,
+    "context_size": 12288,
+    "temperature": 0,
+    "max_output_tokens": 128,
+    "ram_cap_mb": 2048,
+    "cpu_cap_pct": 50,
+    "io_cap_mb_s": 50,
+    "wall_cap_seconds": 1800
+  },
+  "runtime": {
+    "llama_cpp_release": "b10064",
+    "llama_cpp_commit": "86d86ed43",
+    "cuda_runtime": "12.4",
+    "parallel_slots": 1,
+    "gpu_layers": 99,
+    "prompt_cache_ram_mb": 0,
+    "cache_type_k": "f16",
+    "cache_type_v": "f16",
+    "warmup": false,
+    "execution_mode": "supervised_foreground_only"
+  },
+  "official_assets": [
+    {
+      "name": "llama-b10064-bin-win-cuda-12.4-x64.zip",
+      "bytes": 249038000,
+      "sha256": "d3df8c73874d9bf00cb3631a902a6afea556d57f11cb226e165689be9aa9e34b"
+    },
+    {
+      "name": "cudart-llama-bin-win-cuda-12.4-x64.zip",
+      "bytes": 391443627,
+      "sha256": "8c79a9b226de4b3cacfd1f83d24f962d0773be79f1e7b75c6af4ded7e32ae1d6"
+    }
+  ],
+  "runtime_files": [
+    {
+      "name": "llama-server.exe",
+      "bytes": 9216,
+      "sha256": "8d3dfc4bf28453cd81406c385349945a225b85f2bafbb780d0bc261d172c5c66"
+    },
+    {
+      "name": "ggml.dll",
+      "bytes": 86016,
+      "sha256": "14dbd1b9d0308ee4d857f278c65521a56b54f11d38306d562f0b151d82a01a4e"
+    },
+    {
+      "name": "llama.dll",
+      "bytes": 2682880,
+      "sha256": "1ef3eee0c14e13ab3ea3388b5681f77ce83aefdd1ecb591532d1a4a17e835916"
+    },
+    {
+      "name": "ggml-cuda.dll",
+      "bytes": 535481344,
+      "sha256": "54c9b887885c6cb9a1e67c5d00598d4ced9cb712896cf6bdcba7908bffc52997"
+    },
+    {
+      "name": "cudart64_12.dll",
+      "bytes": 553984,
+      "sha256": "d28e42265da7462162a54da6b7a99ea4fa2caf8139d862bb500db875d0b32dfc"
+    },
+    {
+      "name": "cublas64_12.dll",
+      "bytes": 100033536,
+      "sha256": "e40202fe4223c1cd2d2dce7beec59e1ed61c7801bd827309183be9b50e358f4c"
+    },
+    {
+      "name": "cublasLt64_12.dll",
+      "bytes": 473551360,
+      "sha256": "2a896460bef60ed57ef32b0875812f355a6984e671d638bb632f5e8c1d7a831f"
+    }
+  ],
+  "exclusions": [
+    {
+      "run_id": "bonsai-mcp-mesh-screening-20260723-133544",
+      "reason": "missing terminal resource receipt and torn append journals",
+      "readable_rows": 3,
+      "admissible_rows": 0
+    }
+  ],
+  "claim_boundary": "The backend change is an operational addendum, not a new arm. CPU exploratory outcomes and interrupted CPU primary rows cannot be pooled with the fresh CUDA primary lane."
+}

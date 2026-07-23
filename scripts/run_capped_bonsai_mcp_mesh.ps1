@@ -205,6 +205,25 @@ if ($freeRamMb -lt ($RamMb + 512)) {
   throw "Run requires at least $($RamMb + 512) MB free RAM; found $freeRamMb MB."
 }
 
+$runtimeEvidence = @(
+  "llama-server.exe",
+  "ggml.dll",
+  "llama.dll",
+  "ggml-cuda.dll",
+  "cudart64_12.dll",
+  "cublas64_12.dll",
+  "cublasLt64_12.dll"
+) | ForEach-Object {
+  $runtimePath = Join-Path $LlamaDir $_
+  if (Test-Path -LiteralPath $runtimePath) {
+    @{
+      name = $_
+      bytes = (Get-Item -LiteralPath $runtimePath).Length
+      sha256 = (Get-FileHash -LiteralPath $runtimePath -Algorithm SHA256).Hash.ToLowerInvariant()
+    }
+  }
+}
+
 $manifest = [ordered]@{
   run_id = $RunId
   study_id = "bonsai_mcp_skill_mesh_complexity_v0"
@@ -215,6 +234,7 @@ $manifest = [ordered]@{
   model_path = $ModelPath
   server_exe = $ServerExe
   server_exe_sha256 = (Get-FileHash -LiteralPath $ServerExe -Algorithm SHA256).Hash.ToLowerInvariant()
+  runtime_files = $runtimeEvidence
   endpoint = "http://127.0.0.1:$Port/v1"
   caps = @{
     ram_mb = $RamMb
