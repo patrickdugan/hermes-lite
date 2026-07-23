@@ -1,0 +1,93 @@
+{
+  "schema": "hermes.mcp_skill_mesh_final_result.v0",
+  "study_id": "bonsai_mcp_skill_mesh_complexity_v0",
+  "registration_id": "fdaa6dce3853b05e8dba52cf0b1c935b32123e25e746bdce317708616767679f",
+  "status": "completed",
+  "model": "local/bonsai-8b",
+  "promoted_arm": "adaptive_hybrid",
+  "screening": {
+    "completed_cells": 144,
+    "expected_cells": 144,
+    "screening_seed": 17,
+    "task_success_rate": 0.791667,
+    "mean_model_retrieval_recall": 1.0,
+    "mean_model_wrong_skill_activation_rate": 0.0,
+    "token_savings_vs_full_context": 0.538447,
+    "api_prompt_token_savings_vs_full_context": 0.495551,
+    "api_total_token_savings_vs_full_context": 0.475216,
+    "mean_latency_reduction_vs_full_context": 0.388866
+  },
+  "confirmation": {
+    "completed_cells": 72,
+    "expected_cells": 72,
+    "seed_labels": [
+      17,
+      29,
+      43
+    ],
+    "strict_successes": 57,
+    "strict_task_success_rate": 0.791667,
+    "mean_model_retrieval_recall": 1.0,
+    "mean_model_wrong_skill_activation_rate": 0.0,
+    "action_sequence_exact_rate": 0.791667,
+    "model_abstain_rate": 0.0,
+    "mean_packet_tokens_est": 507.958,
+    "token_savings_vs_full_context": 0.538447,
+    "mean_latency_ms": 7433.153,
+    "successes_per_seed_label": {
+      "17": 19,
+      "29": 19,
+      "43": 19
+    },
+    "tasks_with_raw_response_variation_across_seed_labels": 0,
+    "replication_interpretation": "exact deterministic replay, not independent stochastic replication"
+  },
+  "confirmation_by_domain": {
+    "storyworld": {
+      "successes": 18,
+      "cells": 18
+    },
+    "logic": {
+      "successes": 6,
+      "cells": 18
+    },
+    "repository": {
+      "successes": 18,
+      "cells": 18
+    },
+    "data_provenance": {
+      "successes": 15,
+      "cells": 18
+    }
+  },
+  "failure_audit": {
+    "strict_failure_cells": 15,
+    "retrieval_miss_cells": 0,
+    "wrong_skill_cells": 0,
+    "action_sequence_mismatch_cells": 15,
+    "alias_only_failure_cells": 12,
+    "true_ordering_failure_cells": 3,
+    "posthoc_alias_normalized_successes": 69,
+    "posthoc_alias_normalized_success_rate": 0.958333,
+    "posthoc_diagnostic_is_primary": false
+  },
+  "integrity": {
+    "screening_cells_sha256": "a249bb165735cc6bfd2608f6da793c88bb94af6fb5170344df2a30124388b4e4",
+    "screening_resource_attestation_sha256": "0f42f7f8450dc60e8cd883355220eba9bc61900b896f162579a07f9fd8b9b632",
+    "confirmation_cells_sha256": "1b719aff95fcf930ed3711d981da5e226241ba8a8980e0951b934efa3a927bd6",
+    "confirmation_cell_receipts_manifest_sha256": "ea37dea17547bb85dee1770b98781e3f3825ec9d185ca54483a0722fa161107a",
+    "confirmation_summary_sha256": "6bd714152620f4f38eb8dc5b73c9dd078a6f779032775693559466c35dc184f1",
+    "confirmation_resource_attestation_sha256": "7429e3c4b8ff84398fb539166daf716c13e6d9e0ba582f7edcd2f88a774f3f9c",
+    "final_report_sha256": "c0f391a313c5ef95698a2df64f73fceaac04b94f73993d06daefdad30f50bc91",
+    "screening_resource_attestation_passed": true,
+    "confirmation_resource_attestation_passed": true,
+    "api_error_cells": 0
+  },
+  "verification": {
+    "targeted_tests_passed": 16,
+    "canonical_tests_passed": 1049,
+    "canonical_tests_skipped": 78,
+    "canonical_tests_deselected": 26
+  },
+  "claim_boundary": "This fixed-model study evaluates retrieval and control architectures for Bonsai 8B under matched task, tool, context, and deterministic decoding conditions. It does not establish general model capability, general alignment, oversight sufficiency, or stochastic robustness."
+}
