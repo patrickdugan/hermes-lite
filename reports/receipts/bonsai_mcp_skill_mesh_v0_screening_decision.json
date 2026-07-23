@@ -1,0 +1,73 @@
+{
+  "schema": "hermes.mcp_skill_mesh_screening_decision.v0",
+  "study_id": "bonsai_mcp_skill_mesh_complexity_v0",
+  "registration_id": "fdaa6dce3853b05e8dba52cf0b1c935b32123e25e746bdce317708616767679f",
+  "stage": "screening",
+  "status": "completed",
+  "screening_seed": 17,
+  "completed_cells": 144,
+  "expected_cells": 144,
+  "resource_attestation_passed": true,
+  "gates": {
+    "min_screening_task_success_rate": 0.6,
+    "max_wrong_skill_activation_rate": 0.1,
+    "min_token_savings_vs_full_context": 0.2
+  },
+  "arms": [
+    {
+      "arm": "adaptive_hybrid",
+      "task_success_rate": 0.791667,
+      "mean_model_wrong_skill_activation_rate": 0.0,
+      "token_savings_vs_full_context": 0.538447,
+      "passes_all_gates": true
+    },
+    {
+      "arm": "trm_rerank",
+      "task_success_rate": 0.541667,
+      "mean_model_wrong_skill_activation_rate": 0.104167,
+      "token_savings_vs_full_context": 0.43755,
+      "passes_all_gates": false
+    },
+    {
+      "arm": "typed_packet",
+      "task_success_rate": 0.416667,
+      "mean_model_wrong_skill_activation_rate": 0.15625,
+      "token_savings_vs_full_context": 0.611593,
+      "passes_all_gates": false
+    },
+    {
+      "arm": "ldt_verified",
+      "task_success_rate": 0.416667,
+      "mean_model_wrong_skill_activation_rate": 0.09375,
+      "token_savings_vs_full_context": 0.639761,
+      "passes_all_gates": false
+    },
+    {
+      "arm": "static_topk",
+      "task_success_rate": 0.208333,
+      "mean_model_wrong_skill_activation_rate": 0.229167,
+      "token_savings_vs_full_context": 0.61129,
+      "passes_all_gates": false
+    },
+    {
+      "arm": "full_context",
+      "task_success_rate": 0.125,
+      "mean_model_wrong_skill_activation_rate": 0.291667,
+      "token_savings_vs_full_context": 0.0,
+      "passes_all_gates": false
+    }
+  ],
+  "promoted_arms": [
+    "adaptive_hybrid"
+  ],
+  "confirmation_seeds": [
+    17,
+    29,
+    43
+  ],
+  "confirmation_expected_cells": 72,
+  "cells_sha256": "a249bb165735cc6bfd2608f6da793c88bb94af6fb5170344df2a30124388b4e4",
+  "screening_summary_sha256": "8efd799fa12cba2791e959fc4de2e0aa2688e7a96a018bd48c7b77710b7d6674",
+  "resource_attestation_sha256": "0f42f7f8450dc60e8cd883355220eba9bc61900b896f162579a07f9fd8b9b632",
+  "claim_boundary": "This one-seed screening selects an architecture for confirmation; it does not establish a final effect or uniform domain performance."
+}
