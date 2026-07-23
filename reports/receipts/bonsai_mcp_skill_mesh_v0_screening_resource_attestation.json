@@ -1,0 +1,20 @@
+{
+  "schema": "hermes.mcp_skill_mesh_resource_attestation_receipt.v0",
+  "study_id": "bonsai_mcp_skill_mesh_complexity_v0",
+  "registration_id": "fdaa6dce3853b05e8dba52cf0b1c935b32123e25e746bdce317708616767679f",
+  "stage": "screening",
+  "status": "passed",
+  "all_completed_cells_cap_valid": true,
+  "completed_cells": 144,
+  "expected_cells": 144,
+  "resource_run_count": 3,
+  "resource_run_cell_counts": {
+    "bonsai-mcp-mesh-screening-20260723-150657": 48,
+    "bonsai-mcp-mesh-screening-20260723-161609": 91,
+    "bonsai-mcp-mesh-screening-20260723-164903": 5
+  },
+  "cells_sha256": "a249bb165735cc6bfd2608f6da793c88bb94af6fb5170344df2a30124388b4e4",
+  "live_attestation_sha256": "0f42f7f8450dc60e8cd883355220eba9bc61900b896f162579a07f9fd8b9b632",
+  "created_at": "2026-07-23T20:53:44.439276+00:00",
+  "claim": "Every completed screening cell is bound to a registered wrapper receipt whose OS-level cap enforcement and owned-process cleanup passed. Screening promotion metrics may now be evaluated."
+}
