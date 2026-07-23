@@ -754,6 +754,9 @@ def _build_api_messages(agent, messages, active_system_prompt):
         effective_system = (effective_system + "\n\n" + agent.ephemeral_system_prompt).strip()
     if agent._honcho_context:
         effective_system = (effective_system + "\n\n" + agent._honcho_context).strip()
+    retrieval_packet = agent._build_retrieval_packet(messages)
+    if retrieval_packet:
+        effective_system = (effective_system + "\n\n" + retrieval_packet).strip()
     if agent._needs_tool_adapter and agent.tools:
         effective_system = inject_tools_into_system_prompt(effective_system, agent.tools)
     if effective_system:

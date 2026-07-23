@@ -93,6 +93,7 @@ from agent.model_metadata import (
     save_context_length,
 )
 from agent.context_compressor import ContextCompressor
+from agent.retrieval_packet import RetrievalPacketBuilder
 from agent.prompt_caching import apply_anthropic_cache_control
 from agent.prompt_builder import build_context_files_prompt
 from agent.display import (
@@ -276,7 +277,7 @@ class AIAgent:
         api_key: str = None,
         provider: str = None,
         api_mode: str = None,
-        model: str = "claude-sonnet-4-5-20250929",
+        model: str = "anthropic/claude-sonnet-4-5-20250929",
         max_iterations: int = 60,  # Default tool-calling iterations
         tool_delay: float = 1.0,
         enabled_toolsets: List[str] = None,
@@ -590,7 +591,17 @@ class AIAgent:
         # Initialize context compressor for automatic context management
         # Compresses conversation when approaching model's context limit
         # Configuration via config.yaml (compression section) or environment variables
-        compression_threshold = float(os.getenv("CONTEXT_COMPRESSION_THRESHOLD", "0.85"))
+        try:
+            from hermes_cli.config import load_config as _load_hermes_config
+            _retrieval_config = _load_hermes_config()
+        except Exception:
+            _retrieval_config = {}
+        _skills_config = _retrieval_config.get("skills", {}) if isinstance(_retrieval_config, dict) else {}
+        _ultra_models = _skills_config.get("ultra_lean_models", []) if isinstance(_skills_config, dict) else []
+        _default_threshold = 0.85
+        if self.model in _ultra_models and _skills_config.get("context_mode", "auto") != "full":
+            _default_threshold = float(_skills_config.get("working_set_ratio", 0.50))
+        compression_threshold = float(os.getenv("CONTEXT_COMPRESSION_THRESHOLD", str(_default_threshold)))
         compression_enabled = os.getenv("CONTEXT_COMPRESSION_ENABLED", "true").lower() in ("true", "1", "yes")
         compression_summary_model = os.getenv("CONTEXT_COMPRESSION_MODEL") or None
         
@@ -605,6 +616,11 @@ class AIAgent:
             base_url=self.base_url,
         )
         self.compression_enabled = compression_enabled
+        self.retrieval_packet_builder = RetrievalPacketBuilder.from_config(
+            _retrieval_config,
+            model=self.model,
+            context_length=self.context_compressor.context_length,
+        )
         self._user_turn_count = 0
 
         # Cumulative token usage for the session
@@ -657,6 +673,24 @@ class AIAgent:
             result = re.sub(r'<think>.*', '', result, flags=re.DOTALL)
             result = re.sub(r'^.*?</think>\s*', '', result, flags=re.DOTALL)
             return result
+
+    def _build_retrieval_packet(self, messages: List[Dict[str, Any]]) -> str:
+        """Return the per-call TRM/LDT packet, if retrieval is enabled."""
+        builder = getattr(self, "retrieval_packet_builder", None)
+        if not builder:
+            return ""
+
+        user_message = ""
+        for msg in reversed(messages or []):
+            if msg.get("role") == "user":
+                content = msg.get("content")
+                user_message = content if isinstance(content, str) else str(content)
+                break
+        try:
+            return builder.build(user_message=user_message)
+        except Exception as exc:
+            logger.debug("Retrieval packet build failed: %s", exc)
+            return ""
 
     def _looks_like_codex_intermediate_ack(
         self,
@@ -2685,6 +2719,22 @@ class AIAgent:
                               function_result: str, tool_duration: float, display_idx: int,
                               messages: list) -> None:
         """Post-process a tool result: truncate, log, append to messages."""
+        if function_name == "skill_view":
+            try:
+                payload = json.loads(function_result)
+                contract = payload.get("contract") if isinstance(payload, dict) else None
+                if payload.get("mode") == "ultra_lean" and isinstance(contract, dict):
+                    self.retrieval_packet_builder.set_skill_contract(contract)
+                    function_result = json.dumps({
+                        "name": payload.get("name"),
+                        "mode": "ultra_lean",
+                        "activated": True,
+                        "contract_tokens": payload.get("estimated_tokens", 0),
+                        "note": "Contract is active in the TRM/LDT retrieval packet.",
+                    }, ensure_ascii=False, separators=(",", ":"))
+            except (TypeError, json.JSONDecodeError):
+                pass
+
         result_preview = function_result[:200] if len(function_result) > 200 else function_result
 
         # Log tool errors to the persistent error log so [error] tags
@@ -3147,6 +3197,9 @@ class AIAgent:
                 effective_system = (effective_system + "\n\n" + self.ephemeral_system_prompt).strip()
             if self._honcho_context:
                 effective_system = (effective_system + "\n\n" + self._honcho_context).strip()
+            retrieval_packet = self._build_retrieval_packet(messages)
+            if retrieval_packet:
+                effective_system = (effective_system + "\n\n" + retrieval_packet).strip()
             if self._needs_tool_adapter and self.tools:
                 effective_system = inject_tools_into_system_prompt(effective_system, self.tools)
             if effective_system:

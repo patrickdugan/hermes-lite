@@ -35,7 +35,7 @@ def show_status(args):
     show_all = getattr(args, "all", False)
     anthropic_key = os.getenv("ANTHROPIC_API_KEY", "")
     openai_base = os.getenv("OPENAI_BASE_URL", "")
-    local_port = LOCAL_MODEL_PORTS.get(model, 8800) if model.startswith("local/") else 8800
+    local_port = LOCAL_MODEL_PORTS.get(model, 8800)
 
     print()
     print(color("◆ hermes-lite status", Colors.CYAN, Colors.BOLD))

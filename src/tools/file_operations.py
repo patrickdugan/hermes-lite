@@ -396,7 +396,7 @@ class ShellFileOperations(FileOperations):
             # Get home directory via the terminal environment
             result = self._exec("echo $HOME")
             if result.exit_code == 0 and result.stdout.strip():
-                home = result.stdout.strip()
+                home = self._from_shell_path(result.stdout.strip())
                 if path == '~':
                     return home
                 elif path.startswith('~/'):
@@ -404,14 +404,31 @@ class ShellFileOperations(FileOperations):
                 # ~username format - let shell expand it
                 expand_result = self._exec(f"echo {path}")
                 if expand_result.exit_code == 0:
-                    return expand_result.stdout.strip()
+                    return self._from_shell_path(expand_result.stdout.strip())
         
         return path
     
     def _escape_shell_arg(self, arg: str) -> str:
         """Escape a string for safe use in shell commands."""
+        if (
+            os.name == "nt"
+            and self.env.__class__.__name__ == "LocalEnvironment"
+            and re.match(r"^[A-Za-z]:[\\/]", arg)
+        ):
+            drive = arg[0].lower()
+            suffix = arg[2:].replace("\\", "/").lstrip("/")
+            arg = f"/{drive}/{suffix}"
         # Use single quotes and escape any single quotes in the string
         return "'" + arg.replace("'", "'\"'\"'") + "'"
+
+    def _from_shell_path(self, path: str) -> str:
+        """Convert a local Git Bash drive path back to a Windows host path."""
+
+        if os.name == "nt" and self.env.__class__.__name__ == "LocalEnvironment":
+            match = re.match(r"^/([A-Za-z])/(.*)$", path)
+            if match:
+                return os.path.normpath(f"{match.group(1).upper()}:/{match.group(2)}")
+        return path
     
     def _unified_diff(self, old_content: str, new_content: str, filename: str) -> str:
         """Generate unified diff between old and new content."""
@@ -862,9 +879,9 @@ class ShellFileOperations(FileOperations):
             # Parse "timestamp path" format
             parts = line.split(' ', 1)
             if len(parts) == 2 and parts[0].replace('.', '').isdigit():
-                files.append(parts[1])
+                files.append(self._from_shell_path(parts[1]))
             else:
-                files.append(line)
+                files.append(self._from_shell_path(line))
         
         return SearchResult(
             files=files,
@@ -922,7 +939,11 @@ class ShellFileOperations(FileOperations):
         
         # Parse results based on output mode
         if output_mode == "files_only":
-            all_files = [f for f in result.stdout.strip().split('\n') if f]
+            all_files = [
+                self._from_shell_path(f)
+                for f in result.stdout.strip().split('\n')
+                if f
+            ]
             total = len(all_files)
             page = all_files[offset:offset + limit]
             return SearchResult(files=page, total_count=total)
@@ -934,7 +955,7 @@ class ShellFileOperations(FileOperations):
                     parts = line.rsplit(':', 1)
                     if len(parts) == 2:
                         try:
-                            counts[parts[0]] = int(parts[1])
+                            counts[self._from_shell_path(parts[0])] = int(parts[1])
                         except ValueError:
                             pass
             return SearchResult(counts=counts, total_count=sum(counts.values()))
@@ -950,31 +971,25 @@ class ShellFileOperations(FileOperations):
                     continue
                 
                 # Try match line first (colon-separated: file:line:content)
-                parts = line.split(':', 2)
-                if len(parts) >= 3:
-                    try:
-                        matches.append(SearchMatch(
-                            path=parts[0],
-                            line_number=int(parts[1]),
-                            content=parts[2][:500]
-                        ))
-                        continue
-                    except ValueError:
-                        pass
+                parsed = re.match(r"^(.*):(\d+):(.*)$", line)
+                if parsed:
+                    matches.append(SearchMatch(
+                        path=self._from_shell_path(parsed.group(1)),
+                        line_number=int(parsed.group(2)),
+                        content=parsed.group(3)[:500],
+                    ))
+                    continue
                 
                 # Try context line (dash-separated: file-line-content)
                 # Only attempt if context was requested to avoid false positives
                 if context > 0:
-                    parts = line.split('-', 2)
-                    if len(parts) >= 3:
-                        try:
-                            matches.append(SearchMatch(
-                                path=parts[0],
-                                line_number=int(parts[1]),
-                                content=parts[2][:500]
-                            ))
-                        except ValueError:
-                            pass
+                    parsed = re.match(r"^(.*)-(\d+)-(.*)$", line)
+                    if parsed:
+                        matches.append(SearchMatch(
+                            path=self._from_shell_path(parsed.group(1)),
+                            line_number=int(parsed.group(2)),
+                            content=parsed.group(3)[:500],
+                        ))
             
             total = len(matches)
             page = matches[offset:offset + limit]

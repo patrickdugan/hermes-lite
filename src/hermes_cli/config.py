@@ -62,7 +62,7 @@ def ensure_hermes_home():
 
 DEFAULT_CONFIG = {
     "model": {
-        "default": "claude-sonnet-4-5-20250929",
+        "default": "anthropic/claude-sonnet-4-5-20250929",
         "provider": "anthropic",
     },
     "toolsets": ["hermes-lite-cli"],
@@ -78,6 +78,37 @@ DEFAULT_CONFIG = {
         "enabled": True,
         "threshold": 0.85,
         "summary_model": "claude-haiku-4-5",
+    },
+
+    "retrieval": {
+        "enabled": False,
+        "auto_for_small_local_models": True,
+        "budget_tokens": 1200,
+        "hard_context_tokens": 12000,
+        "max_replay_hints": 1,
+        "resource_dirs": [".hermes/trm", ".hermes/ldt", ".hermes"],
+    },
+
+    "skills": {
+        "roots": [],
+        "context_mode": "auto",
+        "ultra_lean_models": ["local/bonsai-8b", "digitsflow/bonsai-8b"],
+        "skill_budget_tokens": 1100,
+        "working_set_ratio": 0.667,
+    },
+
+    "runtime": {
+        "mode": "auto",
+        "lean": {
+            "max_context_tokens": 12000,
+            "max_input_tokens": 8000,
+            "max_repair_attempts": 1,
+            "max_tool_expansion": 2,
+            "router_confidence": 0.80,
+            "router_margin": 0.15,
+            "state_dir": ".hermes/runtime",
+            "router_checkpoint": "~/.hermes-lite/models/skill-router.pt",
+        },
     },
     
     "memory": {
@@ -548,6 +579,13 @@ def show_config():
         print(f"  Model:        {compression.get('summary_model', 'claude-haiku-4-5')}")
 
     print()
+    print(color("◆ Retrieval Packets", Colors.CYAN, Colors.BOLD))
+    retrieval = config.get("retrieval", {})
+    print(f"  Enabled:      {'yes' if retrieval.get('enabled', False) else 'auto' if retrieval.get('auto_for_small_local_models', True) else 'no'}")
+    print(f"  Budget:       {retrieval.get('budget_tokens', 1200)} tokens")
+    print(f"  Resources:    {', '.join(retrieval.get('resource_dirs', []))}")
+
+    print()
     print(color("─" * 60, Colors.DIM))
     print(color("  hermes-lite config edit     # Edit config file", Colors.DIM))
     print(color("  hermes-lite config set KEY VALUE", Colors.DIM))
@@ -601,7 +639,7 @@ def set_config_value(key: str, value: str):
         or key.upper().endswith('_PASSWORD')
         or key.upper().startswith('TERMINAL_SSH')):
         save_env_value(key.upper(), value)
-        print(f"✓ Set {key} in {get_env_path()}")
+        print(f"OK Set {key} in {get_env_path()}")
         return
     
     # Otherwise it goes to config.yaml
@@ -656,7 +694,7 @@ def set_config_value(key: str, value: str):
     if key in _config_to_env_sync:
         save_env_value(_config_to_env_sync[key], str(value))
 
-    print(f"✓ Set {key} = {value} in {config_path}")
+    print(f"OK Set {key} = {value} in {config_path}")
 
 
 # =============================================================================
@@ -680,7 +718,7 @@ def config_command(args):
             print("Usage: hermes config set KEY VALUE")
             print()
             print("Examples:")
-            print("  hermes-lite config set model.default claude-sonnet-4-5-20250929")
+            print("  hermes-lite config set model.default anthropic/claude-sonnet-4-5-20250929")
             print("  hermes-lite config set terminal.backend local")
             print("  hermes-lite config set ANTHROPIC_API_KEY sk-ant-...")
             sys.exit(1)

@@ -56,6 +56,8 @@ DEFAULT_CONTEXT_LENGTHS = {
     "qwen/qwen3.5-9b": 262144,
     "qwen/qwen3.5-4b": 262144,
     "local/qwen3.5-9b": 32768,
+    "local/bonsai-8b": 12000,
+    "digitsflow/bonsai-8b": 12000,
     # WebGPU client-side models (conservative limits for browser VRAM)
     "webgpu/qwen3-4b": 8192,
     "webgpu/qwen2.5-3b": 8192,
@@ -153,6 +155,19 @@ def get_next_probe_tier(current_length: int) -> Optional[int]:
     for tier in CONTEXT_PROBE_TIERS:
         if tier < current_length:
             return tier
+    return None
+
+
+def get_known_context_length(model: str, base_url: str = "") -> Optional[int]:
+    """Return a declared or measured limit without inventing a probe ceiling."""
+
+    if base_url:
+        cached = get_cached_context_length(model, base_url)
+        if cached is not None:
+            return cached
+    for default_model, length in DEFAULT_CONTEXT_LENGTHS.items():
+        if default_model in model or model in default_model:
+            return length
     return None
 
 

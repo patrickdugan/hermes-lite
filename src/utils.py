@@ -3,8 +3,19 @@
 import json
 import os
 import tempfile
+import threading
 from pathlib import Path
 from typing import Any, Union
+
+
+_atomic_json_locks_guard = threading.Lock()
+_atomic_json_locks: dict[str, threading.Lock] = {}
+
+
+def _atomic_json_lock(path: Path) -> threading.Lock:
+    key = os.path.normcase(str(path.resolve()))
+    with _atomic_json_locks_guard:
+        return _atomic_json_locks.setdefault(key, threading.Lock())
 
 
 def atomic_json_write(path: Union[str, Path], data: Any, *, indent: int = 2) -> None:
@@ -22,20 +33,21 @@ def atomic_json_write(path: Union[str, Path], data: Any, *, indent: int = 2) -> 
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
 
-    fd, tmp_path = tempfile.mkstemp(
-        dir=str(path.parent),
-        prefix=f".{path.stem}_",
-        suffix=".tmp",
-    )
-    try:
-        with os.fdopen(fd, "w", encoding="utf-8") as f:
-            json.dump(data, f, indent=indent, ensure_ascii=False)
-            f.flush()
-            os.fsync(f.fileno())
-        os.replace(tmp_path, path)
-    except BaseException:
+    with _atomic_json_lock(path):
+        fd, tmp_path = tempfile.mkstemp(
+            dir=str(path.parent),
+            prefix=f".{path.stem}_",
+            suffix=".tmp",
+        )
         try:
-            os.unlink(tmp_path)
-        except OSError:
-            pass
-        raise
+            with os.fdopen(fd, "w", encoding="utf-8") as f:
+                json.dump(data, f, indent=indent, ensure_ascii=False)
+                f.flush()
+                os.fsync(f.fileno())
+            os.replace(tmp_path, path)
+        except BaseException:
+            try:
+                os.unlink(tmp_path)
+            except OSError:
+                pass
+            raise

@@ -33,10 +33,13 @@ def _find_shell() -> str:
     if custom and os.path.isfile(custom):
         return custom
 
-    # shutil.which finds bash.exe if Git\bin is on PATH
-    found = shutil.which("bash")
-    if found:
-        return found
+    # Derive bash from the selected Git executable before consulting generic
+    # PATH entries, where Windows' WSL shim is commonly named bash.exe.
+    git_exe = shutil.which("git")
+    if git_exe:
+        candidate = os.path.join(os.path.dirname(os.path.dirname(git_exe)), "bin", "bash.exe")
+        if os.path.isfile(candidate):
+            return candidate
 
     # Check common Git for Windows install locations
     for candidate in (
@@ -46,6 +49,10 @@ def _find_shell() -> str:
     ):
         if candidate and os.path.isfile(candidate):
             return candidate
+
+    found = shutil.which("bash")
+    if found and f"{os.sep}git{os.sep}" in os.path.normcase(found):
+        return found
 
     raise RuntimeError(
         "Git Bash not found. Hermes Agent requires Git for Windows on Windows.\n"
@@ -164,7 +171,7 @@ class LocalEnvironment(BaseEnvironment):
             # command output and discard shell init/exit noise.
             fenced_cmd = (
                 f"printf '{_OUTPUT_FENCE}';"
-                f" {exec_command};"
+                f" {{ {exec_command}; }} 2>&1;"
                 f" __hermes_rc=$?;"
                 f" printf '{_OUTPUT_FENCE}';"
                 f" exit $__hermes_rc"
@@ -185,7 +192,8 @@ class LocalEnvironment(BaseEnvironment):
             if stdin_data is not None:
                 def _write_stdin():
                     try:
-                        proc.stdin.write(stdin_data)
+                        proc.stdin.buffer.write(stdin_data.encode("utf-8"))
+                        proc.stdin.buffer.flush()
                         proc.stdin.close()
                     except (BrokenPipeError, OSError):
                         pass

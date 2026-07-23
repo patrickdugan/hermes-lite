@@ -25,6 +25,9 @@ from typing import List, Dict, Any, Optional
 
 logger = logging.getLogger(__name__)
 
+LOCAL_BONSAI_MODEL = "local/bonsai-8b"
+OLLAMA_BONSAI_MODEL = "digitsflow/bonsai-8b"
+
 # Suppress startup messages for clean CLI experience
 os.environ["MSWEA_SILENT_STARTUP"] = "1"  # mini-swe-agent
 os.environ["HERMES_QUIET"] = "1"  # Our own modules
@@ -147,7 +150,7 @@ def load_cli_config() -> Dict[str, Any]:
     # Default configuration
     defaults = {
         "model": {
-            "default": "claude-sonnet-4-5-20250929",
+            "default": "anthropic/claude-sonnet-4-5-20250929",
             "base_url": "",
             "provider": "anthropic",
         },
@@ -410,6 +413,9 @@ def _cprint(text: str):
     StdoutProxy.  Routing through print_formatted_text(ANSI(...)) lets
     prompt_toolkit parse the escapes and render real colors.
     """
+    if not getattr(sys.stdout, "isatty", lambda: False)():
+        print(text)
+        return
     _pt_print(_PT_ANSI(text))
 
 
@@ -1308,6 +1314,8 @@ class HermesCLI:
             print("  Usage:")
             print("    /provider anthropic    Switch to direct Anthropic API")
             print("    /provider local         Switch to local Qwen3.5-9B")
+            print("    /provider bonsai        Switch to local GGUF Bonsai 8B on port 8801")
+            print("    /provider ollama-bonsai Switch to Ollama Bonsai 8B")
             print()
             return
 
@@ -1317,7 +1325,7 @@ class HermesCLI:
                 if not key:
                     print("  Cancelled.")
                     return
-                model = input(f"  Model [{self.model or 'claude-sonnet-4-5-20250929'}]: ").strip() or self.model or "claude-sonnet-4-5-20250929"
+                model = input(f"  Model [{self.model or 'anthropic/claude-sonnet-4-5-20250929'}]: ").strip() or self.model or "anthropic/claude-sonnet-4-5-20250929"
                 self.api_key = key
                 self.base_url = ""
                 self.model = model
@@ -1337,14 +1345,43 @@ class HermesCLI:
                 self.agent = None
                 save_config_value("model.default", self.model)
                 save_config_value("model.provider", "local")
+                save_config_value("model.base_url", self.base_url)
                 from hermes_cli.config import save_env_value
                 save_env_value("OPENAI_BASE_URL", self.base_url)
                 save_env_value("OPENAI_API_KEY", "local")
                 print(f"  Switched to local Qwen3.5-9B (port 8800)")
 
+            elif arg in ("bonsai", "local-bonsai"):
+                self.api_key = "local"
+                self.base_url = "http://127.0.0.1:8801/v1"
+                self.model = LOCAL_BONSAI_MODEL
+                self.requested_provider = "local"
+                self.agent = None
+                save_config_value("model.default", self.model)
+                save_config_value("model.provider", "local")
+                save_config_value("model.base_url", self.base_url)
+                from hermes_cli.config import save_env_value
+                save_env_value("OPENAI_BASE_URL", self.base_url)
+                save_env_value("OPENAI_API_KEY", "local")
+                print("  Switched to local GGUF Bonsai 8B (llama.cpp on port 8801)")
+
+            elif arg in ("ollama", "ollama-bonsai"):
+                self.api_key = "local"
+                self.base_url = "http://127.0.0.1:11434/v1"
+                self.model = OLLAMA_BONSAI_MODEL
+                self.requested_provider = "local"
+                self.agent = None
+                save_config_value("model.default", self.model)
+                save_config_value("model.provider", "local")
+                save_config_value("model.base_url", self.base_url)
+                from hermes_cli.config import save_env_value
+                save_env_value("OPENAI_BASE_URL", self.base_url)
+                save_env_value("OPENAI_API_KEY", "local")
+                print("  Switched to Ollama Bonsai 8B (digitsflow/bonsai-8b on port 11434)")
+
             else:
                 print(f"  Unknown provider: {arg}")
-                print("  Options: anthropic, local")
+                print("  Options: anthropic, local, bonsai, ollama-bonsai")
         except (KeyboardInterrupt, EOFError):
             print("\n  Cancelled.")
 
@@ -1607,11 +1644,14 @@ class HermesCLI:
         elif cmd_lower.startswith("/model"):
             # Shortcut aliases for quick model switching
             _CLAUDE_MODELS = {
-                "sonnet": "claude-sonnet-4-5-20250929",
-                "haiku": "claude-haiku-4-5",
+                "sonnet": "anthropic/claude-sonnet-4-5-20250929",
+                "haiku": "anthropic/claude-haiku-4-5",
             }
             _MODEL_ALIASES = {
                 "qwen": "local/qwen3.5-9b",
+                "bonsai": LOCAL_BONSAI_MODEL,
+                "local-bonsai": LOCAL_BONSAI_MODEL,
+                "ollama-bonsai": OLLAMA_BONSAI_MODEL,
             }
             parts = cmd_original.split(maxsplit=1)
             if len(parts) > 1:
@@ -1638,10 +1678,11 @@ class HermesCLI:
 
                 self.model = new_model
                 self.agent = None  # Force re-init
-                if new_model.startswith("local/"):
+                if new_model.startswith("local/") or new_model == OLLAMA_BONSAI_MODEL:
                     self.requested_provider = "local"
                     self.api_key = "local"
-                    self.base_url = "http://127.0.0.1:8800/v1"
+                    port = 11434 if new_model == OLLAMA_BONSAI_MODEL else 8801 if new_model == LOCAL_BONSAI_MODEL else 8800
+                    self.base_url = f"http://127.0.0.1:{port}/v1"
                     self._explicit_base_url = self.base_url
                 elif not claude_alias:
                     ant_key = os.getenv("ANTHROPIC_API_KEY", "").strip()
@@ -1652,13 +1693,18 @@ class HermesCLI:
                         self._explicit_base_url = ""
                 save_config_value("model.default", new_model)
                 save_config_value("model.provider", self.requested_provider)
+                if new_model.startswith("local/") or new_model == OLLAMA_BONSAI_MODEL:
+                    save_config_value("model.base_url", self.base_url)
+                    from hermes_cli.config import save_env_value
+                    save_env_value("OPENAI_BASE_URL", self.base_url)
+                    save_env_value("OPENAI_API_KEY", "local")
                 provider_label = self.requested_provider
                 if provider_label == "anthropic":
                     provider_label = "anthropic (direct)"
                 print(f"  Switched to: {new_model} ({provider_label})")
             else:
                 print(f"Current model: {self.model}")
-                print("  Shortcuts: /model sonnet | haiku | qwen")
+                print("  Shortcuts: /model sonnet | haiku | qwen | bonsai | ollama-bonsai")
                 print("  Or: /model <full-model-name>")
         elif cmd_lower.startswith("/provider"):
             self._handle_provider_command(cmd_original)
@@ -1859,13 +1905,7 @@ class HermesCLI:
 
     def _show_context_gauge(self):
         """Show ASCII context window gauge for the current model."""
-        # Model context limits (only Qwen3.5-9B for now)
-        MODEL_CONTEXTS = {
-            "local/qwen3.5-9b": 32768,
-            "qwen/qwen3.5-9b": 262144,
-        }
-
-        # Try to get context length from compressor first, then hardcoded
+        # Try to get context length from compressor first, then model metadata.
         ctx_len = 0
         used_tokens = 0
 
@@ -1875,15 +1915,14 @@ class HermesCLI:
             used_tokens = compressor.last_prompt_tokens
 
         if not ctx_len:
-            # Fuzzy match model name
-            for key, length in MODEL_CONTEXTS.items():
-                if key in self.model or self.model in key:
-                    ctx_len = length
-                    break
+            from agent.model_metadata import get_known_context_length
+            ctx_len = get_known_context_length(
+                self.model,
+                base_url=getattr(self, "base_url", ""),
+            )
 
         if not ctx_len:
             print(f"  (._.) Context tracking not available for model: {self.model}")
-            print(f"  Only local/qwen3.5-9b is supported right now.")
             return
 
         # Estimate used tokens from conversation history if compressor has no data
@@ -1920,7 +1959,7 @@ class HermesCLI:
 
         print()
         print(f"  Context Window \u2014 {self.model}")
-        print(f"  {'\u2500' * 56}")
+        print("  " + "\u2500" * 56)
         self.console.print(f"  [{color}]{bar_filled}[/][dim]{bar_empty}[/] {pct_used:.1f}%")
         print()
         print(f"  Used:      {used_tokens:>8,} tokens")

@@ -53,7 +53,7 @@ The main agent is in `run_agent.py`:
 class AIAgent:
     def __init__(
         self,
-        model: str = "claude-sonnet-4-5-20250929",
+        model: str = "anthropic/claude-sonnet-4-5-20250929",
         api_key: str = None,
         base_url: str = None,
         max_iterations: int = 60,

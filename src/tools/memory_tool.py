@@ -21,9 +21,14 @@ Design follows the todo_tool pattern:
 import json
 import logging
 import os
-import fcntl
 from pathlib import Path
 from typing import Optional
+
+try:
+    import fcntl
+except ImportError:  # Windows
+    fcntl = None
+    import msvcrt
 
 logger = logging.getLogger(__name__)
 
@@ -31,6 +36,25 @@ DEFAULT_HERMES_HOME = os.path.expanduser("~/.hermes-lite")
 PROJECT_MEMORY_DIR = ".hermes"
 MEMORY_FILENAME = "MEMORY.md"
 USER_FILENAME = "USER.md"
+
+
+def _lock_file(lock_fd) -> None:
+    if fcntl is not None:
+        fcntl.flock(lock_fd, fcntl.LOCK_EX)
+        return
+    lock_fd.seek(0)
+    lock_fd.write("0")
+    lock_fd.flush()
+    lock_fd.seek(0)
+    msvcrt.locking(lock_fd.fileno(), msvcrt.LK_LOCK, 1)
+
+
+def _unlock_file(lock_fd) -> None:
+    if fcntl is not None:
+        fcntl.flock(lock_fd, fcntl.LOCK_UN)
+        return
+    lock_fd.seek(0)
+    msvcrt.locking(lock_fd.fileno(), msvcrt.LK_UNLCK, 1)
 
 
 class MemoryStore:
@@ -91,14 +115,14 @@ class MemoryStore:
             path.parent.mkdir(parents=True, exist_ok=True)
             # Use file locking to prevent concurrent write corruption
             lock_path = path.with_suffix(path.suffix + ".lock")
-            with open(lock_path, "w") as lock_fd:
-                fcntl.flock(lock_fd, fcntl.LOCK_EX)
+            with open(lock_path, "a+") as lock_fd:
+                _lock_file(lock_fd)
                 try:
                     tmp = path.with_suffix(".tmp")
                     tmp.write_text(content, encoding="utf-8")
-                    tmp.rename(path)
+                    os.replace(tmp, path)
                 finally:
-                    fcntl.flock(lock_fd, fcntl.LOCK_UN)
+                    _unlock_file(lock_fd)
             # Clean up lock file (best effort)
             try:
                 lock_path.unlink()

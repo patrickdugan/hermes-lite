@@ -79,6 +79,37 @@ def run_doctor(_args):
     else:
         _warn("Local server not running", "(run `hermes-lite-serve qwen` if needed)")
 
+    llama_dir = os.getenv("HERMES_LLAMA_CPP_DIR", "").strip()
+    bonsai_server = os.getenv("HERMES_LLAMA_SERVER", "").strip()
+    if not bonsai_server and llama_dir:
+        bonsai_server = os.path.join(llama_dir, "llama-server.exe")
+    bonsai_model = os.getenv("HERMES_BONSAI_MODEL", "").strip()
+    if bonsai_server and os.path.exists(bonsai_server):
+        _ok("Bonsai llama.cpp server present", f"({bonsai_server})")
+    elif bonsai_server:
+        _warn("Bonsai llama.cpp server not found", f"({bonsai_server})")
+    else:
+        _warn("Bonsai llama.cpp server not configured", "(set HERMES_LLAMA_CPP_DIR)")
+    if bonsai_model and os.path.exists(bonsai_model):
+        _ok("Bonsai GGUF present", f"({bonsai_model})")
+    elif bonsai_model:
+        _warn("Bonsai GGUF not found", f"({bonsai_model})")
+    else:
+        _warn("Bonsai GGUF not configured", "(set HERMES_BONSAI_MODEL)")
+    if _local_server_alive(8801):
+        _ok("Bonsai local server responding", "(port 8801)")
+    else:
+        _warn("Bonsai local server not running", "(run `scripts\\start_bonsai_llamacpp.ps1`)")
+
+    if shutil.which("ollama"):
+        _ok("Ollama executable present")
+        if _local_server_alive(11434):
+            _ok("Ollama server responding", "(port 11434)")
+        else:
+            _warn("Ollama server not running", "(run `ollama serve` if needed)")
+    else:
+        _warn("Ollama executable not found", "(needed only for ollama-bonsai)")
+
     print()
     print(color("◆ Files", Colors.CYAN, Colors.BOLD))
     home = get_hermes_home()

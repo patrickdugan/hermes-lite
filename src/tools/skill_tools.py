@@ -14,12 +14,15 @@ import re
 from pathlib import Path
 from typing import Optional
 
+from agent.skill_catalog import find_skill, iter_skill_files, load_ultra_lean_contract, skill_roots
+
 logger = logging.getLogger(__name__)
 
 DEFAULT_HERMES_HOME = os.path.expanduser("~/.hermes-lite")
 
 
 def _skills_dir() -> Path:
+    """Backward-compatible primary skill directory."""
     home = Path(os.getenv("HERMES_HOME", DEFAULT_HERMES_HOME))
     return home / "skills"
 
@@ -47,22 +50,28 @@ def _read_frontmatter(path: Path) -> dict:
 
 def skills_list_tool(category: Optional[str] = None) -> str:
     """List available skills with descriptions."""
-    sd = _skills_dir()
-    if not sd.exists():
+    roots = skill_roots()
+    if not roots:
         return json.dumps({"skills": [], "message": "No skills directory found."})
 
     skills = []
-    for skill_file in sorted(sd.rglob("SKILL.md")):
+    for root, skill_file in iter_skill_files():
         name = skill_file.parent.name
         fm = _read_frontmatter(skill_file)
         desc = fm.get("description", "")
         # Truncate long descriptions for the listing
         if len(desc) > 120:
             desc = desc[:117] + "..."
-        cat = skill_file.relative_to(sd).parts[0] if len(skill_file.relative_to(sd).parts) > 1 else "general"
+        rel = skill_file.relative_to(root)
+        cat = rel.parts[0] if len(rel.parts) > 1 else "general"
         if category and cat != category:
             continue
-        skills.append({"name": name, "category": cat, "description": desc})
+        skills.append({
+            "name": name,
+            "category": cat,
+            "description": desc,
+            "ultra_lean": load_ultra_lean_contract(skill_file) is not None,
+        })
 
     return json.dumps({"skills": skills, "count": len(skills)}, ensure_ascii=False)
 
@@ -91,31 +100,39 @@ SKILLS_LIST_SCHEMA = {
 # skill_view
 # =============================================================================
 
-def skill_view_tool(name: str) -> str:
-    """Load a skill's full content by name."""
+def skill_view_tool(name: str, mode: str = "auto") -> str:
+    """Load a skill contract, preferring ultra-lean mode when available."""
     if not name or not name.strip():
         return json.dumps({"error": "Skill name is required."})
 
-    sd = _skills_dir()
     name = name.strip()
+    mode = (mode or "auto").strip().lower()
+    if mode not in {"auto", "ultra_lean", "full"}:
+        return json.dumps({"error": "mode must be auto, ultra_lean, or full"})
 
-    # Try direct match first
-    skill_path = sd / name / "SKILL.md"
-    if not skill_path.exists():
-        # Search recursively
-        for candidate in sd.rglob("SKILL.md"):
-            if candidate.parent.name == name:
-                skill_path = candidate
-                break
-
-    if not skill_path.exists():
-        available = [p.parent.name for p in sd.rglob("SKILL.md")]
+    found = find_skill(name)
+    if not found:
+        available = [p.parent.name for _, p in iter_skill_files()]
         return json.dumps({
             "error": f"Skill '{name}' not found.",
             "available": available,
         })
+    _, skill_path = found
 
     try:
+        contract = load_ultra_lean_contract(skill_path)
+        if mode == "ultra_lean" and contract is None:
+            return json.dumps({"error": f"Skill '{name}' has no valid ULTRA_LEAN.json contract."})
+        if contract is not None and mode in {"auto", "ultra_lean"}:
+            compact = json.dumps(contract, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+            return json.dumps({
+                "name": name,
+                "mode": "ultra_lean",
+                "activate": True,
+                "estimated_tokens": (len(compact) + 3) // 4,
+                "contract": contract,
+            }, ensure_ascii=False, separators=(",", ":"))
+
         content = skill_path.read_text(encoding="utf-8")
 
         # Also load any reference files in the skill directory
@@ -129,7 +146,7 @@ def skill_view_tool(name: str) -> str:
                     ref_content = ref_content[:5000] + "\n\n[Truncated]"
                 refs[rel] = ref_content
 
-        result = {"name": name, "content": content}
+        result = {"name": name, "mode": "full", "content": content}
         if refs:
             result["references"] = refs
         return json.dumps(result, ensure_ascii=False)
@@ -152,6 +169,11 @@ SKILL_VIEW_SCHEMA = {
                 "type": "string",
                 "description": "Name of the skill to load (e.g. 'frontend-design').",
             },
+            "mode": {
+                "type": "string",
+                "enum": ["auto", "ultra_lean", "full"],
+                "description": "auto uses the lean contract when available; full is diagnostic only.",
+            },
         },
         "required": ["name"],
     },
@@ -163,7 +185,7 @@ SKILL_VIEW_SCHEMA = {
 # =============================================================================
 
 def check_skills_requirements() -> bool:
-    return _skills_dir().exists()
+    return bool(skill_roots())
 
 
 # =============================================================================
@@ -184,6 +206,6 @@ registry.register(
     name="skill_view",
     toolset="skills",
     schema=SKILL_VIEW_SCHEMA,
-    handler=lambda args, **kw: skill_view_tool(name=args.get("name", "")),
+    handler=lambda args, **kw: skill_view_tool(name=args.get("name", ""), mode=args.get("mode", "auto")),
     check_fn=check_skills_requirements,
 )

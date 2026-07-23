@@ -23,6 +23,16 @@ class HermesLiteAgent(AIAgent):
 
     def __init__(self, *, skip_memory: bool = False, honcho_session_key: str = None, **kwargs):
         super().__init__(**kwargs)
+        self._lean_runtime = None
+        try:
+            from agent.lean_runtime import LeanSkillRuntime, should_use_lean_runtime
+            from hermes_cli.config import load_config as _load_runtime_config
+
+            runtime_config = _load_runtime_config()
+            if should_use_lean_runtime(runtime_config, self.model, self.context_compressor.context_length):
+                self._lean_runtime = LeanSkillRuntime(agent=self, config=runtime_config)
+        except Exception as exc:
+            logger.warning("Lean runtime initialization failed; using standard runtime: %s", exc)
 
         # ── Persistent memory (MEMORY.md) ──
         self._memory_store = None
@@ -91,6 +101,20 @@ class HermesLiteAgent(AIAgent):
             self._skill_nudge_interval = int(skills_config.get("creation_nudge_interval", 15))
         except Exception:
             pass
+
+    def run_conversation(self, user_message, system_message=None, conversation_history=None, task_id=None):
+        if self._lean_runtime is not None and isinstance(user_message, str):
+            return self._lean_runtime.run(
+                user_message,
+                task_id=task_id,
+                conversation_history=conversation_history,
+            )
+        return super().run_conversation(
+            user_message,
+            system_message=system_message,
+            conversation_history=conversation_history,
+            task_id=task_id,
+        )
 
     # ── System prompt with memory + skills ──
 

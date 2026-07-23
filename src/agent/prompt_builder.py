@@ -184,17 +184,17 @@ def build_skills_system_prompt() -> str:
     Includes per-skill descriptions from frontmatter so the model can
     match skills by meaning, not just name.
     """
-    hermes_home = Path(os.getenv("HERMES_HOME", Path.home() / ".hermes-lite"))
-    skills_dir = hermes_home / "skills"
+    from agent.skill_catalog import iter_skill_files, skill_roots
 
-    if not skills_dir.exists():
+    roots = skill_roots()
+    if not roots:
         return ""
 
     # Collect skills with descriptions, grouped by category
     # Each entry: (skill_name, description)
     skills_by_category: dict[str, list[tuple[str, str]]] = {}
-    for skill_file in skills_dir.rglob("SKILL.md"):
-        rel_path = skill_file.relative_to(skills_dir)
+    for root, skill_file in iter_skill_files():
+        rel_path = skill_file.relative_to(root)
         parts = rel_path.parts
         if len(parts) >= 2:
             category = parts[0]
@@ -211,13 +211,16 @@ def build_skills_system_prompt() -> str:
     # Read category-level descriptions from DESCRIPTION.md
     category_descriptions = {}
     for category in skills_by_category:
-        desc_file = skills_dir / category / "DESCRIPTION.md"
-        if desc_file.exists():
+        for root in roots:
+            desc_file = root / category / "DESCRIPTION.md"
+            if not desc_file.exists():
+                continue
             try:
                 content = desc_file.read_text(encoding="utf-8")
                 match = re.search(r"^---\s*\n.*?description:\s*(.+?)\s*\n.*?^---", content, re.MULTILINE | re.DOTALL)
                 if match:
                     category_descriptions[category] = match.group(1).strip()
+                break
             except Exception as e:
                 logger.debug("Could not read skill description %s: %s", desc_file, e)
 
@@ -242,7 +245,7 @@ def build_skills_system_prompt() -> str:
     return (
         "## Skills (mandatory)\n"
         "Before replying, scan the skills below. If one clearly matches your task, "
-        "load it with skill_view(name) and follow its instructions. "
+        "load it with skill_view(name, mode='auto') and follow its compact contract. "
         "If a skill has issues, fix it with skill_manage(action='patch').\n"
         "\n"
         "<available_skills>\n"

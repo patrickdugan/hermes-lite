@@ -11,11 +11,15 @@ from hermes_cli.config import load_config
 
 LOCAL_MODEL_PORTS = {
     "local/qwen3.5-9b": 8800,
+    "local/bonsai-8b": 8801,
+    "digitsflow/bonsai-8b": 11434,
 }
 
 _LOCAL_MODEL_ALIASES = {
     "local/qwen3.5-9b": "qwen",
 }
+
+OLLAMA_MODELS = {"digitsflow/bonsai-8b"}
 
 _managed_server_proc = None
 
@@ -44,7 +48,7 @@ def resolve_requested_provider(requested: Optional[str] = None) -> str:
         return cfg_provider.strip().lower()
 
     model_id = model_cfg.get("default", "")
-    if isinstance(model_id, str) and model_id.startswith("local/"):
+    if isinstance(model_id, str) and (model_id.startswith("local/") or model_id in OLLAMA_MODELS):
         return "local"
 
     return "anthropic"

@@ -25,6 +25,12 @@ def test_resolve_requested_provider_config(monkeypatch):
     assert rp.resolve_requested_provider() == "local"
 
 
+def test_resolve_requested_provider_ollama_bonsai_model(monkeypatch):
+    monkeypatch.delenv("HERMES_INFERENCE_PROVIDER", raising=False)
+    monkeypatch.setattr(rp, "_get_model_config", lambda: {"default": "digitsflow/bonsai-8b"})
+    assert rp.resolve_requested_provider() == "local"
+
+
 def test_resolve_runtime_provider_anthropic(monkeypatch):
     monkeypatch.setattr(rp, "_get_model_config", lambda: {"provider": "anthropic"})
     monkeypatch.delenv("HERMES_INFERENCE_PROVIDER", raising=False)
@@ -59,6 +65,18 @@ def test_resolve_runtime_provider_local(monkeypatch):
 
     assert resolved["provider"] == "local"
     assert "127.0.0.1" in resolved["base_url"]
+
+
+def test_resolve_runtime_provider_ollama_bonsai_default_url(monkeypatch):
+    monkeypatch.setattr(rp, "_get_model_config", lambda: {"provider": "local", "default": "digitsflow/bonsai-8b"})
+    monkeypatch.delenv("HERMES_INFERENCE_PROVIDER", raising=False)
+    monkeypatch.delenv("OPENAI_BASE_URL", raising=False)
+    monkeypatch.setattr(rp, "_auto_start_local_server", lambda *a, **k: True)
+
+    resolved = rp.resolve_runtime_provider(requested="local")
+
+    assert resolved["provider"] == "local"
+    assert resolved["base_url"] == "http://127.0.0.1:11434/v1"
 
 
 def test_resolve_runtime_provider_explicit_overrides(monkeypatch):

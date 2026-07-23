@@ -60,6 +60,9 @@ def _resolve_last_cli_session() -> Optional[str]:
 
 
 def cmd_chat(args):
+    runtime_mode = getattr(args, "runtime", None)
+    if runtime_mode:
+        os.environ["HERMES_RUNTIME_MODE"] = runtime_mode
     if getattr(args, "continue_last", False) and not getattr(args, "resume", None):
         last_id = _resolve_last_cli_session()
         if not last_id:
@@ -202,6 +205,7 @@ def main():
     )
     parser.add_argument("--version", "-V", action="store_true", help="Show version and exit")
     parser.add_argument("-m", "--model", default=None, help="Model to use")
+    parser.add_argument("--runtime", choices=["auto", "lean", "standard"], default=None, help="Agent runtime profile")
     parser.add_argument(
         "--provider",
         choices=["anthropic", "local"],
@@ -225,6 +229,7 @@ def main():
     chat_parser.add_argument("-m", "--model", help="Model to use")
     chat_parser.add_argument("-t", "--toolsets", help="Comma-separated toolsets to enable")
     chat_parser.add_argument("--provider", choices=["anthropic", "local"], default=None)
+    chat_parser.add_argument("--runtime", choices=["auto", "lean", "standard"], default=None)
     chat_parser.add_argument("-v", "--verbose", action="store_true", help="Verbose output")
     chat_parser.add_argument("--resume", "-r", metavar="SESSION_ID")
     chat_parser.add_argument("--continue", "-c", dest="continue_last", action="store_true", default=False)

@@ -49,5 +49,10 @@ wandb/
 /experiments/*
 !/experiments/README.md
 
+# Machine-local eval configs. Commit portable fixtures as *.example.json.
+/evals/*.local.json
+/evals/storyworld_bonsai_20_lean.json
+/evals/storyworld_bonsai_terminal_repair.json
+
 # Node (for demo projects)
 node_modules/

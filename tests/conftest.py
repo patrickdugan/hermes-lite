@@ -39,12 +39,14 @@ def session_db(request, tmp_path):
 
 @pytest.fixture(autouse=True)
 def _isolate_hermes_home(tmp_path, monkeypatch):
-    """Redirect HERMES_HOME to a temp dir so tests never write to ~/.hermes/."""
+    """Isolate filesystem and model-selection state from the host."""
     fake_home = tmp_path / "hermes_test"
     fake_home.mkdir()
     (fake_home / "sessions").mkdir()
     (fake_home / "memories").mkdir()
     monkeypatch.setenv("HERMES_HOME", str(fake_home))
+    monkeypatch.delenv("LLM_MODEL", raising=False)
+    monkeypatch.delenv("OPENAI_MODEL", raising=False)
 
 
 @pytest.fixture()

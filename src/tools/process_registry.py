@@ -737,7 +737,7 @@ class ProcessRegistry:
             try:
                 os.kill(pid, 0)
                 alive = True
-            except (ProcessLookupError, PermissionError):
+            except OSError:
                 pass
 
             if alive:
