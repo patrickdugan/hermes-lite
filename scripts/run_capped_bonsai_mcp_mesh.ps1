@@ -70,6 +70,16 @@ function Test-TcpPort {
   }
 }
 
+function Test-ServerReady {
+  param([int]$TcpPort)
+  try {
+    $health = Invoke-RestMethod -Uri "http://127.0.0.1:$TcpPort/health" -TimeoutSec 2
+    return $health.status -eq "ok"
+  } catch {
+    return $false
+  }
+}
+
 function Stop-OwnedProcess {
   param([int]$OwnedPid)
   if ($OwnedPid -le 0) {
@@ -348,12 +358,12 @@ try {
       $abortReason = "server_startup_failure"
       break
     }
-    if (Test-TcpPort -HostName "127.0.0.1" -TcpPort $Port) {
+    if (Test-ServerReady -TcpPort $Port) {
       break
     }
     Start-Sleep -Milliseconds 500
   }
-  if (-not $abortReason -and -not (Test-TcpPort -HostName "127.0.0.1" -TcpPort $Port)) {
+  if (-not $abortReason -and -not (Test-ServerReady -TcpPort $Port)) {
     $abortReason = "server_startup_timeout"
   }
   if ($abortReason) {
@@ -419,7 +429,13 @@ try {
   } else {
     $evaluator.WaitForExit()
     if ($evaluator.ExitCode -ne 0) {
-      $abortReason = "evaluation_failed"
+      $innerSummaryPath = Join-Path $LiveRoot "live_$Stage`_summary.json"
+      if (Test-Path -LiteralPath $innerSummaryPath) {
+        $innerSummary = Get-Content -LiteralPath $innerSummaryPath -Raw | ConvertFrom-Json
+        $abortReason = if ($innerSummary.abort_reason) { [string]$innerSummary.abort_reason } else { "evaluation_failed" }
+      } else {
+        $abortReason = "evaluation_failed"
+      }
     }
   }
 } catch {
