@@ -1,0 +1,46 @@
+{
+  "schema": "hermes.lean_control_mesh_calibration_distilled_receipt.v1",
+  "study_id": "hermes_lite_12k_control_mesh_v1",
+  "registration_id": "20affa942b608ac960a17a98d56ef6cccaa1f59c4a77346be0d69b93e798988e",
+  "status": "completed_no_promotion",
+  "held_case_count": 128,
+  "cell_count": 768,
+  "promotion_threshold": 0.75,
+  "promoted_arms": [],
+  "best_arm": "lexical_typed",
+  "best_strict_success_rate": 0.7265625,
+  "by_arm": {
+    "lexical_typed": 0.7265625,
+    "trm_typed": 0.71875,
+    "ram_typed": 0.171875,
+    "trm_then_ram_typed": 0.4921875,
+    "ram_then_trm_typed": 0.25,
+    "adaptive_mesh": 0.4921875
+  },
+  "perturbation_strict_success": {
+    "lexical_typed": {
+      "plain": 1.0,
+      "checkpoint_state": 0.742857,
+      "stale_hint": 0.257143
+    },
+    "trm_typed": {
+      "plain": 1.0,
+      "checkpoint_state": 0.885714,
+      "stale_hint": 0.114286
+    }
+  },
+  "construction_defects": [
+    "typed LDT accepted allowed but noncanonical operations, invalidating RAM-arm repair and plan-quality metrics"
+  ],
+  "routing_metrics_valid": true,
+  "ram_plan_metrics_valid": false,
+  "all_packets_context_compliant": true,
+  "full_hermes_baseline_present": false,
+  "artifacts": {
+    "cells_sha256": "f41332c2bf8a136ce33805d79c4a4d5ec2783bdc85f06495846e868838c84437",
+    "summary_sha256": "643b18eb162533c39a0b9275aff0e95b6e8a97045f897679b877fde0544e5295",
+    "ram_policy_sha256": "9b3268db07da4196619327850df70fdad502d4de792e16ff068ef0d7a378d160",
+    "trm_router_sha256": "ce8fc00f23830b9650ab06044667f65af751ff467ffabfb6434ab5f5f20b6543"
+  },
+  "claim_boundary": "This is routing and schedule calibration, not executable agent efficacy. No 160k full-Hermes comparison is present."
+}
