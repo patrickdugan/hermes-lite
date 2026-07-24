@@ -1,0 +1,109 @@
+{
+  "schema": "hermes.executable_control_mesh_final_result.v1",
+  "study_id": "hermes_lite_executable_bridge_v1",
+  "registration_id": "9255e3b4e1395ab18d73f6bc33bdae05a93c165ade71ce06944f0fddfe043d00",
+  "status": "completed_with_registered_substitute_denominator",
+  "tasks": {
+    "held_count": 8,
+    "domains": [
+      "storyworld",
+      "logic",
+      "repository",
+      "data_provenance"
+    ],
+    "levels": [
+      5,
+      6
+    ],
+    "deterministic_single_pass": true
+  },
+  "bonsai": {
+    "model": "local/bonsai-8b",
+    "context_budget_tokens": 12000,
+    "api_error_cells": 0,
+    "arms": {
+      "lexical_typed": {
+        "strict_task_success": 1.0,
+        "resource_recall": 1.0,
+        "domain_specialist_accuracy": 0.25,
+        "mean_packet_tokens_est": 1030.0,
+        "max_packet_tokens_est": 1185,
+        "mean_latency_ms": 105448.5
+      },
+      "adaptive_mesh": {
+        "strict_task_success": 1.0,
+        "resource_recall": 1.0,
+        "domain_specialist_accuracy": 0.875,
+        "mean_packet_tokens_est": 1076.875,
+        "max_packet_tokens_est": 1218,
+        "mean_latency_ms": 112834.75
+      }
+    }
+  },
+  "full_hermes": {
+    "preregistered_baseline": {
+      "provider": "openai",
+      "model": "gpt-4.1",
+      "status": "unavailable",
+      "valid_model_responses": 0
+    },
+    "substitute_addendum_id": "b1c62a073a36cac7c98e78152f0bf94f3db6804444815b425cc6eb793c0d5526",
+    "provider": "openai-codex",
+    "model": "gpt-5.6-sol",
+    "context_budget_tokens": 160000,
+    "max_packet_tokens_est": 7048,
+    "mean_packet_tokens_est": 7001.25,
+    "strict_task_success": 1.0,
+    "resource_recall": 1.0,
+    "api_error_cells": 0,
+    "mean_latency_ms": 5227.5,
+    "max_latency_ms": 7161,
+    "mean_response_characters": 243.125,
+    "max_response_characters": 323,
+    "total_input_tokens_reported": 36922,
+    "total_output_tokens_reported": 533,
+    "output_limit_mode": "prompt_contract_and_4000_character_receipt_cap"
+  },
+  "comparisons": {
+    "lexical_efficacy_fraction_vs_substitute": 1.0,
+    "adaptive_efficacy_fraction_vs_substitute": 1.0,
+    "registered_min_efficacy_fraction": 0.65,
+    "efficacy_gate_passed": true,
+    "adaptive_specialist_accuracy_delta_vs_lexical": 0.625,
+    "adaptive_strict_success_delta_vs_lexical": 0.0,
+    "adaptive_mean_packet_token_delta_vs_lexical": 46.875,
+    "adaptive_mean_latency_delta_ms_vs_lexical": 7386.25,
+    "lexical_prompt_token_reduction_vs_full_fraction": 0.8528834136761293,
+    "adaptive_prompt_token_reduction_vs_full_fraction": 0.8461881806820211,
+    "full_to_lexical_prompt_ratio": 6.797330097087379,
+    "full_to_adaptive_prompt_ratio": 6.501450957632037
+  },
+  "registered_gate_results": {
+    "min_bonsai_task_success": true,
+    "min_adaptive_domain_specialist_accuracy": true,
+    "max_bonsai_packet_tokens": true,
+    "zero_bonsai_api_errors": true,
+    "min_efficacy_fraction_vs_full_hermes_substitute": true
+  },
+  "verification": {
+    "targeted_command": "python -m pytest tests/agent/test_executable_control_mesh_v1.py tests/agent/test_lean_control_mesh_v1.py -q",
+    "targeted_passed": 22,
+    "targeted_failed": 0,
+    "full_non_prodpush_status": "host_platform_failure",
+    "full_non_prodpush_first_isolated_failure": "tests/test_atomic_json_write.py concurrent Windows replace raised PermissionError(13) in two writer threads",
+    "full_non_prodpush_runner_failure": "pytest crashed in Windows numbered-temp symlink creation",
+    "changed_module_test_failures": 0
+  },
+  "artifacts": {
+    "prompts_sha256": "93017a1cd71885dd654d323b51d8833832f30b604f8d3904a69bc83572b3ad5e",
+    "bonsai_cells_sha256": "4f706f8b0a5ec2df129f4f059380eea5344a89308faa51399dccaaa0281b3ed9",
+    "bonsai_summary_sha256": "32c25b5e939a03c7476450eff20e08fa64d6797db948a11849afc5f91fc425f4",
+    "full_hermes_raw_sha256": "e1c03a430654501824026d8a3da9b21d110e19c9cc9a0d955dc680a3ba37b8e0",
+    "full_hermes_runner_summary_sha256": "707719486158f26a0a3073c0aa9082ead92591fc31abc2d07cb94440c84f062c",
+    "full_hermes_cells_sha256": "79336f048addeab63eebef24c6ca2ac081beb1e71b69819f51e4f985d8a818b7",
+    "full_hermes_summary_sha256": "27566faea782f80183c83c49bf9a097cc7766a15b062779228d91e899465f8e9"
+  },
+  "resource_caveat": "The first ten Bonsai cells have sampled telemetry but no final wrapper receipt after an external monitoring interruption. The six-cell resume completed under the 2048 MB cap and passed PID-owned cleanup.",
+  "interpretation": "Typed retrieval preserves strict performance with about 85% fewer estimated prompt tokens than the broad full-Hermes packet. Domain RAM improves specialist selection by 5/8 but adds tokens and latency without improving saturated strict success.",
+  "claim_boundary": "Eight deterministic synthetic MCP tasks support no GPT-4.1, 160k-length, general capability, tool execution, stochastic robustness, safety, or broad alignment claim."
+}
