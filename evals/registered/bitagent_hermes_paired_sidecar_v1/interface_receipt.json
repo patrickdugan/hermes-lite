@@ -1,0 +1,77 @@
+{
+  "authority": {
+    "approval": false,
+    "broadcast": false,
+    "candidate_only": true,
+    "capability_material_is_authorization": false,
+    "execution": false,
+    "signing": false
+  },
+  "capability_fingerprint_conformance_canonical_lf_sha256": "973d571d2be9962841db7b4488bca5f4680a981fde76988163a15e5242aaf90e",
+  "capability_fingerprint_cross_language_agreement": true,
+  "capability_fingerprint_result": "6b1fd73a1156011947e6fd743279a3e85e03393bb220d1dc6c402cf63d879ad6",
+  "claim_scope": "This process-owned sidecar exposes deterministic packetization, typed LDT validation, and fingerprinted capability-request material to a BitAgent Node host. It does not authorize or execute the material, and the separately gated live Bonsai runtime remains disabled until adapter promotion.",
+  "control_mesh_registration_id": "af4d4d23d888736a3200a73b87017cb2f0d6ddd867236473b659f3fdc8071042",
+  "control_mesh_source_status": "local_uncommitted_source_byte_pinned",
+  "operations": [
+    "materialize_capability_request",
+    "packetize",
+    "validate"
+  ],
+  "receipt_sha256": "141d927c5b0fb4f5ae3d4bf294f8a59ea3ac7932cae15866bdd1ea0d2fda0818",
+  "schema": "hermes.bitagent_sidecar_interface_receipt.v1",
+  "source_files": {
+    "configs/bitagent_hermes_sidecar_v1.json": {
+      "canonical_bytes": 1108,
+      "canonical_lf_sha256": "90917eac0d4146092a384006d73fb5e7f7c1ed7b15c41ff5f31b222ddbe667a9"
+    },
+    "contracts/bitagent_hermes_sidecar_v1.schema.json": {
+      "canonical_bytes": 4159,
+      "canonical_lf_sha256": "43c7e0470d5dc346aab3af29b5c1aa47d53e26bfd0d84726df85b24c085e8d4a"
+    },
+    "docs/bitagent_hermes_sidecar_v1.md": {
+      "canonical_bytes": 2841,
+      "canonical_lf_sha256": "834608090d5fe4967f44eb2e9f9ec28b44f985c54c1a92906a73c470fedd34d7"
+    },
+    "integrations/bitagent/README.md": {
+      "canonical_bytes": 1512,
+      "canonical_lf_sha256": "91e40c28d8c86e9b2876bec937ebfea1ba5222d3f35bc118b53b2ac8c0b26fde"
+    },
+    "integrations/bitagent/hermes-role-mesh-sidecar.d.ts": {
+      "canonical_bytes": 1064,
+      "canonical_lf_sha256": "b053564ac1a0bcdd29905ebcc867b95c76bc714672d8e17a6c294885416eac07"
+    },
+    "integrations/bitagent/hermes-role-mesh-sidecar.mjs": {
+      "canonical_bytes": 6017,
+      "canonical_lf_sha256": "c0349ac28c4f243374dd99c89bf8be23fc8cdfa80fc0afe846e6f05ffdee9a5d"
+    },
+    "integrations/bitagent/package.json": {
+      "canonical_bytes": 291,
+      "canonical_lf_sha256": "ef51e4e0be0aeedd4dc0abf6f4f08372b8351c7be4f0c0ebec50c7785b1cac39"
+    },
+    "src/agent/bitagent_sidecar_receipt_v1.py": {
+      "canonical_bytes": 4705,
+      "canonical_lf_sha256": "956e646c7901e00de0ba47064740e376651d16933aa396fa4e44732b801871ce"
+    },
+    "src/agent/bitagent_sidecar_v1.py": {
+      "canonical_bytes": 15189,
+      "canonical_lf_sha256": "45f6261329f8f73788bd1092adf66307dc39cd99c07fc5789289075dc12e62cd"
+    },
+    "tests/agent/test_bitagent_sidecar_v1.py": {
+      "canonical_bytes": 9864,
+      "canonical_lf_sha256": "1fd9cdadd795d9f0044577e3f5f97d2a22c57c86aec50007ae5ce56426406f18"
+    },
+    "tests/node/bitagent_hermes_stdio_sidecar.test.mjs": {
+      "canonical_bytes": 3403,
+      "canonical_lf_sha256": "6de56fef8ab3a9042c7001650c553de81e6d4a7c798f131e429ab6dff42f12e4"
+    }
+  },
+  "status": "sealed_deterministic_interface",
+  "study_id": "bitagent_hermes_paired_sidecar_v1",
+  "transport": "owned_child_stdio_jsonl",
+  "verification_commands": [
+    "python -m pytest tests/agent/test_bitagent_sidecar_v1.py -q",
+    "python -m pytest tests/agent -q -k bitagent",
+    "node --test tests/node/bitagent_hermes_stdio_sidecar.test.mjs"
+  ]
+}

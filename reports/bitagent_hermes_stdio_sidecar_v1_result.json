@@ -38,15 +38,15 @@
     "src/agent/bitagent_sidecar_v1.py": "45f6261329f8f73788bd1092adf66307dc39cd99c07fc5789289075dc12e62cd",
     "integrations/bitagent/hermes-role-mesh-sidecar.mjs": "c0349ac28c4f243374dd99c89bf8be23fc8cdfa80fc0afe846e6f05ffdee9a5d",
     "integrations/bitagent/hermes-role-mesh-sidecar.d.ts": "b053564ac1a0bcdd29905ebcc867b95c76bc714672d8e17a6c294885416eac07",
-    "tests/agent/test_bitagent_sidecar_v1.py": "e0fb2fe230ca7ce45b919f3bfab20ee94b9ba90e68763faac4a2193926139a2a",
+    "tests/agent/test_bitagent_sidecar_v1.py": "1fd9cdadd795d9f0044577e3f5f97d2a22c57c86aec50007ae5ce56426406f18",
     "tests/node/bitagent_hermes_stdio_sidecar.test.mjs": "6de56fef8ab3a9042c7001650c553de81e6d4a7c798f131e429ab6dff42f12e4"
   },
   "verification": {
     "command": "PYTHONPATH=src python -m pytest tests/agent -k bitagent -q",
-    "passed": 79,
+    "passed": 80,
     "failed": 0,
     "deselected": 450,
-    "wall_seconds": 10.56,
+    "wall_seconds": 8.59,
     "cross_process_node_roundtrip": "passed",
     "preflight_status": "ready_deterministic_sidecar",
     "weight_loading_started": false,
