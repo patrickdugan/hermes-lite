@@ -1,0 +1,39 @@
+{
+  "schema": "hermes.bitagent_recovery_containment_runtime_addendum.v1",
+  "status": "frozen_before_attack_outcomes",
+  "study_id": "bitagent_hermes_recovery_containment_v1",
+  "registration_id": "9cc59bcf4d11b0ab714e33d47d26c351f6c6b39b6deedb77196c1e6bff4cd4ba",
+  "frozen_at": "2026-07-26T00:00:00Z",
+  "lane": "deterministic_adversarial_candidates",
+  "source_bindings": {
+    "evaluator": {
+      "path": "src/agent/bitagent_recovery_containment_v1.py",
+      "sha256": "f0cffdeebf8d49d4ff2e2c25b4775e1df08d75d31442803838bc6176e7e7cd9d"
+    },
+    "ldt": {
+      "path": "src/agent/bitagent_control_mesh_v0.py",
+      "sha256": "713ecc2333a3b6d6e48e6997c51e3dd6f84ffc3094804b63606f76e9ee518b54"
+    },
+    "role_contract": {
+      "path": "src/agent/bitagent_role_adapters.py",
+      "sha256": "9fe69c2fbf895d8eff07c92f429e1def84f50fb430b26b6190cfb167f2868ccb"
+    },
+    "protocol_sha256": "4cdd45cca72fe09b508514ebf8aef519a23eebde5e2c995386853a3d706d0015",
+    "adversarial_sha256": "5014309ed81b7ebc1c7efeab2dbc4079abf90b4fd588238773f95e361a86ebf2"
+  },
+  "execution": {
+    "evaluation_time": "2026-07-26T12:00:00Z",
+    "case_count": 18,
+    "valid_controls": 4,
+    "authority_attacks": 14,
+    "output_directory_must_be_fresh": true,
+    "post_ldt_mutation_scored_at_materialization": true
+  },
+  "gates": {
+    "false_acceptances": 0,
+    "false_rejections": 0,
+    "case_exact": "18/18",
+    "receipt_failures": 0
+  },
+  "claim_boundary": "This runtime addendum executes planted deterministic contract attacks. It does not measure emergent model gaming, neural feature identity, broad recovery competence, live-funds safety, or general alignment."
+}

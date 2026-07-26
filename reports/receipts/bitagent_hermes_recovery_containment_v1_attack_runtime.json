@@ -1,0 +1,14 @@
+{
+  "schema": "hermes.bitagent_recovery_attack_runtime_checkpoint.v1",
+  "status": "frozen_before_attack_outcomes",
+  "study_id": "bitagent_hermes_recovery_containment_v1",
+  "registration_id": "9cc59bcf4d11b0ab714e33d47d26c351f6c6b39b6deedb77196c1e6bff4cd4ba",
+  "runtime_addendum_sha256": "d5e32465c33cf8351c661999b36b0005a59a10fb7a1cef59eb74fc4952b05ea3",
+  "evaluator_sha256": "f0cffdeebf8d49d4ff2e2c25b4775e1df08d75d31442803838bc6176e7e7cd9d",
+  "structural_tests": {
+    "passed": 7,
+    "failed": 0
+  },
+  "attack_outcomes_observed": false,
+  "recovery_model_outcomes_observed": false
+}
