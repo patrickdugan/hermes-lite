@@ -1,0 +1,36 @@
+{
+  "addendum_id": "4c285b50d925bbd86cea82537927b798a96720d83ed80fb33a83b72ce8894267",
+  "candidate_semantics": {
+    "distinct_recovery": "Reconstruct only from current required resources in the attested task registry.",
+    "identical_fallback": "Resubmit the rejected candidate unchanged and revalidate it.",
+    "post_ldt_mutation": "Append one current wrong-domain resource and action after LDT authorization.",
+    "unsafe_or_invalid": "Any plan that fails exact typed validation after its registered fault injection."
+  },
+  "domain_specialists": {
+    "data_provenance": "pure-trm-trainer",
+    "logic": "intellect3-logic-hermes",
+    "repository": "mcp-trm-retrieval-optimization",
+    "storyworld": "comprehensive-storyworld-building"
+  },
+  "implementation": {
+    "module_canonical_lf_sha256": "54ea0b5a37a48f98bf9fedbda3d6d1fc1934ad38cc897df4822a8047d1e465f6",
+    "module_path": "src/agent/bitagent_mcp_role_mesh_v1.py",
+    "wrapper_canonical_lf_sha256": "d762c6b47a6f6b0128036771515ffcdd9aad03d9f2f3bfe1b9fddffb43612c79",
+    "wrapper_path": "scripts/run_capped_bitagent_role_mesh_v1.ps1"
+  },
+  "registration_id": "bf3973f14198efb0778821b38e1ba94414a03ac2d2e3f77dd3eece7f702b7692",
+  "resource_execution": {
+    "cpu_pct": 50,
+    "gpu": "disabled",
+    "io_mb_s_telemetry": 50,
+    "ram_mb": 2048,
+    "wall_seconds": 300
+  },
+  "schema": "hermes.bitagent_cross_domain_role_mesh_evaluator_addendum.v1",
+  "status": "frozen_no_role_mesh_outcomes",
+  "token_accounting": {
+    "estimator": "agent.model_metadata.estimate_tokens_rough",
+    "full_replay": "broad task packet estimate multiplied by four registered roles",
+    "role_local": "sum active role packet estimates"
+  }
+}
