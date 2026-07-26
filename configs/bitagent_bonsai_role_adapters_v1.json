@@ -1,0 +1,182 @@
+{
+  "schema": "hermes.bitagent_bonsai_role_adapters.v1",
+  "study_id": "bitagent_bonsai8b_role_adapters_v1",
+  "claim_scope": "This configuration trains small role-scoped candidate-action adapters for the three BitAgent launch intents and the separately bounded committed-signal lane. It does not grant wallet authority, establish profitable trading, or authorize signing or broadcast.",
+  "models": {
+    "training_base": {
+      "repo": "prism-ml/Bonsai-8B-unpacked",
+      "revision": "376f381570d6115bc03f82adcfa4af0c7672ae54",
+      "license": "apache-2.0",
+      "format": "safetensors_f16"
+    },
+    "inference_base": {
+      "repo": "prism-ml/Bonsai-8B-gguf",
+      "revision": "48516770dd04643643e9f9019a2a349cf26c5dbd",
+      "license": "apache-2.0",
+      "format": "gguf_q1_0",
+      "local_path_hint": "D:/models/Tesseract/bonsai-8b-q1/Bonsai-8B-Q1_0.gguf"
+    }
+  },
+  "authority": {
+    "model_output_is_candidate_only": true,
+    "wallet_owned": [
+      "balance_and_confirmation_truth",
+      "approval",
+      "input_selection",
+      "signing",
+      "broadcast",
+      "execution_verification"
+    ],
+    "forbidden_model_effects": [
+      "request_or_store_secret_material",
+      "approve_wallet_action",
+      "sign_transaction",
+      "broadcast_transaction",
+      "invent_wallet_or_chain_state",
+      "change_strategy_parameters",
+      "select_its_own_financial_authority"
+    ]
+  },
+  "roles": {
+    "intent_planner": {
+      "purpose": "Identify one supported intent, collect missing public parameters, and propose a typed next tool.",
+      "allowed_tools": [
+        "bitagent.wallet.connect",
+        "bitagent.deposit.prepare",
+        "bitagent.strategy.simulate",
+        "bitagent.withdraw.simulate",
+        "bitagent.workflow.get"
+      ]
+    },
+    "utxo_tradelayer_specialist": {
+      "purpose": "Interpret supplied UTXORef and TradeLayer state and propose exact simulation arguments.",
+      "allowed_tools": [
+        "bitagent.strategy.simulate",
+        "bitagent.withdraw.simulate",
+        "bitagent.workflow.get",
+        "bitagent.signal.simulate",
+        "bitagent.signal.get"
+      ]
+    },
+    "risk_approval_guard": {
+      "purpose": "Check exact effects, fees, freshness, provenance hashes, and approval binding without approving.",
+      "allowed_tools": [
+        "bitagent.workflow.get",
+        "bitagent.signal.get"
+      ]
+    },
+    "recovery_operator": {
+      "purpose": "Resume persisted interrupted, rejected, stale, or submitted workflows without duplicate execution.",
+      "allowed_tools": [
+        "bitagent.workflow.get",
+        "bitagent.action.verify",
+        "bitagent.signal.get",
+        "bitagent.signal.verify"
+      ]
+    }
+  },
+  "routing": {
+    "owner": "deterministic_host",
+    "model_may_select_role": false,
+    "precedence": [
+      "recovery_operator",
+      "risk_approval_guard",
+      "utxo_tradelayer_specialist",
+      "intent_planner"
+    ]
+  },
+  "hermes_context": {
+    "hard_context_tokens": 12000,
+    "working_packet_target_tokens": 5000,
+    "working_packet_max_tokens": 6000,
+    "summary_lane_tokens": 6000,
+    "max_replay_hints": 1,
+    "raw_transcripts": false,
+    "packet_order": [
+      "task_card",
+      "role_contract",
+      "compact_workflow_state",
+      "typed_tool_contracts",
+      "current_evidence",
+      "single_matching_failure_replay"
+    ]
+  },
+  "training": {
+    "method": "qlora_sft",
+    "base_quantization": "nf4",
+    "compute_dtype": "bfloat16",
+    "max_sequence_tokens": 2048,
+    "lora_rank": 8,
+    "lora_alpha": 16,
+    "lora_dropout": 0.05,
+    "target_modules": [
+      "q_proj",
+      "k_proj",
+      "v_proj",
+      "o_proj",
+      "gate_proj",
+      "up_proj",
+      "down_proj"
+    ],
+    "per_device_train_batch_size": 1,
+    "gradient_accumulation_steps": 16,
+    "gradient_checkpointing": true,
+    "learning_rate": 0.0001,
+    "epochs": 2,
+    "seed": 26072026,
+    "minimum_seed_examples_per_role": 5,
+    "minimum_promotion_examples_per_role": 200,
+    "minimum_promotion_validation_examples_per_role": 20,
+    "minimum_promotion_test_examples_per_role": 20,
+    "required_operator_inputs": [
+      "training_task_id",
+      "ram_cap_mb",
+      "cpu_cap_pct",
+      "io_cap_mb_s",
+      "wall_seconds",
+      "checkpoint_steps_or_seconds",
+      "chunk_strategy",
+      "training_base_path_or_download_authorization"
+    ]
+  },
+  "promotion": {
+    "min_intent_accuracy": 0.98,
+    "min_valid_tool_arguments": 0.99,
+    "min_recovery_success": 0.95,
+    "require_zero_unauthorized_effects": true,
+    "require_zero_secret_requests": true,
+    "require_zero_fabricated_state": true,
+    "require_all_bitagent_critical_tests": true,
+    "require_gguf_adapter_compatibility_test": true
+  },
+  "device_profiles": {
+    "cpu_2gb": {
+      "context_tokens": 2048,
+      "parallel": 1,
+      "active_adapters": 1,
+      "kv_cache": "q4_0",
+      "gpu_layers": 0
+    },
+    "cpu_4gb": {
+      "context_tokens": 4096,
+      "parallel": 1,
+      "active_adapters": 1,
+      "kv_cache": "q4_0",
+      "gpu_layers": 0
+    },
+    "cpu_8gb": {
+      "context_tokens": 8192,
+      "parallel": 1,
+      "active_adapters": 1,
+      "kv_cache": "q4_0",
+      "gpu_layers": 0
+    },
+    "rtx3050_4gb": {
+      "context_tokens": 12000,
+      "parallel": 1,
+      "active_adapters": 1,
+      "kv_cache": "q4_0",
+      "gpu_layers": "auto"
+    }
+  }
+}

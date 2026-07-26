@@ -1,0 +1,48 @@
+{
+  "schema": "hermes.bitagent_control_mesh_checkpoint_receipt.v0",
+  "status": "registered_no_mesh_outcomes",
+  "study_id": "bitagent_hermes_control_mesh_v0",
+  "registration_id": "af4d4d23d888736a3200a73b87017cb2f0d6ddd867236473b659f3fdc8071042",
+  "hermes_base_commit": "b3ad2605627188db52e8938593e142e4619570e7",
+  "hermes_branch": "feat/bitagent-hermes-role-mesh-v0",
+  "bitagent_git_head": "ad578df3fa1f1e337b631f898613987594151439",
+  "bitagent_source_versioning_status": "local_uncommitted_source_byte_pinned",
+  "registered_cases": {
+    "total": 50,
+    "train": 40,
+    "held": 10,
+    "split_overlap": 0
+  },
+  "bitagent_host_baseline": {
+    "launch_tests": "27/27",
+    "sovereign_tests": "5/5",
+    "economic_tests": "4/4",
+    "launch_eval_cases": "50/50",
+    "launch_eval_metrics_at_one": 8
+  },
+  "hermes_focused_tests": {
+    "passed": 33,
+    "failed": 0,
+    "model_weights_loaded": false
+  },
+  "full_nonintegration_suite": {
+    "status": "environment_failure",
+    "first_failure_after_passed": 492,
+    "skipped_before_first_failure": 48,
+    "first_failure": "ModuleNotFoundError: prompt_toolkit",
+    "additional_unrestricted_run_failure": "Windows access violation in hermes_state._init_schema",
+    "claimed_green": false
+  },
+  "capability_fingerprint_conformance": {
+    "status": "passed",
+    "typescript": "6b1fd73a1156011947e6fd743279a3e85e03393bb220d1dc6c402cf63d879ad6",
+    "python": "6b1fd73a1156011947e6fd743279a3e85e03393bb220d1dc6c402cf63d879ad6"
+  },
+  "authority": {
+    "model_output": "candidate_only",
+    "deterministic_host_role_selection": true,
+    "broadcast_delegable": false,
+    "live_funds_exercised": false
+  },
+  "claim_scope": "This checkpoint registers and tests local integration contracts. It reports no RAM, TRM, adaptive-mesh, Bonsai, QLoRA, profitability, or live-funds outcome."
+}

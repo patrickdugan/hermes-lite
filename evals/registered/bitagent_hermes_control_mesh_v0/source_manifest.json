@@ -1,0 +1,44 @@
+{
+  "files": [
+    {
+      "bytes": 7950,
+      "git_status": "?? eval/agent-cases.ts",
+      "path": "eval/agent-cases.ts",
+      "sha256": "d1e1ac7a589a0367cc38afc47db8cb330b8b40ae25a6c02d685d42a748c84284"
+    },
+    {
+      "bytes": 4220,
+      "git_status": "?? eval/harness.ts",
+      "path": "eval/harness.ts",
+      "sha256": "8fa4efe83043388e4d16648ee409ceb9f224e062631db429092a84ff03010646"
+    },
+    {
+      "bytes": 2454,
+      "git_status": "M package.json",
+      "path": "package.json",
+      "sha256": "3396c86b7872e939473e8a8f1e050c24b7420ccb6bc19a9cf30044d2650f59c5"
+    },
+    {
+      "bytes": 5753,
+      "git_status": "?? src/sovereign/capabilities.ts",
+      "path": "src/sovereign/capabilities.ts",
+      "sha256": "eed87258478f2e748a098db98cef4259e086e60001d0bc9c8e55e3a7b129107a"
+    },
+    {
+      "bytes": 3114,
+      "git_status": "?? src/sovereign/types.ts",
+      "path": "src/sovereign/types.ts",
+      "sha256": "e0790723877bb1513976bec6cf6b83d0fcc9749fdcac19a5814e0c4e2f4adb36"
+    },
+    {
+      "bytes": 7295,
+      "git_status": "?? src/survival/policy.ts",
+      "path": "src/survival/policy.ts",
+      "sha256": "75672f54d767d71aaac58a98274c0fffb13ad74e62421159894a5f3f1224d583"
+    }
+  ],
+  "git_head": "ad578df3fa1f1e337b631f898613987594151439",
+  "schema": "hermes.bitagent_source_manifest.v0",
+  "source_root": "C:/projects/BitAgent/BitAgent/tradelayer-thorchain-starter/tradelayer-thorchain-starter",
+  "versioning_status": "local_uncommitted_source_byte_pinned"
+}

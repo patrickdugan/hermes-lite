@@ -1,0 +1,21 @@
+{
+  "arms": [
+    "lexical_ldt",
+    "ram_ldt",
+    "trm_ldt",
+    "adaptive_mesh_ldt"
+  ],
+  "claim_scope": "This registered local integration study measures bounded-context role routing, typed candidate validity, LDT rejection, fallback behavior, and compatibility with byte-pinned local BitAgent interfaces. It does not grant financial authority, establish profitable behavior, certify the uncommitted BitAgent source as reproducible from git, or authorize approval, signing, broadcast, or live funds.",
+  "held_case_count": 10,
+  "held_cases_sha256": "7306ac917c13ef64dc6fd760b7d2da6694f39b702c8bd08fc4f1a1876732e433",
+  "protocol_sha256": "9350da558284abcf505d907adabd5bfe41793723b5c310d226896d58aa55b19c",
+  "registration_id": "af4d4d23d888736a3200a73b87017cb2f0d6ddd867236473b659f3fdc8071042",
+  "schema": "hermes.bitagent_control_mesh_registration.v0",
+  "source_manifest_sha256": "d2222a23bb49c8b4219ca0d011e3db1a474ad423e4b84f1adbf2848656df983a",
+  "source_versioning_status": "local_uncommitted_source_byte_pinned",
+  "split_overlap_count": 0,
+  "status": "registered_no_mesh_outcomes",
+  "study_id": "bitagent_hermes_control_mesh_v0",
+  "train_case_count": 40,
+  "train_cases_sha256": "3b02079e953dd87d056fe4b18ce1a19b2763998134d4461ee7a92a0cf12a2d34"
+}

@@ -148,6 +148,20 @@ Use `scripts\run_capped_bonsai_mcp_mesh.ps1` for live Windows runs so the
 owned server and evaluator share hard RAM and CPU caps and PID-specific
 cleanup.
 
+### BitAgent role adapters
+
+The BitAgent path keeps a shared Bonsai 8B base and four separate,
+candidate-only adapters for intent planning, UTXO/TradeLayer simulation,
+approval-risk review, and interrupted-session recovery. Hermes Lite selects a
+role deterministically, builds a compact retrieval packet, and activates only
+that adapter per llama.cpp request. Wallet approval, signing, broadcast, and
+verification remain outside the model.
+
+The training harness refuses uncapped weight loading and the checked-in runtime
+manifest remains disabled until adapters pass held-out and GGUF compatibility
+gates. See
+[`docs/bitagent_bonsai_role_adapters_v1.md`](docs/bitagent_bonsai_role_adapters_v1.md).
+
 ## Multi-agent mode
 
 The Rust TUI supports multiple agent panes, each running an independent subprocess with its own session, model, and conversation.

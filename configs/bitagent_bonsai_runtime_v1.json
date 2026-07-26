@@ -1,0 +1,34 @@
+{
+  "schema": "hermes.bitagent_bonsai_runtime.v1",
+  "status": "adapter_artifacts_not_trained",
+  "base_model": {
+    "path": "D:/models/Tesseract/bonsai-8b-q1/Bonsai-8B-Q1_0.gguf",
+    "repo": "prism-ml/Bonsai-8B-gguf",
+    "revision": "48516770dd04643643e9f9019a2a349cf26c5dbd"
+  },
+  "endpoint": "http://127.0.0.1:8801/v1",
+  "model_alias": "local/bonsai-8b",
+  "device_profile": "rtx3050_4gb",
+  "adapter_files": {
+    "intent_planner": "intent_planner.gguf",
+    "utxo_tradelayer_specialist": "utxo_tradelayer_specialist.gguf",
+    "risk_approval_guard": "risk_approval_guard.gguf",
+    "recovery_operator": "recovery_operator.gguf"
+  },
+  "activation": {
+    "owner": "deterministic_host",
+    "per_request": true,
+    "active_adapter_count": 1,
+    "scale": 1.0,
+    "server_flag": "--lora-init-without-apply"
+  },
+  "promotion_required": [
+    "role_adapter_training_completed",
+    "peft_to_gguf_conversion_completed",
+    "base_adapter_compatibility_passed",
+    "heldout_bitagent_evaluations_passed",
+    "zero_unauthorized_effects",
+    "zero_secret_requests",
+    "operator_marked_runtime_ready"
+  ]
+}

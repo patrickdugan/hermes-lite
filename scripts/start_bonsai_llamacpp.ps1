@@ -11,6 +11,8 @@ param(
     [int]$Batch = 256,
     [int]$UBatch = 128,
     [int]$CacheRamMb = 2048,
+    [string[]]$LoraPaths = @(),
+    [switch]$LoraInitWithoutApply,
     [int]$WaitSeconds = 120,
     [switch]$Warmup,
     [switch]$Foreground,
@@ -115,6 +117,11 @@ if (-not (Test-Path -LiteralPath $serverExe)) {
 if (-not (Test-Path -LiteralPath $ModelPath)) {
     throw "Bonsai GGUF not found at $ModelPath"
 }
+foreach ($loraPath in $LoraPaths) {
+    if (-not (Test-Path -LiteralPath $loraPath)) {
+        throw "Bonsai LoRA adapter not found at $loraPath"
+    }
+}
 
 $existingProc = Get-OwnedProcess -Path $pidFile
 if ($existingProc) {
@@ -146,6 +153,12 @@ $serverArgs = @(
 if (-not $Warmup) {
     $serverArgs += "--no-warmup"
 }
+foreach ($loraPath in $LoraPaths) {
+    $serverArgs += @("--lora", $loraPath)
+}
+if ($LoraInitWithoutApply -and $LoraPaths.Count -gt 0) {
+    $serverArgs += "--lora-init-without-apply"
+}
 
 $manifest = [ordered]@{
     started_at = (Get-Date).ToString("o")
@@ -161,6 +174,8 @@ $manifest = [ordered]@{
     batch = $Batch
     ubatch = $UBatch
     cache_ram_mb = $CacheRamMb
+    lora_paths = @($LoraPaths)
+    lora_init_without_apply = [bool]$LoraInitWithoutApply
     warmup = [bool]$Warmup
     stdout_log = $stdoutLog
     stderr_log = $stderrLog

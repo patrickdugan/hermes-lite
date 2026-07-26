@@ -1,0 +1,37 @@
+{
+  "schema": "hermes.bitagent_capability_fingerprint_conformance.v0",
+  "status": "passed",
+  "checked_at": "2026-07-26T00:00:00Z",
+  "vector": {
+    "requestId": "req-conformance-001",
+    "agentId": "agent-conformance",
+    "capability": "propose_tradelayer_intake",
+    "effects": [
+      "reserve_capital",
+      "read_state"
+    ],
+    "scope": {
+      "workflowId": "workflow-1",
+      "rail": "tradelayer"
+    },
+    "expiresAt": "2026-07-26T12:03:00Z",
+    "intent": {
+      "id": "intent-conformance-001",
+      "rail": "tradelayer"
+    }
+  },
+  "implementations": {
+    "bitagent_typescript": {
+      "path": "src/sovereign/capabilities.ts",
+      "source_sha256": "eed87258478f2e748a098db98cef4259e086e60001d0bc9c8e55e3a7b129107a",
+      "result": "6b1fd73a1156011947e6fd743279a3e85e03393bb220d1dc6c402cf63d879ad6"
+    },
+    "hermes_python": {
+      "path": "src/agent/bitagent_control_mesh_v0.py",
+      "source_sha256": "713ecc2333a3b6d6e48e6997c51e3dd6f84ffc3094804b63606f76e9ee518b54",
+      "result": "6b1fd73a1156011947e6fd743279a3e85e03393bb220d1dc6c402cf63d879ad6"
+    }
+  },
+  "agreement": true,
+  "claim_scope": "This vector establishes equality for the registered BitAgent capability-request value shape. It is not a general cross-language JSON canonicalization proof."
+}
