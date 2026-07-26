@@ -1,6 +1,6 @@
 param(
   [string]$RegistrationDir = "evals\registered\hermes_lite_12k_control_mesh_v1",
-  [ValidateSet("base_control_mesh", "executable_domain_ram")]
+  [ValidateSet("base_control_mesh", "executable_domain_ram", "bitagent_mesh_v0")]
   [string]$TrainingKind = "base_control_mesh",
   [string]$TrainingTaskId = "hermes-lite-12k-control-mesh-v1-1",
   [string]$PublishedModelName = "control-mesh-v1-1",
@@ -95,6 +95,19 @@ $arguments = if ($TrainingKind -eq "executable_domain_ram") {
     "--ram-cap-mb", "$RamMb",
     "--io-cap-mb-s", "$IoMbS"
   )
+} elseif ($TrainingKind -eq "bitagent_mesh_v0") {
+  @(
+    "-m", "agent.bitagent_mesh_benchmark_v0", "train",
+    "--registration-dir", $RegistrationDir,
+    "--output-dir", $RunDir,
+    "--steps", "$Steps",
+    "--ram-epochs", "$RamEpochs",
+    "--seed", "$Seed",
+    "--ram-cap-mb", "$RamMb",
+    "--io-cap-mb-s", "$IoMbS",
+    "--wall-seconds", "$WallSeconds",
+    "--checkpoint-steps", "50"
+  )
 } else {
   @(
     "-m", "agent.lean_control_mesh_v1", "train",
@@ -122,6 +135,8 @@ $manifest = @{
   training_kind = $TrainingKind
   chunk_strategy = if ($TrainingKind -eq "executable_domain_ram") {
     "sparse four-label Bernoulli log-odds memory fit"
+  } elseif ($TrainingKind -eq "bitagent_mesh_v0") {
+    "40 frozen train cards; sparse RAM epochs plus 16-card CPU TRM minibatches"
   } else {
     "sparse RAM updates plus 16-row CPU TRM minibatches"
   }
@@ -174,6 +189,9 @@ if ($completed) {
   New-Item -ItemType Directory -Force -Path $publishedDir | Out-Null
   if ($TrainingKind -eq "executable_domain_ram") {
     Copy-Item -LiteralPath (Join-Path $RunDir "domain_ram_policy.json") -Destination (Join-Path $publishedDir "domain_ram_policy.json") -Force
+  } elseif ($TrainingKind -eq "bitagent_mesh_v0") {
+    Copy-Item -LiteralPath (Join-Path $RunDir "ram_policy.json") -Destination (Join-Path $publishedDir "ram_policy.json") -Force
+    Copy-Item -LiteralPath (Join-Path $RunDir "trm_router.pt") -Destination (Join-Path $publishedDir "trm_router.pt") -Force
   } else {
     Copy-Item -LiteralPath (Join-Path $RunDir "ram_policy.json") -Destination (Join-Path $publishedDir "ram_policy.json") -Force
     Copy-Item -LiteralPath (Join-Path $RunDir "trm_router.pt") -Destination (Join-Path $publishedDir "trm_router.pt") -Force

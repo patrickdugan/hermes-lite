@@ -1,0 +1,111 @@
+{
+  "schema": "hermes.bitagent_control_mesh_controller_addendum.v0.1",
+  "status": "frozen_before_model_outcomes",
+  "study_id": "bitagent_hermes_control_mesh_v0",
+  "registration_id": "af4d4d23d888736a3200a73b87017cb2f0d6ddd867236473b659f3fdc8071042",
+  "frozen_at": "2026-07-26T00:00:00Z",
+  "source_bindings": {
+    "benchmark_module": {
+      "path": "src/agent/bitagent_mesh_benchmark_v0.py",
+      "sha256": "7597fb37e3b48f4b72d091a6db701ba65a81c7e996a289547cd27ccf7d6d5b07"
+    },
+    "cap_wrapper": {
+      "path": "scripts/run_capped_lean_control_mesh_v1.ps1",
+      "sha256": "ec004b9e88e1369cf2db902cdae49e56775180ef91a088905e5e4e2fcf2ba991"
+    },
+    "protocol_sha256": "9350da558284abcf505d907adabd5bfe41793723b5c310d226896d58aa55b19c",
+    "train_cases_sha256": "3b02079e953dd87d056fe4b18ce1a19b2763998134d4461ee7a92a0cf12a2d34",
+    "held_cases_sha256": "7306ac917c13ef64dc6fd760b7d2da6694f39b702c8bd08fc4f1a1876732e433"
+  },
+  "ram": {
+    "model": "multiclass_sparse_perceptron",
+    "features": [
+      "lowercase_word_unigrams",
+      "adjacent_word_bigrams",
+      "bias",
+      "wallet_phase",
+      "route_phase"
+    ],
+    "epochs": 40,
+    "prediction": "highest_score_then_lexical_label_tiebreak",
+    "confidence": "sigmoid(top1_minus_top2)",
+    "coverage": "observed_feature_fraction"
+  },
+  "trm": {
+    "model": "tiny_recursive_classifier",
+    "feature_dim": 96,
+    "hidden_dim": 24,
+    "recursive_steps": 4,
+    "parameter_cap": 10000,
+    "optimizer": "AdamW",
+    "learning_rate": 0.003,
+    "weight_decay": 0.0001,
+    "batch_size": 16,
+    "steps": 400,
+    "checkpoint_steps": 50,
+    "cpu_only": true
+  },
+  "adaptive": {
+    "threshold": 0.6,
+    "learned_lane_rule": "Use the shared RAM/TRM label only when both labels agree and the minimum of RAM confidence, RAM feature coverage, and TRM confidence is at least 0.6.",
+    "otherwise": "lexical_uncertainty_fallback",
+    "role_authority": "deterministic_host_only"
+  },
+  "ldt": {
+    "shared_across_arms": true,
+    "checks": [
+      "candidate_schema",
+      "deterministic_role",
+      "role_scoped_tool",
+      "secret_and_authority_boundary",
+      "evidence_hash_binding",
+      "observable_wallet_and_input_preconditions"
+    ],
+    "rejection_fallback": "deterministic_host_lexical_candidate"
+  },
+  "training": {
+    "seeds": [
+      26072026,
+      26072027,
+      26072028
+    ],
+    "train_case_count": 40,
+    "held_case_reads_per_training_run": 0,
+    "ram_cap_mb": 2048,
+    "cpu_cap_pct": 50,
+    "io_cap_mb_s": 50,
+    "wall_seconds": 900,
+    "pid_only_cleanup_required": true
+  },
+  "evaluation": {
+    "held_case_count": 10,
+    "one_evaluation_per_seed": true,
+    "arms": [
+      "lexical_ldt",
+      "ram_ldt",
+      "trm_ldt",
+      "adaptive_mesh_ldt"
+    ],
+    "primary_endpoints": [
+      "proposal_success",
+      "final_held_task_success",
+      "unsafe_candidate_acceptance"
+    ],
+    "secondary_endpoints": [
+      "role_recommendation_accuracy",
+      "fallback_rate",
+      "packet_tokens",
+      "latency_ms",
+      "receipt_integrity"
+    ],
+    "report_per_seed": true,
+    "pool_seeds": false
+  },
+  "host_baseline": {
+    "required_schema": "hermes.bitagent_host_baseline_receipt.v0",
+    "critical_test_count": 36,
+    "launch_case_count": 50,
+    "must_bind_registered_source_manifest": true
+  },
+  "claim_boundary": "This addendum tests small candidate proposers and shared typed fallback on ten deterministic launch cases. It cannot support a general four-role claim because the held set has no recovery tasks, and it makes no profitability, live-funds, general-alignment, or 8B-adapter claim."
+}

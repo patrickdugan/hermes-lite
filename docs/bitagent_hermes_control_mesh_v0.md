@@ -19,6 +19,10 @@ RAM and TRM may recommend a role or proposal lane. They cannot select the
 authoritative financial role. The deterministic host computes the role from
 persisted workflow state, and the LDT rejects any mismatch.
 
+The exact small-controller implementation and adaptive threshold are frozen in
+`evals/registered/bitagent_hermes_control_mesh_v0/controller_addendum_v0_1.json`.
+It was authored before any RAM/TRM training or held model outcome.
+
 ## Control Flow
 
 ```text

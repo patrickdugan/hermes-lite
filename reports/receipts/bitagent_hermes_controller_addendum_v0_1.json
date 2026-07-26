@@ -1,0 +1,21 @@
+{
+  "schema": "hermes.bitagent_controller_addendum_checkpoint.v0.1",
+  "status": "frozen_before_model_outcomes",
+  "study_id": "bitagent_hermes_control_mesh_v0",
+  "registration_id": "af4d4d23d888736a3200a73b87017cb2f0d6ddd867236473b659f3fdc8071042",
+  "addendum_sha256": "97559567ff765b46d1d6c253ae007c2c0fa430f1dab29d7942fffecbc31699d8",
+  "benchmark_module_sha256": "7597fb37e3b48f4b72d091a6db701ba65a81c7e996a289547cd27ccf7d6d5b07",
+  "cap_wrapper_sha256": "ec004b9e88e1369cf2db902cdae49e56775180ef91a088905e5e4e2fcf2ba991",
+  "focused_tests": {
+    "passed": 40,
+    "failed": 0
+  },
+  "shared_wrapper_tests": {
+    "passed": 16,
+    "failed": 0
+  },
+  "model_training_started": false,
+  "held_model_outcomes_observed": false,
+  "model_weights_loaded": false,
+  "live_funds_exercised": false
+}
