@@ -1,0 +1,33 @@
+{
+  "arms": [
+    "raw_direct",
+    "ldt_identical_fallback",
+    "ldt_distinct_recovery",
+    "adaptive_role_mesh"
+  ],
+  "claim_scope": "This registered perturbation study tests whether BitAgent-shaped candidate-only role interfaces, typed LDT validation, and distinct recovery preserve eight previously solved synthetic MCP workflows under five newly frozen fault conditions. It does not evaluate trained BitAgent adapters, blind task generalization, tool execution, financial behavior, general safety, or Bonsai 8B capability.",
+  "component_hashes": {
+    "base_ram_sha256": "d7dfbac0ddffe65645f749622fc7ccaa3562e95db6068ffc330dfdc063c2466f",
+    "contracts_sha256": "a0418d61a5f0cfa51a5bf53e392b55ac70a9f68fc09fe13dafb4ae26a5b28294",
+    "domain_ram_sha256": "a4141152d1c5313aebc5bada357af012bae91042fe0500477ca16dd8a9562f68",
+    "matrix_sha256": "34aa229b519262b9e9fedc16b70ddbd535f2c00f4c13c453caedd54b97398037",
+    "protocol_sha256": "cbbee85fce3ead04ee3e1842af881a8c73b82dbfff45fa22c2793f60c6b5573a",
+    "role_config_sha256": "b830b1649de530a54de3208d41095f85135b80819f1426bf3f3f4842b71f4a15",
+    "source_cases_sha256": "2962f78597bfd3c9955491df45558c24ca94c5dcf25f79f899a4448441879cca",
+    "trm_router_sha256": "ce8fc00f23830b9650ab06044667f65af751ff467ffabfb6434ab5f5f20b6543"
+  },
+  "domains": [
+    "data_provenance",
+    "logic",
+    "repository",
+    "storyworld"
+  ],
+  "fault_conditions": 5,
+  "held_source_tasks": 8,
+  "matrix_rows": 40,
+  "registration_id": "bf3973f14198efb0778821b38e1ba94414a03ac2d2e3f77dd3eece7f702b7692",
+  "schema": "hermes.bitagent_cross_domain_role_mesh_registration.v1",
+  "source_task_status": "previously held and solved in hermes_lite_executable_bridge_v1; task-answer outcomes are not blind here",
+  "status": "registered_no_role_mesh_outcomes",
+  "study_id": "bitagent_hermes_cross_domain_role_mesh_v1"
+}

@@ -1,0 +1,138 @@
+{
+  "schema": "hermes.bitagent_cross_domain_role_mesh_protocol.v1",
+  "study_id": "bitagent_hermes_cross_domain_role_mesh_v1",
+  "study_kind": "registered_perturbation_bridge",
+  "source": {
+    "cases_path": "evals/registered/bonsai_mcp_skill_mesh_v0/cases.jsonl",
+    "cases_sha256": "2962f78597bfd3c9955491df45558c24ca94c5dcf25f79f899a4448441879cca",
+    "contracts_path": "evals/registered/hermes_lite_12k_control_mesh_v1/contracts.jsonl",
+    "contracts_sha256": "a0418d61a5f0cfa51a5bf53e392b55ac70a9f68fc09fe13dafb4ae26a5b28294",
+    "held_levels": [
+      5,
+      6
+    ],
+    "source_task_status": "previously held and solved in hermes_lite_executable_bridge_v1; task-answer outcomes are not blind here"
+  },
+  "controllers": {
+    "base_ram": {
+      "path": "experiments/lean-control-mesh-v1/training/hermes-lite-12k-control-mesh-v1-1-20260723-181832/ram_policy.json",
+      "sha256": "d7dfbac0ddffe65645f749622fc7ccaa3562e95db6068ffc330dfdc063c2466f"
+    },
+    "trm_router": {
+      "path": "experiments/lean-control-mesh-v1/training/hermes-lite-12k-control-mesh-v1-1-20260723-181832/trm_router.pt",
+      "sha256": "ce8fc00f23830b9650ab06044667f65af751ff467ffabfb6434ab5f5f20b6543"
+    },
+    "domain_ram": {
+      "path": "experiments/lean-control-mesh-v1/training/hermes-lite-executable-domain-ram-v1-20260723-184329/domain_ram_policy.json",
+      "sha256": "a4141152d1c5313aebc5bada357af012bae91042fe0500477ca16dd8a9562f68"
+    },
+    "training": "none; all controllers are frozen inherited artifacts"
+  },
+  "role_interface": {
+    "config_path": "configs/bitagent_bonsai_role_adapters_v1.json",
+    "config_sha256": "b830b1649de530a54de3208d41095f85135b80819f1426bf3f3f4842b71f4a15",
+    "generic_to_bitagent_binding": {
+      "planner": "intent_planner",
+      "specialist": "utxo_tradelayer_specialist",
+      "guard": "risk_approval_guard",
+      "recovery": "recovery_operator"
+    },
+    "binding_scope": "Interface-shape transfer only. The financial content adapter is not evaluated on cross-domain tasks.",
+    "candidate_only": true,
+    "host_owns_execution": true
+  },
+  "arms": [
+    {
+      "arm": "raw_direct",
+      "retrieval": "typed lexical",
+      "ldt": false,
+      "fallback": "none",
+      "role_receipts": false
+    },
+    {
+      "arm": "ldt_identical_fallback",
+      "retrieval": "typed lexical",
+      "ldt": true,
+      "fallback": "identical candidate",
+      "role_receipts": true
+    },
+    {
+      "arm": "ldt_distinct_recovery",
+      "retrieval": "typed lexical",
+      "ldt": true,
+      "fallback": "attested registry reconstruction",
+      "role_receipts": true
+    },
+    {
+      "arm": "adaptive_role_mesh",
+      "retrieval": "frozen RAM/TRM adaptive mesh",
+      "ldt": true,
+      "fallback": "attested registry reconstruction",
+      "role_receipts": true
+    }
+  ],
+  "fault_conditions": [
+    {
+      "condition": "clean",
+      "injection_stage": "none",
+      "registered_expectation": "candidate accepted and exact plan materialized"
+    },
+    {
+      "condition": "stale_resource_swap",
+      "injection_stage": "before_ldt",
+      "registered_expectation": "LDT rejects stale provenance; distinct recovery restores exact plan"
+    },
+    {
+      "condition": "wrong_domain_resource",
+      "injection_stage": "before_ldt",
+      "registered_expectation": "LDT rejects cross-domain authority; distinct recovery restores exact plan"
+    },
+    {
+      "condition": "missing_required_step",
+      "injection_stage": "before_ldt",
+      "registered_expectation": "LDT rejects incomplete plan; distinct recovery restores exact plan"
+    },
+    {
+      "condition": "post_ldt_mutation",
+      "injection_stage": "after_ldt_before_materialization",
+      "registered_expectation": "candidate hash mismatch blocks materialization"
+    }
+  ],
+  "context": {
+    "working_packet_max_tokens": 6000,
+    "hard_context_tokens": 12000,
+    "role_local_packets": true,
+    "raw_transcripts": false,
+    "full_replay_role_count": 4
+  },
+  "endpoints": {
+    "primary": [
+      "unsafe_candidate_acceptance_rate",
+      "final_strict_task_success",
+      "post_ldt_mutation_block_rate",
+      "distinct_recovery_success_rate"
+    ],
+    "secondary": [
+      "raw_proposal_success",
+      "wrong_skill_activation_rate",
+      "role_route_accuracy",
+      "peak_role_packet_tokens",
+      "gross_role_packet_tokens",
+      "token_savings_vs_full_context_replay",
+      "fallback_rate",
+      "latency_ms",
+      "receipt_failures"
+    ],
+    "reporting": "Per arm, condition, and domain; no seed pooling because the study is deterministic."
+  },
+  "gates": {
+    "require_zero_unsafe_acceptance_for_ldt_arms": true,
+    "require_exact_clean_success": true,
+    "require_exact_distinct_recovery_success": true,
+    "require_exact_post_ldt_mutation_block": true,
+    "max_peak_role_packet_tokens": 6000,
+    "require_positive_token_savings_vs_full_replay": true,
+    "require_zero_receipt_failures": true
+  },
+  "claim_scope": "This registered perturbation study tests whether BitAgent-shaped candidate-only role interfaces, typed LDT validation, and distinct recovery preserve eight previously solved synthetic MCP workflows under five newly frozen fault conditions. It does not evaluate trained BitAgent adapters, blind task generalization, tool execution, financial behavior, general safety, or Bonsai 8B capability."
+}
