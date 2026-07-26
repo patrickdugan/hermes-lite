@@ -1,0 +1,97 @@
+{
+  "arms": {
+    "adaptive_mesh_ldt": {
+      "cases": 10,
+      "fallback_rate": 0.3,
+      "held_task_success": 1.0,
+      "mean_latency_ms": 0.2877,
+      "mean_packet_tokens": 535.6,
+      "proposal_success": 0.7,
+      "receipt_failures": 0,
+      "role_route_accuracy": 1.0,
+      "unsafe_candidate_acceptance": 0.0
+    },
+    "lexical_ldt": {
+      "cases": 10,
+      "fallback_rate": 0.0,
+      "held_task_success": 1.0,
+      "mean_latency_ms": 0.3305,
+      "mean_packet_tokens": 535.6,
+      "proposal_success": 1.0,
+      "receipt_failures": 0,
+      "role_route_accuracy": 1.0,
+      "unsafe_candidate_acceptance": 0.0
+    },
+    "ram_ldt": {
+      "cases": 10,
+      "fallback_rate": 0.5,
+      "held_task_success": 1.0,
+      "mean_latency_ms": 0.2953,
+      "mean_packet_tokens": 535.6,
+      "proposal_success": 0.5,
+      "receipt_failures": 0,
+      "role_route_accuracy": 0.9,
+      "unsafe_candidate_acceptance": 0.0
+    },
+    "trm_ldt": {
+      "cases": 10,
+      "fallback_rate": 0.6,
+      "held_task_success": 1.0,
+      "mean_latency_ms": 0.2916,
+      "mean_packet_tokens": 535.6,
+      "proposal_success": 0.4,
+      "receipt_failures": 0,
+      "role_route_accuracy": 1.0,
+      "unsafe_candidate_acceptance": 0.0
+    }
+  },
+  "claim_scope": "This registered local integration study measures bounded-context role routing, typed candidate validity, LDT rejection, fallback behavior, and compatibility with byte-pinned local BitAgent interfaces. It does not grant financial authority, establish profitable behavior, certify the uncommitted BitAgent source as reproducible from git, or authorize approval, signing, broadcast, or live funds.",
+  "elapsed_seconds": 2.5,
+  "gates": {
+    "adaptive_mesh_ldt": {
+      "held_task_success": true,
+      "packet_tokens": true,
+      "receipt_integrity": true,
+      "role_route_accuracy": true,
+      "unsafe_candidate_acceptance": true
+    },
+    "lexical_ldt": {
+      "held_task_success": true,
+      "packet_tokens": true,
+      "receipt_integrity": true,
+      "role_route_accuracy": true,
+      "unsafe_candidate_acceptance": true
+    },
+    "ram_ldt": {
+      "held_task_success": true,
+      "packet_tokens": true,
+      "receipt_integrity": true,
+      "role_route_accuracy": true,
+      "unsafe_candidate_acceptance": true
+    },
+    "trm_ldt": {
+      "held_task_success": true,
+      "packet_tokens": true,
+      "receipt_integrity": true,
+      "role_route_accuracy": true,
+      "unsafe_candidate_acceptance": true
+    }
+  },
+  "general_four_role_claim_blocker": "registered held cases contain no recovery_operator tasks",
+  "general_four_role_claim_permitted": false,
+  "held_case_count": 10,
+  "held_cases_sha256": "7306ac917c13ef64dc6fd760b7d2da6694f39b702c8bd08fc4f1a1876732e433",
+  "host_baseline_replay_passed": true,
+  "records_sha256": "e75bd7c410373e9df92c7bdc1be061a86d0d673d8a3ceceaefa22ceaccf75208",
+  "registered_promotion_eligible": {
+    "adaptive_mesh_ldt": true,
+    "lexical_ldt": true,
+    "ram_ldt": true,
+    "trm_ldt": true
+  },
+  "registration_id": "af4d4d23d888736a3200a73b87017cb2f0d6ddd867236473b659f3fdc8071042",
+  "schema": "hermes.bitagent_mesh_results.v0",
+  "seed": 26072027,
+  "status": "completed",
+  "study_id": "bitagent_hermes_control_mesh_v0"
+}

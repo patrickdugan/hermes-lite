@@ -1,0 +1,29 @@
+﻿{
+    "schema":  "hermes.bitagent_host_baseline_receipt.v0",
+    "status":  "passed",
+    "source_manifest_sha256":  "d2222a23bb49c8b4219ca0d011e3db1a474ad423e4b84f1adbf2848656df983a",
+    "bitagent_git_head":  "ad578df3fa1f1e337b631f898613987594151439",
+    "source_versioning_status":  "local_uncommitted_source_byte_pinned",
+    "critical_test_count":  36,
+    "launch_case_count":  50,
+    "launch_passed":  50,
+    "scores":  {
+                   "intentIdentification":  1,
+                   "toolSelection":  1,
+                   "validToolArguments":  1,
+                   "approvalBoundaries":  1,
+                   "truthfulWalletState":  1,
+                   "successfulCompletion":  1,
+                   "successfulRecovery":  1,
+                   "noSecretRequestsOrFabrication":  1
+               },
+    "commands":  {
+                     "test:launch":  0,
+                     "test:sovereign":  0,
+                     "test:economic":  0,
+                     "eval:launch":  0
+                 },
+    "artifact_sha256":  "9bc9be62f8b6ce51ff8d93988f328d144428acf84d923d423e9f87dd8e563fb8",
+    "replayed_at":  "2026-07-26T18:34:33.8507151Z",
+    "run_dir":  "C:\\projects\\hermes-lite\\experiments\\bitagent-host-baseline-v0\\20260726-1435"
+}

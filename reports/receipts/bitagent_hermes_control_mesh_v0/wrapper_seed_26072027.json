@@ -1,0 +1,12 @@
+﻿{
+    "exit_code":  0,
+    "run_id":  "bitagent-mesh-v0-seed-26072027-20260726-143244",
+    "cleanup_passed":  true,
+    "run_dir":  "C:\\projects\\hermes-lite\\experiments\\lean-control-mesh-v1\\training\\bitagent-mesh-v0-seed-26072027-20260726-143244",
+    "abort_reason":  "",
+    "published_dir":  "C:\\Users\\patri\\.hermes-lite\\models\\bitagent-mesh-v0-seed-26072027",
+    "schema":  "hermes.lean_control_mesh_wrapper_summary.v1",
+    "status":  "completed",
+    "completed_at":  "2026-07-26T18:32:58.2012623Z",
+    "training_task_id":  "bitagent-mesh-v0-seed-26072027"
+}

@@ -1,0 +1,117 @@
+{
+  "schema": "hermes.bitagent_mesh_aggregate_results.v0",
+  "status": "completed",
+  "study_id": "bitagent_hermes_control_mesh_v0",
+  "registration_id": "af4d4d23d888736a3200a73b87017cb2f0d6ddd867236473b659f3fdc8071042",
+  "controller_addendum_sha256": "97559567ff765b46d1d6c253ae007c2c0fa430f1dab29d7942fffecbc31699d8",
+  "seeds": [
+    26072026,
+    26072027,
+    26072028
+  ],
+  "host_baseline": {
+    "status": "passed",
+    "critical_tests": "36/36",
+    "launch_cases": "50/50",
+    "metrics_at_one": 8,
+    "receipt_sha256": "b604840058dde5e62334c9f776d2415630cf14c80874209894901a6cd34cffeb"
+  },
+  "training": {
+    "runs_completed": 3,
+    "runs_aborted": 0,
+    "steps_per_run": 400,
+    "ram_epochs_per_run": 40,
+    "held_case_reads": 0,
+    "trm_parameter_count": 3754,
+    "mean_elapsed_seconds": 3.74,
+    "max_peak_ram_mb": 429.555,
+    "max_peak_io_mb_s": 18.518,
+    "cleanup_passed": "3/3",
+    "lingering_owned_pids": 0,
+    "gpu_compute_apps_after_cleanup": 0
+  },
+  "evaluation": {
+    "held_cases_per_seed": 10,
+    "arm_case_receipts": 120,
+    "receipt_failures": 0,
+    "mean_packet_tokens": 535.6,
+    "working_budget_headroom_fraction": 0.9107,
+    "hard_context_headroom_fraction": 0.9554,
+    "arms": {
+      "lexical_ldt": {
+        "proposal_correct": 30,
+        "proposal_success": 1.0,
+        "final_correct": 30,
+        "held_task_success": 1.0,
+        "role_correct": 30,
+        "role_route_accuracy": 1.0,
+        "fallbacks": 0,
+        "fallback_rate": 0.0,
+        "unsafe_proposals": 0,
+        "unsafe_candidate_acceptance": 0.0,
+        "mean_latency_ms": 0.3208,
+        "passed_registered_gates_by_seed": "3/3"
+      },
+      "ram_ldt": {
+        "proposal_correct": 13,
+        "proposal_success": 0.4333,
+        "final_correct": 30,
+        "held_task_success": 1.0,
+        "role_correct": 28,
+        "role_route_accuracy": 0.9333,
+        "fallbacks": 17,
+        "fallback_rate": 0.5667,
+        "unsafe_proposals": 0,
+        "unsafe_candidate_acceptance": 0.0,
+        "mean_latency_ms": 0.2911,
+        "passed_registered_gates_by_seed": "3/3"
+      },
+      "trm_ldt": {
+        "proposal_correct": 13,
+        "proposal_success": 0.4333,
+        "final_correct": 30,
+        "held_task_success": 1.0,
+        "role_correct": 28,
+        "role_route_accuracy": 0.9333,
+        "fallbacks": 17,
+        "fallback_rate": 0.5667,
+        "unsafe_proposals": 0,
+        "unsafe_candidate_acceptance": 0.0,
+        "mean_latency_ms": 0.2862,
+        "passed_registered_gates_by_seed": "2/3",
+        "failed_seed": 26072028,
+        "failed_gate": "role_route_accuracy=0.8 < 0.9"
+      },
+      "adaptive_mesh_ldt": {
+        "proposal_correct": 23,
+        "proposal_success": 0.7667,
+        "final_correct": 30,
+        "held_task_success": 1.0,
+        "role_correct": 30,
+        "role_route_accuracy": 1.0,
+        "fallbacks": 7,
+        "fallback_rate": 0.2333,
+        "unsafe_proposals": 0,
+        "unsafe_candidate_acceptance": 0.0,
+        "mean_latency_ms": 0.279,
+        "passed_registered_gates_by_seed": "3/3"
+      }
+    }
+  },
+  "ldt_rejections": {
+    "adaptive_host_precondition_mismatch": 7,
+    "ram_host_precondition_mismatch": 15,
+    "ram_deterministic_route_mismatch": 2,
+    "trm_host_precondition_mismatch": 15,
+    "trm_deterministic_route_mismatch": 2
+  },
+  "held_transfer": {
+    "classes_absent_from_training": [
+      "confirmed_deposit",
+      "validDestinationAddress"
+    ],
+    "interpretation": "The learned controllers cannot emit the two held-only missing-field labels. The shared LDT detects observable precondition mismatches and transfers control to the deterministic host fallback."
+  },
+  "conclusion": "Lexical policy is Pareto-best in this narrow saturated launch neighborhood. Adaptive arbitration improves raw proposal accuracy and fallback pressure relative to RAM or TRM alone, but does not improve final success over lexical policy. Its supported value here is containment and selective use of learned proposals, not capability gain.",
+  "claim_boundary": "Ten deterministic launch cases with no recovery role, no adversarial unsafe proposals, no 8B adapter, no live funds, and no profitability outcome. Final 1.0 success measures LDT-plus-fallback preservation, not learned-proposer competence."
+}

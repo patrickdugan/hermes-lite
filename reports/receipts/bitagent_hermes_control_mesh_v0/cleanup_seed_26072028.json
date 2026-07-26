@@ -1,0 +1,100 @@
+﻿{
+    "lingering_owned_pids":  {
+
+                             },
+    "top_processes":  [
+                          {
+                              "Id":  21404,
+                              "ProcessName":  "ChatGPT",
+                              "private_mb":  976.2,
+                              "working_set_mb":  314.74
+                          },
+                          {
+                              "Id":  12844,
+                              "ProcessName":  "python",
+                              "private_mb":  890.2,
+                              "working_set_mb":  446.93
+                          },
+                          {
+                              "Id":  28020,
+                              "ProcessName":  "python",
+                              "private_mb":  509.53,
+                              "working_set_mb":  185.74
+                          },
+                          {
+                              "Id":  4612,
+                              "ProcessName":  "MsMpEng",
+                              "private_mb":  447.54,
+                              "working_set_mb":  410.61
+                          },
+                          {
+                              "Id":  15408,
+                              "ProcessName":  "firefox",
+                              "private_mb":  434.8,
+                              "working_set_mb":  145.08
+                          },
+                          {
+                              "Id":  20048,
+                              "ProcessName":  "steamwebhelper",
+                              "private_mb":  421.75,
+                              "working_set_mb":  271.05
+                          },
+                          {
+                              "Id":  1860,
+                              "ProcessName":  "Discord",
+                              "private_mb":  379.59,
+                              "working_set_mb":  340.45
+                          },
+                          {
+                              "Id":  16176,
+                              "ProcessName":  "firefox",
+                              "private_mb":  335.16,
+                              "working_set_mb":  365.45
+                          },
+                          {
+                              "Id":  16448,
+                              "ProcessName":  "firefox",
+                              "private_mb":  327.98,
+                              "working_set_mb":  273.5
+                          },
+                          {
+                              "Id":  16888,
+                              "ProcessName":  "firefox",
+                              "private_mb":  288.28,
+                              "working_set_mb":  305.12
+                          }
+                      ],
+    "ts_utc":  "2026-07-26T18:33:15.8379504Z",
+    "cleanup_passed":  true,
+    "memory_before":  {
+                          "cache_mb":  500.52,
+                          "available_mb":  10800,
+                          "page_reads_per_sec":  50,
+                          "committed_mb":  19314.38,
+                          "standby_mb":  8306.96
+                      },
+    "owned_pids":  [
+                       8612
+                   ],
+    "gpu":  {
+                "gpu":  [
+                            "NVIDIA GeForce RTX 3050 Laptop GPU, 0, 0, 3964"
+                        ],
+                "compute_apps":  [
+
+                                 ],
+                "available":  true
+            },
+    "memory_after":  {
+                         "cache_mb":  500.72,
+                         "available_mb":  10801,
+                         "page_reads_per_sec":  0,
+                         "committed_mb":  19229.52,
+                         "standby_mb":  8306.72
+                     },
+    "run_id":  "bitagent-mesh-v0-seed-26072028-20260726-143304",
+    "stopped_owned_pids":  [
+
+                           ],
+    "global_cache_purge":  "not_requested"
+}

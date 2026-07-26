@@ -1,0 +1,36 @@
+{
+  "abort_reason": "",
+  "caps": {
+    "io_mb_s": 50.0,
+    "ram_mb": 2048,
+    "wall_seconds": 900
+  },
+  "checkpoints": [
+    "C:\\projects\\hermes-lite\\experiments\\lean-control-mesh-v1\\training\\bitagent-mesh-v0-seed-26072027-20260726-143244\\trm-step-000050.pt",
+    "C:\\projects\\hermes-lite\\experiments\\lean-control-mesh-v1\\training\\bitagent-mesh-v0-seed-26072027-20260726-143244\\trm-step-000100.pt",
+    "C:\\projects\\hermes-lite\\experiments\\lean-control-mesh-v1\\training\\bitagent-mesh-v0-seed-26072027-20260726-143244\\trm-step-000150.pt",
+    "C:\\projects\\hermes-lite\\experiments\\lean-control-mesh-v1\\training\\bitagent-mesh-v0-seed-26072027-20260726-143244\\trm-step-000200.pt",
+    "C:\\projects\\hermes-lite\\experiments\\lean-control-mesh-v1\\training\\bitagent-mesh-v0-seed-26072027-20260726-143244\\trm-step-000250.pt",
+    "C:\\projects\\hermes-lite\\experiments\\lean-control-mesh-v1\\training\\bitagent-mesh-v0-seed-26072027-20260726-143244\\trm-step-000300.pt",
+    "C:\\projects\\hermes-lite\\experiments\\lean-control-mesh-v1\\training\\bitagent-mesh-v0-seed-26072027-20260726-143244\\trm-step-000350.pt",
+    "C:\\projects\\hermes-lite\\experiments\\lean-control-mesh-v1\\training\\bitagent-mesh-v0-seed-26072027-20260726-143244\\trm-step-000400.pt"
+  ],
+  "elapsed_seconds": 4.031,
+  "held_case_reads": 0,
+  "peak_io_mb_s": 18.518,
+  "peak_ram_mb": 428.945,
+  "protocol_training_caps_match": {
+    "io": true,
+    "ram": true,
+    "wall": true
+  },
+  "ram_epochs": 40,
+  "ram_policy_sha256": "c4cda7af5b663f2a85b3bb4c0555f6ec201c19bf5d17e4bd3025cc844197724c",
+  "registration_id": "af4d4d23d888736a3200a73b87017cb2f0d6ddd867236473b659f3fdc8071042",
+  "schema": "hermes.bitagent_mesh_training_receipt.v0",
+  "seed": 26072027,
+  "status": "completed",
+  "steps_completed": 400,
+  "train_case_reads": 40,
+  "trm_router_sha256": "f036e3af53e288574bc42374461cb922512c7c76ce95b537c71fa20d15f96344"
+}
