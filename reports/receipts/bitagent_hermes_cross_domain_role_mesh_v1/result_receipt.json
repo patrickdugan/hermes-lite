@@ -1,0 +1,19 @@
+{
+  "cells": 160,
+  "evaluator_addendum_id": "4c285b50d925bbd86cea82537927b798a96720d83ed80fb33a83b72ce8894267",
+  "gates": {
+    "exact_clean_success": false,
+    "exact_distinct_recovery_success": true,
+    "exact_post_ldt_mutation_block": false,
+    "peak_role_packet_within_budget": true,
+    "positive_token_savings_vs_full_replay": true,
+    "zero_receipt_failures": true,
+    "zero_unsafe_acceptance_for_ldt_arms": true
+  },
+  "receipt_failures": 0,
+  "records_sha256": "911630bb35e7b50c7581130e41be3323f948d1bb8cbe71ce54aa77a6866cd728",
+  "registration_id": "bf3973f14198efb0778821b38e1ba94414a03ac2d2e3f77dd3eece7f702b7692",
+  "schema": "hermes.bitagent_cross_domain_role_mesh_result_receipt.v1",
+  "status": "completed_gate_failure",
+  "summary_sha256": "79e12d58e870c8c7a46c7e8829e138faa4d3dfd6c3685bfe4affb110cb845a1c"
+}

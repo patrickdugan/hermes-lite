@@ -1,0 +1,29 @@
+{
+    "exit_code":  0,
+    "elapsed_seconds":  4.037,
+    "run_id":  "bitagent-role-mesh-v1-20260726-150533",
+    "lingering_owned_pids":  {
+
+                             },
+    "peak_ram_mb":  369.309,
+    "schema":  "hermes.bitagent_cross_domain_role_mesh_resource_receipt.v1",
+    "cleanup_passed":  true,
+    "evaluator_addendum_id":  "4c285b50d925bbd86cea82537927b798a96720d83ed80fb33a83b72ce8894267",
+    "enforcement":  {
+                        "cpu":  "Windows Job Object hard cap",
+                        "ram":  "Windows Job Object hard cap",
+                        "io":  "evaluator telemetry abort",
+                        "wall":  "wrapper hard timeout"
+                    },
+    "caps":  {
+                 "ram_mb":  2048,
+                 "cpu_pct":  50,
+                 "wall_seconds":  300,
+                 "io_mb_s_telemetry":  50,
+                 "gpu":  "disabled"
+             },
+    "status":  "completed",
+    "completed_at":  "2026-07-26T19:05:40.3609750Z",
+    "peak_io_mb_s_sampled":  0,
+    "registration_id":  "bf3973f14198efb0778821b38e1ba94414a03ac2d2e3f77dd3eece7f702b7692"
+}

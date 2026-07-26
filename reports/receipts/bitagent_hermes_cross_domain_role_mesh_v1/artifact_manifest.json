@@ -1,0 +1,24 @@
+{
+  "schema": "hermes.bitagent_cross_domain_role_mesh_artifact_manifest.v1",
+  "study_id": "bitagent_hermes_cross_domain_role_mesh_v1",
+  "registration_id": "bf3973f14198efb0778821b38e1ba94414a03ac2d2e3f77dd3eece7f702b7692",
+  "evaluator_addendum_id": "4c285b50d925bbd86cea82537927b798a96720d83ed80fb33a83b72ce8894267",
+  "source_run": {
+    "run_id": "bitagent-role-mesh-v1-20260726-150533",
+    "status": "completed",
+    "raw_windows_records_sha256": "a8caa107eb08380a8be048c3cef0038feea9d533f610519ce043fe4cd135e155",
+    "raw_windows_summary_sha256": "5e0c7840da395dacbf25e41691f16723f491004ef43ea7b11ea4f77c4399bd55",
+    "raw_windows_result_receipt_sha256": "51d07d206a0e97c48db6914d51bb49bfa7bab4a7684dea1fa54b0eda144657ac",
+    "normalization": "CRLF and optional UTF-8 BOM were canonicalized to UTF-8 LF for Git portability; records were not reparsed or reordered."
+  },
+  "packaged_artifacts": {
+    "records.jsonl": "911630bb35e7b50c7581130e41be3323f948d1bb8cbe71ce54aa77a6866cd728",
+    "summary.json": "79e12d58e870c8c7a46c7e8829e138faa4d3dfd6c3685bfe4affb110cb845a1c",
+    "result_receipt.json": "76b42a28f52fd1f979b40d6415f04f4fbe1fa2b1a85213eca123caaa2e57b3d2",
+    "resource_receipt.json": "3a0c3378c600995d72c678d7a761aceb5737b1ae1ecc7fd649e2f836b5084a57",
+    "wrapper_manifest.json": "c989495ee795596204e8cbcb43c7d65ede1b60563fdc769a8588dac883f5eb96",
+    "cleanup_summary.json": "80d55ca4ad1f144a0445c19e87a90d79061d255469202ca7ba3bc7f045436bb9"
+  },
+  "semantic_changes_during_packaging": false,
+  "receipt_rebinding": "The packaged summary and result receipt bind the canonical-LF records and summary hashes."
+}
