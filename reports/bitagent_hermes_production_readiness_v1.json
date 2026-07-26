@@ -1,0 +1,139 @@
+{
+  "schema": "hermes.bitagent_production_readiness.v1",
+  "program": "bitagent_hermes_role_mesh",
+  "as_of_commit": "efa73738c784330e679ec26fe93abf8aacb6d584",
+  "decision": {
+    "offline_simulation_control_plane": "go",
+    "live_learned_adapter_plane": "no_go",
+    "production_financial_operation": "no_go",
+    "summary": "The deterministic candidate-only control plane is ready for clean BitAgent integration and offline held evaluation. Bonsai role adapters, live MCP execution, and every financial authority surface remain blocked."
+  },
+  "evidence": {
+    "control_mesh_commit": "694b8a07fbaa7b31ff21d1436a61a2be5a1b1e5e",
+    "containment_commit": "96e5c50e515b2204d04e36e50700adba07d921a3",
+    "adapter_readiness_commit": "b40b12ed7fb29f3ab459e4a5f646be7b4dd1b664",
+    "cross_domain_commit": "aa4bb2e20cc96a2f5aff3f4d89412842a62ec44d",
+    "sidecar_commit": "67e63f096311cd891ab5beb40224180646f48f04",
+    "sidecar_receipt_commit": "efa73738c784330e679ec26fe93abf8aacb6d584",
+    "control_mesh_registration_id": "af4d4d23d888736a3200a73b87017cb2f0d6ddd867236473b659f3fdc8071042",
+    "cross_domain_registration_id": "bf3973f14198efb0778821b38e1ba94414a03ac2d2e3f77dd3eece7f702b7692",
+    "capability_fingerprint": "6b1fd73a1156011947e6fd743279a3e85e03393bb220d1dc6c402cf63d879ad6",
+    "cross_domain_records_canonical_lf_sha256": "911630bb35e7b50c7581130e41be3323f948d1bb8cbe71ce54aa77a6866cd728"
+  },
+  "observations": {
+    "launch_cells": 120,
+    "launch_final_success": 120,
+    "launch_receipt_failures": 0,
+    "adaptive_raw_success": {
+      "numerator": 23,
+      "denominator": 30
+    },
+    "adaptive_fallback_reduction_vs_ram_or_trm": 0.588,
+    "adversarial_candidates_rejected": {
+      "numerator": 14,
+      "denominator": 14
+    },
+    "valid_adversarial_controls_accepted": {
+      "numerator": 4,
+      "denominator": 4
+    },
+    "cross_domain_cells": 160,
+    "cross_domain_receipt_failures": 0,
+    "cross_domain_raw_invalid_acceptance": {
+      "numerator": 35,
+      "denominator": 35
+    },
+    "cross_domain_ldt_invalid_acceptance": {
+      "numerator": 0,
+      "denominator": 35
+    },
+    "cross_domain_distinct_recovery": {
+      "numerator": 35,
+      "denominator": 35
+    },
+    "cross_domain_identical_recovery": {
+      "numerator": 0,
+      "denominator": 35
+    },
+    "adaptive_route_accuracy": {
+      "numerator": 7,
+      "denominator": 8
+    },
+    "adaptive_post_ldt_mutations_blocked": {
+      "numerator": 8,
+      "denominator": 8
+    },
+    "adaptive_context_savings_estimate": 0.678,
+    "maximum_role_packet_estimated_tokens": 584,
+    "sidecar_focused_tests_passed": 80
+  },
+  "gates": [
+    {
+      "id": "source_provenance",
+      "status": "ready",
+      "scope": "The dirty external BitAgent checkout is read-only, commit-pinned, and protected by six critical file hashes."
+    },
+    {
+      "id": "typed_role_and_context_contracts",
+      "status": "ready",
+      "scope": "Four role contracts, deterministic host routing, bounded packets, and candidate-only output semantics are implemented."
+    },
+    {
+      "id": "node_python_sidecar",
+      "status": "ready",
+      "scope": "Owned stdio, hard line bounds, secret rejection, idempotency, evidence binding, and response-hash verification pass cross-process tests."
+    },
+    {
+      "id": "ldt_containment",
+      "status": "experimental",
+      "scope": "All registered planted attacks were contained, but the result is not a general safety or adaptive-gaming estimate."
+    },
+    {
+      "id": "distinct_recovery",
+      "status": "experimental",
+      "scope": "Deterministic attested-registry recovery restored all eligible frozen cells; live model recovery is untested."
+    },
+    {
+      "id": "ram_trm_adaptive_routing",
+      "status": "experimental",
+      "scope": "Adaptive routing reduced fallback and improved complex-task role selection, but lexical routing remains best on the narrow launch neighborhood and one cross-domain route miss remains."
+    },
+    {
+      "id": "bonsai_role_corpus",
+      "status": "blocked",
+      "scope": "83 examples are available; 717 additional reviewed examples are required to reach four 200-example role floors, including at least 152 additions to held splits."
+    },
+    {
+      "id": "bonsai_role_adapters",
+      "status": "blocked",
+      "scope": "No adapter was trained or promoted and no Bonsai weights were loaded."
+    },
+    {
+      "id": "live_mcp_execution",
+      "status": "blocked",
+      "scope": "Benchmarks use frozen deterministic task/resource simulations rather than live provider execution and outage recovery."
+    },
+    {
+      "id": "clean_bitagent_integration",
+      "status": "blocked",
+      "scope": "The ESM package is staged in Hermes Lite but has not been integrated on a clean BitAgent branch or validated by BitAgent's native policy tests."
+    },
+    {
+      "id": "production_financial_authority",
+      "status": "blocked",
+      "scope": "Approval, signing, broadcast, wallet access, and execution are intentionally absent."
+    }
+  ],
+  "next_workorder": {
+    "name": "bitagent_bonsai_role_corpus_v2",
+    "steps": [
+      "Add independently reviewed normal, stale, interrupted, rejected, routing, recovery, and mutation examples to reach 200 examples per role.",
+      "Reserve at least 20 validation and 20 test examples per role with no content or source overlap.",
+      "Reseal corpus provenance and run one role per capped QLoRA job only after the promotion corpus gate passes.",
+      "Promote adapters only after held role accuracy, tool-argument validity, recovery, zero-authority, zero-secret, and GGUF compatibility gates pass.",
+      "Rerun the frozen launch, containment, and cross-domain suites with actual Bonsai candidates before enabling the live runtime.",
+      "Integrate the sidecar package on a clean BitAgent branch and test simulation-only native fingerprint verification, process restart, timeout, load, and MCP-provider outage behavior."
+    ]
+  },
+  "claim_boundary": "This matrix supports a production-oriented deterministic integration substrate for offline and simulation evaluation. It does not establish trained-adapter efficacy, blind generalization, general safety, live MCP reliability, wallet readiness, profitable strategy, or production financial operation."
+}
