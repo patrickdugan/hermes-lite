@@ -1,0 +1,190 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://moralitylab.ai/schemas/bitagent-hermes-sidecar-v1.json",
+  "title": "BitAgent Hermes stdio sidecar v1",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/request"
+    },
+    {
+      "$ref": "#/$defs/successResponse"
+    },
+    {
+      "$ref": "#/$defs/errorResponse"
+    }
+  ],
+  "$defs": {
+    "request": {
+      "type": "object",
+      "required": [
+        "schema",
+        "request_id",
+        "operation",
+        "task_card",
+        "workflow_state"
+      ],
+      "properties": {
+        "schema": {
+          "const": "hermes.bitagent_sidecar_request.v1"
+        },
+        "request_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "operation": {
+          "enum": [
+            "packetize",
+            "validate",
+            "materialize_capability_request"
+          ]
+        },
+        "task_card": {
+          "type": "object"
+        },
+        "workflow_state": {
+          "type": "object"
+        },
+        "tool_contracts": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "current_evidence": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "replay_candidates": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "candidate": {
+          "type": "object"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "operation": {
+                "enum": [
+                  "validate",
+                  "materialize_capability_request"
+                ]
+              }
+            },
+            "required": [
+              "operation"
+            ]
+          },
+          "then": {
+            "required": [
+              "candidate"
+            ]
+          }
+        }
+      ],
+      "additionalProperties": false
+    },
+    "successResponse": {
+      "type": "object",
+      "required": [
+        "schema",
+        "request_id",
+        "operation",
+        "ok",
+        "authority",
+        "result",
+        "response_sha256"
+      ],
+      "properties": {
+        "schema": {
+          "const": "hermes.bitagent_sidecar_response.v1"
+        },
+        "request_id": {
+          "type": "string"
+        },
+        "operation": {
+          "enum": [
+            "packetize",
+            "validate",
+            "materialize_capability_request"
+          ]
+        },
+        "ok": {
+          "const": true
+        },
+        "authority": {
+          "enum": [
+            "no_effect",
+            "candidate_only_or_capability_material_no_execution"
+          ]
+        },
+        "result": {
+          "type": "object"
+        },
+        "response_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "errorResponse": {
+      "type": "object",
+      "required": [
+        "schema",
+        "request_id",
+        "operation",
+        "ok",
+        "authority",
+        "error"
+      ],
+      "properties": {
+        "schema": {
+          "const": "hermes.bitagent_sidecar_response.v1"
+        },
+        "request_id": {
+          "type": "string"
+        },
+        "operation": {
+          "type": "string"
+        },
+        "ok": {
+          "const": false
+        },
+        "authority": {
+          "const": "no_effect"
+        },
+        "error": {
+          "type": "object",
+          "required": [
+            "code",
+            "detail"
+          ],
+          "properties": {
+            "code": {
+              "enum": [
+                "contract_rejected",
+                "internal_error",
+                "invalid_json",
+                "request_id_conflict",
+                "request_too_large"
+              ]
+            },
+            "detail": {
+              "const": "Request rejected by the Hermes Lite typed boundary."
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

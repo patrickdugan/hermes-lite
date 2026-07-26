@@ -1,0 +1,65 @@
+{
+  "schema": "hermes.bitagent_sidecar_result.v1",
+  "study_id": "bitagent_hermes_paired_sidecar_v1",
+  "sealed_at_utc": "2026-07-26T19:31:31.4785697Z",
+  "hermes_base_commit": "aa4bb2e20cc96a2f5aff3f4d89412842a62ec44d",
+  "bitagent_source": {
+    "path": "C:/projects/BitAgent/BitAgent/tradelayer-thorchain-starter/tradelayer-thorchain-starter",
+    "commit": "ad578df3fa1f1e337b631f898613987594151439",
+    "read_only_integration": true,
+    "dirty_worktree_observed": true,
+    "critical_file_sha256": {
+      "eval/agent-cases.ts": "d1e1ac7a589a0367cc38afc47db8cb330b8b40ae25a6c02d685d42a748c84284",
+      "eval/harness.ts": "8fa4efe83043388e4d16648ee409ceb9f224e062631db429092a84ff03010646",
+      "package.json": "3396c86b7872e939473e8a8f1e050c24b7420ccb6bc19a9cf30044d2650f59c5",
+      "src/sovereign/capabilities.ts": "eed87258478f2e748a098db98cef4259e086e60001d0bc9c8e55e3a7b129107a",
+      "src/sovereign/types.ts": "e0790723877bb1513976bec6cf6b83d0fcc9749fdcac19a5814e0c4e2f4adb36",
+      "src/survival/policy.ts": "75672f54d767d71aaac58a98274c0fffb13ad74e62421159894a5f3f1224d583"
+    }
+  },
+  "transport": {
+    "kind": "owned_child_stdio_jsonl",
+    "max_line_bytes": 1048576,
+    "idempotency_entries": 256,
+    "operations": [
+      "packetize",
+      "validate",
+      "materialize_capability_request"
+    ],
+    "shell": false,
+    "authority": [
+      "no_effect",
+      "candidate_only_or_capability_material_no_execution"
+    ]
+  },
+  "artifact_canonical_lf_sha256": {
+    "configs/bitagent_hermes_sidecar_v1.json": "90917eac0d4146092a384006d73fb5e7f7c1ed7b15c41ff5f31b222ddbe667a9",
+    "contracts/bitagent_hermes_sidecar_v1.schema.json": "43c7e0470d5dc346aab3af29b5c1aa47d53e26bfd0d84726df85b24c085e8d4a",
+    "src/agent/bitagent_sidecar_v1.py": "45f6261329f8f73788bd1092adf66307dc39cd99c07fc5789289075dc12e62cd",
+    "integrations/bitagent/hermes-role-mesh-sidecar.mjs": "c0349ac28c4f243374dd99c89bf8be23fc8cdfa80fc0afe846e6f05ffdee9a5d",
+    "integrations/bitagent/hermes-role-mesh-sidecar.d.ts": "b053564ac1a0bcdd29905ebcc867b95c76bc714672d8e17a6c294885416eac07",
+    "tests/agent/test_bitagent_sidecar_v1.py": "e0fb2fe230ca7ce45b919f3bfab20ee94b9ba90e68763faac4a2193926139a2a",
+    "tests/node/bitagent_hermes_stdio_sidecar.test.mjs": "6de56fef8ab3a9042c7001650c553de81e6d4a7c798f131e429ab6dff42f12e4"
+  },
+  "verification": {
+    "command": "PYTHONPATH=src python -m pytest tests/agent -k bitagent -q",
+    "passed": 79,
+    "failed": 0,
+    "deselected": 450,
+    "wall_seconds": 10.56,
+    "cross_process_node_roundtrip": "passed",
+    "preflight_status": "ready_deterministic_sidecar",
+    "weight_loading_started": false,
+    "live_adapter_runtime_status": "adapter_artifacts_not_trained"
+  },
+  "controls": {
+    "oversized_input_rejected_and_stream_recovered": true,
+    "secret_input_rejected_without_echo": true,
+    "identical_request_replayed": true,
+    "request_id_collision_rejected": true,
+    "post_binding_evidence_mutation_rejected": true,
+    "response_hash_recomputed_by_node": true,
+    "approval_signing_broadcast_execution_enabled": false
+  },
+  "claim_scope": "The result establishes a deterministic, typed, candidate-only cross-process integration boundary between a Node host and Hermes Lite. It does not establish trained-adapter efficacy, live model readiness, wallet integration, profitable strategy, or production financial operation."
+}
