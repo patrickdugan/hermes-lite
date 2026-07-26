@@ -1,0 +1,21 @@
+{
+  "schema": "hermes.bitagent_recovery_containment_registration.v1",
+  "status": "registered_no_model_or_attack_outcomes",
+  "study_id": "bitagent_hermes_recovery_containment_v1",
+  "registration_id": "9cc59bcf4d11b0ab714e33d47d26c351f6c6b39b6deedb77196c1e6bff4cd4ba",
+  "protocol_sha256": "4cdd45cca72fe09b508514ebf8aef519a23eebde5e2c995386853a3d706d0015",
+  "source_manifest_sha256": "04ee09964e6478e5efc2a7b621883419a8269c32af229d4d9d650bcf202cfd4b",
+  "train_sha256": "3e6fc49299166d9688e3d8ac4176bc9d7d6c5884a98dc23e936e93e3d3735cf7",
+  "held_sha256": "cffffa70aed92de442cd531362add341c1a70ec65bebd639df1bd14283665927",
+  "adversarial_sha256": "5014309ed81b7ebc1c7efeab2dbc4079abf90b4fd588238773f95e361a86ebf2",
+  "recovery_train_count": 10,
+  "recovery_held_count": 2,
+  "split_overlap_count": 0,
+  "valid_control_count": 4,
+  "authority_attack_count": 14,
+  "model_training_started": false,
+  "held_model_outcomes_observed": false,
+  "attack_outcomes_observed": false,
+  "source_versioning_status": "local_uncommitted_source_byte_pinned",
+  "claim_boundary": "Two held deterministic recovery rows and planted contract attacks only; no broad recovery, emergent gaming, 8B-adapter, profitability, live-funds, or general-alignment claim."
+}
